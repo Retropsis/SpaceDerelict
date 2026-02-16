@@ -274,6 +274,7 @@ public:
 	virtual void Manifest() override;
 	void OnSpawn(APlayerController* PC);
 	ARoomActor* SpawnRoomActor(UObject* Outer) const;
+	ARoomActor* GetRoomActor() const { return RoomActor.Get(); }
 	FGameplayTag GetRoomType() const { return RoomType; }
 	void SetSpawnedRoomActor(ARoomActor* Room);
 	TMap<FIntPoint, FName> GetSockets() const { return Sockets; }
@@ -284,7 +285,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<ARoomActor> RoomActorClass = nullptr;
 
-	TWeakObjectPtr<ARoomActor> RoomActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<ARoomActor> RoomActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TMap<FIntPoint, FName> Sockets;
@@ -325,8 +327,12 @@ struct FValuableFragment : public FItemFragment
 	
 public:
 	TMap<UTexture2D*, int32> GetValuables() const { return Valuables; };
+	TArray<TSubclassOf<AActor>> GetValuableItems() const { return ValuableItems; };
 	
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TMap<UTexture2D*, int32> Valuables;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TArray<TSubclassOf<AActor>> ValuableItems;
 };

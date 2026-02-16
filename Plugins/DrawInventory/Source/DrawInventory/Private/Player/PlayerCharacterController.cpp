@@ -15,12 +15,14 @@ APlayerCharacterController::APlayerCharacterController()
 	PrimaryActorTick.bCanEverTick = true;
 	TraceLength = 500.0;
 	InteractionTraceChannel = ECC_GameTraceChannel2;
+	AO_Pitch = 0.f;
 }
 
 void APlayerCharacterController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	TraceForItem();
+	CalculateAOPitch();
 }
 
 void APlayerCharacterController::BeginPlay()
@@ -34,6 +36,20 @@ void APlayerCharacterController::BeginPlay()
 	InventoryComponent = FindComponentByClass<UInventoryComponent>();
 	DrawComponent = FindComponentByClass<UDrawComponent>();
 	CreateHUDWidget();
+	
+	SetTimerPlayerPositionUpdate();
+}
+
+void APlayerCharacterController::SetTimerPlayerPositionUpdate() const
+{
+	FTimerHandle PositionUpdateTimer;
+	GetWorld()->GetTimerManager().SetTimer(PositionUpdateTimer, [this] ()
+	{
+		const APawn* Pawn = GetPawn();
+		const FVector2D Location = FVector2D(Pawn->GetActorLocation().X, Pawn->GetActorLocation().Y);
+		const float Angle = Pawn->GetActorRotation().Yaw;
+		OnPlayerPositionUpdated.Broadcast(Location, Angle);
+	}, .2f, true);
 }
 
 void APlayerCharacterController::SetupInputComponent()
@@ -48,7 +64,7 @@ void APlayerCharacterController::SetupInputComponent()
 void APlayerCharacterController::PrimaryInteract()
 {
 	if (!ThisActor.IsValid()) return;
-
+	
 	UItemComponent* ItemComponent = ThisActor->FindComponentByClass<UItemComponent>();
 	if (IsValid(ItemComponent) && InventoryComponent.IsValid())
 	{
@@ -58,7 +74,8 @@ void APlayerCharacterController::PrimaryInteract()
 	
 	UDoorComponent* DoorComponent = ThisActor->FindComponentByClass<UDoorComponent>();
 	if (!IsValid(DoorComponent) || !DrawComponent.IsValid()) return;
-
+	
+	if (InventoryComponent->IsMenuOpen()) InventoryComponent->ToggleInventoryMenu();
 	DrawComponent->TryDrawing(DoorComponent);
 }
 
@@ -86,6 +103,20 @@ void APlayerCharacterController::ToggleInventory()
 	else
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+}
+
+void APlayerCharacterController::CalculateAOPitch()
+{
+	if (!IsValid(GetPawn())) return;
+	
+	AO_Pitch = GetPawn()->GetBaseAimRotation().Pitch;
+	if(AO_Pitch > 90.f && !GetPawn()->IsLocallyControlled())
+	{
+		// Mapping pitch from [270, 360) to [-90, 0)
+		const FVector2D InRange(270.f, 360.f);
+		const FVector2D OutRange(-90.f, 0.f);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
 }
 
@@ -126,9 +157,4 @@ void APlayerCharacterController::TraceForItem()
 	{
 		
 	}
-}
-
-void APlayerCharacterController::ToggleDrawingBoard()
-{
-	
 }

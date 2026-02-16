@@ -4,12 +4,14 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/Image.h"
 #include "DrawManagement/Component/DrawComponent.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Item/InventoryItem.h"
 #include "Item/Fragment/FragmentTags.h"
 #include "Item/Fragment/ItemFragment.h"
+#include "Player/PlayerCharacterController.h"
 #include "Widget/DrawInventory/GridSlot/RoomGridSlot.h"
 #include "Widget/DrawInventory/SlottedRoom/SlottedRoom.h"
 #include "Widget/Utiliies/WidgetUtiliies.h"
@@ -21,11 +23,19 @@ void UDrawingGrid::NativeOnInitialized()
 	DrawComponent->OnRoomAdded.AddDynamic(this, &ThisClass::AddRoom);
 	DrawComponent->OnRoomHovered.AddDynamic(this, &ThisClass::AddRoom);
 	DrawComponent->OnRoomUnhovered.AddDynamic(this, &ThisClass::RemoveRoom);
+
+	if (APlayerCharacterController* PC = Cast<APlayerCharacterController>(GetOwningPlayer()))
+	{
+		PC->OnPlayerPositionUpdated.AddDynamic(this, &ThisClass::OnPlayerPositionUpdate);
+	}
 	
 	Rows = DrawComponent->GetRows();
 	Columns = DrawComponent->GetColumns();
 	TileSize = DrawComponent->GetTileSize();
+	RoomSize = DrawComponent->GetRoomSize();
 	ConstructGrid();
+
+	Image_PlayerCursor->SetColorAndOpacity(PlayerColor);
 }
 
 void UDrawingGrid::ConstructGrid()
@@ -76,7 +86,11 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 		else if (IsDestinationAvailable(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw))
 		{
 			Availability.DoorState = EDoorState::Opened;
-			// Broadcast to open door at ShiftedCoordinates
+			DrawComponent->Server_OpenConnectedDoor(Availability.DestinationIndex, Availability.Socket);
+			// if (SlottedRooms.Contains(Availability.DestinationIndex) && IsValid(SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()))
+			// {
+			// 	DrawComponent->Server_OpenConnectedDoor(SlottedRooms[Availability.DestinationIndex]->GetInventoryItem(), Availability.Socket);
+			// }
 			continue;
 		}
 		
@@ -90,11 +104,14 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 			Availability.DoorState = EDoorState::Sealed;
 		}
 		
-		// UE_LOG(LogTemp, Warning, TEXT("RoomIndex %d with DestinationIndex %d and Yaw %d"), RoomIndex, Availability.DestinationIndex, RoomYaw);
-		if (RoomIndex == Availability.DestinationIndex) continue;
+		UE_LOG(LogTemp, Warning, TEXT("From room index %d to destination index %d, Yaw %d, ShiftedOffset %s, Socket %s"),
+			RoomIndex,
+			Availability.DestinationIndex,
+			RoomYaw,
+			*ShiftedOffset.ToString(),
+			*Availability.Socket.ToString());
 		
-		// UE_LOG(LogTemp, Warning, TEXT("Found destination index %d with ShiftedOffset %s"), Availability.DestinationIndex, *ShiftedOffset.ToString());
-		// UE_LOG(LogTemp, Warning, TEXT("Found destination index %d with Socket %s"), Availability.DestinationIndex, *Availability.Socket.ToString());
+		if (RoomIndex == Availability.DestinationIndex) continue;
 		
 		Result.DestinationAvailabilities.Add(Availability);
 	}	
@@ -146,13 +163,11 @@ void UDrawingGrid::AddRoom(UInventoryItem* Item, int32 Index)
 	
 	AddRoomAtIndex(Item, Index);
 	UpdateGridSlots(Item, Index);
-	UE_LOG(LogTemp, Warning, TEXT("AddRoom"));
 }
 
 void UDrawingGrid::RemoveRoom(UInventoryItem* Item, int32 Index)
 {
 	RemoveRoomFromGrid(Item, Index);
-	UE_LOG(LogTemp, Warning, TEXT("RemoveRoom"));
 }
 
 void UDrawingGrid::AddRoomAtIndex(UInventoryItem* Item, const int32 Index)
@@ -245,6 +260,9 @@ void UDrawingGrid::SetSlottedImage(const USlottedRoom* SlottedRoom, const FGridF
 void UDrawingGrid::AddSlottedRoomToCanvas(const int32 Index, const FGridFragment* GridFragment, USlottedRoom* SlottedRoom) const
 {
 	CanvasPanel->AddChild(SlottedRoom);
+	FVector2D CanvasSize = CanvasPanel->GetDesiredSize();
+	// GEngine->AddOnScreenDebugMessage(4557, 90.f, FColor::Cyan, FString::Printf(TEXT("CanvasSize: %f / %f"), CanvasSize.X, CanvasSize.Y));
+	
 	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(SlottedRoom);
 	CanvasSlot->SetSize(GetDrawSize(GridFragment));
 	// const FVector2D DrawPosition = UWidgetUtiliies::GetPositionFromIndex(Index, Columns) * TileSize;
@@ -252,6 +270,17 @@ void UDrawingGrid::AddSlottedRoomToCanvas(const int32 Index, const FGridFragment
 	const FVector2D DrawPosition = UWidgetUtiliies::GetPositionFromIndex(Index, Columns);
 	const FVector2D DrawPositionWithPadding = FVector2D(DrawPosition.X * TileSize, (Columns - DrawPosition.Y) * TileSize);
 	CanvasSlot->SetPosition(DrawPositionWithPadding);
+}
+
+void UDrawingGrid::OnPlayerPositionUpdate(const FVector2D& Location, const float Angle)
+{
+	UCanvasPanelSlot* CanvasSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Image_PlayerCursor);
+	const float PlayerX = Location.X / RoomSize * TileSize + TileSize / 2.f;
+	const float PlayerY = Columns * TileSize + Location.Y / RoomSize * TileSize + TileSize / 2.f;
+	const FVector2D DrawPosition = FVector2D(PlayerX, PlayerY);
+	CanvasSlot->SetPosition(DrawPosition);
+	
+	Image_PlayerCursor->SetRenderTransformAngle(Angle + 90.f);
 }
 
 FVector2D UDrawingGrid::GetDrawSize(const FGridFragment* GridFragment) const

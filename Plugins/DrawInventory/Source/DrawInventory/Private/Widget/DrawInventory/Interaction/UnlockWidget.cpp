@@ -14,10 +14,10 @@ void UUnlockWidget::NativeOnInitialized()
 void UUnlockWidget::OnUnlockButtonClicked()
 {
 	UnlockButtonClicked.Broadcast();
-	RemoveFromParent();
+	SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UUnlockWidget::OnCancelButtonClicked()
 {
-	RemoveFromParent();
+	SetVisibility(ESlateVisibility::Collapsed);
 }

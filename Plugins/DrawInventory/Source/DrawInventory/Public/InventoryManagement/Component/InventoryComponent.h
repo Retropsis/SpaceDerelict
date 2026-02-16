@@ -11,6 +11,7 @@ class UItemComponent;
 class UInventoryItem;
 class UInventoryBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FConstructInventory);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChange, UInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNoItemOfTypeInInventory, const FName&, ItemName);
@@ -58,6 +59,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="Inventory")
 	void TryAddItem(UItemComponent* ItemComponent);
 	
+	FConstructInventory OnConstructInventory;
 	FInventoryItemChange OnItemAdded;
 	FInventoryItemChange OnItemRemoved;
 	FNoRoomInInventory NoRoomInInventory;

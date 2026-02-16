@@ -34,7 +34,7 @@ public:
 	void AddRepSubObj(UObject* SubObj);
 	void ToggleDrawingBoard();
 	void InitializeFromRoomData();
-	void BuildPresetRooms() const;
+	void BuildPresetRooms();
 	void BuildRoomPool();
 	ARoomActor* SpawnRoomActor(FRoomFragment* RoomFragment) const;
 	void TryDrawing(UDoorComponent* DoorComponent);
@@ -56,6 +56,9 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_DrawnRoomSlotClicked(UInventoryItem* RoomToSpawn);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_OpenConnectedDoor(int32 Index, const FName& Socket);
 	
 	// UFUNCTION(Server, Reliable)
 	// void Server_AddNewItem(UItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
@@ -83,6 +86,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UFUNCTION()
+	void InitializeDrawComponent();
+	
 	void ConstructDrawingBoard();
 	void ConstructUnlockWidget();
 	void DrawRooms();
@@ -100,6 +106,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDrawingBoard> DrawingBoard;
 
+	UPROPERTY()
+	TMap<int32, TObjectPtr<ARoomActor>> SpawnedRooms; 
+
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UUnlockWidget> UnlockWidgetClass;
 
@@ -109,6 +118,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<URoomData> RoomData;
 
+	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	TArray<TObjectPtr<URoomAsset>> RoomPool;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")

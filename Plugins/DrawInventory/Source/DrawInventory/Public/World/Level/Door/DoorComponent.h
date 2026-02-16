@@ -16,6 +16,8 @@ public:
 	UDoorComponent();
 	void ToggleDoor(bool bOpen);
 	bool IsLocked() const { return DoorState == EDoorState::Locked; }
+	void Unlock();
+	void SwitchDoorState(const EDoorState NewState);
 	void SetDoorState(const EDoorState NewState) { DoorState = NewState; }
 	bool IsSealed() const { return DoorState == EDoorState::Sealed; }
 	void SetRoomIndex(int32 Index) { RoomIndex = Index; }

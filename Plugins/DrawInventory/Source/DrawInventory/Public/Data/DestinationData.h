@@ -2,7 +2,7 @@
 
 #include "DestinationData.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EDoorState : uint8
 {
 	Opened,

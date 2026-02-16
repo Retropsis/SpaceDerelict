@@ -26,6 +26,7 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	ConstructInventory();
+	OnConstructInventory.Broadcast();
 }
 
 void UInventoryComponent::ConstructInventory()

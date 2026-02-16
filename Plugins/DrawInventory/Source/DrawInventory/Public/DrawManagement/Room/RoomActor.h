@@ -21,6 +21,8 @@ public:
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
 	void SetRoomType(const FGameplayTag& Type) { RoomType = Type; }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
+	UDoorComponent* GetDoorComponentBySocket(const FName& Socket);
+	TArray<FTransform> GetAvailableSpawnerTransforms() const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
@@ -30,6 +32,9 @@ private:
 	TSubclassOf<AActor> DoorClass;
 
 	TMap<FName, FIntPoint> DestinationOffsets;
+
+	UPROPERTY()
+	TMap<FName, TObjectPtr<UDoorComponent>> DoorComponentToSockets;
 	
 	FGameplayTag RoomType = FGameplayTag::EmptyTag;
 };

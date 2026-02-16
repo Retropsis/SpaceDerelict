@@ -20,6 +20,26 @@ void UDoorComponent::ToggleDoor(const bool bOpen)
 	if (bOpen) DestroyComponent();
 }
 
+void UDoorComponent::Unlock()
+{
+	DoorState = EDoorState::Opened;
+	ADoor* Door = Cast<ADoor>(GetOwner());
+	if (IsValid(Door))
+	{
+		Door->SwitchDoorState(DoorState);
+	}
+}
+
+void UDoorComponent::SwitchDoorState(const EDoorState NewState)
+{
+	DoorState = NewState;
+	ADoor* Door = Cast<ADoor>(GetOwner());
+	if (IsValid(Door))
+	{
+		Door->SwitchDoorState(DoorState);
+	}
+}
+
 void UDoorComponent::SetInteractionMessageToLocked()
 {
 	InteractionMessage = FString("E - Unlock Door");

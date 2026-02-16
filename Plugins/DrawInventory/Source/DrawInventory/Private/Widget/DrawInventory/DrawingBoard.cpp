@@ -77,6 +77,11 @@ void UDrawingBoard::OnDrawnRoomSlotClicked(UDrawnRoomSlot* DrawnRoomSlot)
 	}
 	
 	check(DrawComponent.IsValid());
+	UInventoryItem* Item = DrawnRoomSlot->GetInventoryItem().Get();
+	if (!IsValid(Item))
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnDrawnRoomSlotClicked: Item is invalid"));
+	}
 	DrawComponent->Server_DrawnRoomSlotClicked(DrawnRoomSlot->GetInventoryItem().Get());
 }
 

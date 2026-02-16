@@ -44,12 +44,17 @@ void UDrawComponent::BeginPlay()
 	Super::BeginPlay();
 
 	InventoryComponent = UInventoryUtility::GetInventoryComponent(Cast<APlayerController>(GetOwner()));
-
+	InventoryComponent->OnConstructInventory.AddDynamic(this, &ThisClass::InitializeDrawComponent);
+	
 	InitializeFromRoomData();
 	ConstructDrawingBoard();
 	ConstructUnlockWidget();
-	BuildPresetRooms();
 	BuildRoomPool();
+}
+
+void UDrawComponent::InitializeDrawComponent()
+{
+	BuildPresetRooms();
 }
 
 void UDrawComponent::InitializeFromRoomData()
@@ -63,7 +68,7 @@ void UDrawComponent::InitializeFromRoomData()
 	LockedDoorChance = RoomData->LockedDoorChance;
 }
 
-void UDrawComponent::BuildPresetRooms() const
+void UDrawComponent::BuildPresetRooms()
 {
 	for (const TTuple<FIntPoint, URoomAsset*>& PresetRoom : RoomData->PresetRooms)
 	{
@@ -81,6 +86,8 @@ void UDrawComponent::BuildPresetRooms() const
 		Result.DestinationYaw = 0;
 		
 		RoomActor->ConstructDoors(Result);
+		RoomFragment->SetSpawnedRoomActor(RoomActor);
+		SpawnedRooms.Add(CurrentRoomIndex, RoomActor);
 		FItemManifest Manifest = PresetRoom.Value->RoomManifest;
 		OnRoomAdded.Broadcast(Manifest.Manifest(OwningController.Get()), CurrentRoomIndex);
 	}
@@ -162,10 +169,51 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
 	RoomActor->ConstructDestinationOffsets();
 	RoomActor->ConstructDoors(Result);
+	RoomFragment->SetSpawnedRoomActor(RoomActor);
+	SpawnedRooms.Add(RoomIndex, RoomActor);
+	
+	const FValuableFragment* ValuableFragment = RoomToSpawn->GetItemManifest().GetFragmentOfType<FValuableFragment>();
+	if (ValuableFragment)
+	{
+		TArray<FTransform> SpawnerTransforms = RoomActor->GetAvailableSpawnerTransforms();
+		TArray<TSubclassOf<AActor>> ItemToSpawns = ValuableFragment->GetValuableItems();
+		for (int32 i = 0; i < SpawnerTransforms.Num(); ++i)
+		{
+			TSubclassOf<AActor> ItemToSpawn = ItemToSpawns.IsValidIndex(i) ? ItemToSpawns[i] : nullptr;
+			if (!IsValid(ItemToSpawn) || !SpawnerTransforms.IsValidIndex(i)) continue;
+			GetWorld()->SpawnActor<AActor>(ItemToSpawn, SpawnerTransforms[i]);
+		}
+	}
 
 	OnRoomAdded.Broadcast(RoomToSpawn, DestinationIndex);
 	InteractingDoorComponent->ToggleDoor(true);
 	CloseDrawingBoard();
+}
+
+void UDrawComponent::Server_OpenConnectedDoor_Implementation(int32 Index, const FName& Socket)
+{
+	// if (!IsValid(Room))
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: Room is invalid"));
+	// 	return;
+	// }
+	// const FRoomFragment* RoomFragment = Room->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+	// if (!RoomFragment || RoomFragment->GetRoomActor())
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: RoomFragment is invalid"));
+	// 	return;
+	// }
+	if (SpawnedRooms.Contains(Index) && IsValid(SpawnedRooms[Index]))
+	{
+		UDoorComponent* DoorComponent = SpawnedRooms[Index]->GetDoorComponentBySocket(Socket);
+		if (!IsValid(DoorComponent))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: DoorComponent is invalid"));
+			return;
+		}
+		DoorComponent->SwitchDoorState(EDoorState::Opened);
+		DoorComponent->ToggleDoor(true);
+	}
 }
 
 void UDrawComponent::DetermineLockedDoors(FDestinationAvailabilityResult& Result) const
@@ -174,6 +222,8 @@ void UDrawComponent::DetermineLockedDoors(FDestinationAvailabilityResult& Result
 	
 	for (FDestinationAvailability& Availability : Result.DestinationAvailabilities)
 	{
+		if (Availability.DoorState == EDoorState::Sealed) continue;
+		
 		const float Chance = FMath::FRandRange(0.f, 100.f);
 		UE_LOG(LogTemp, Warning, TEXT("Rolled a %f  and chance is %f"), Chance, LockedDoorChance);
 		if (Chance <= LockedDoorChance)
@@ -220,7 +270,8 @@ void UDrawComponent::OnItemConsume(const FGameplayTag& ItemType, int32 Amount)
 void UDrawComponent::OnKeyConsume()
 {
 	OnItemConsume(Item::Currency::Key, 1);
-	
+
+	InteractingDoorComponent->Unlock();
 	ToggleDrawingBoard();
 	DrawRooms();
 }
@@ -250,12 +301,13 @@ void UDrawComponent::DrawRooms()
 	{
 		const int32 Selection = FMath::RandRange(0, RoomPool.Num() - 1);
 		// if (!IsValid(DEBUG_RoomPool[Selection])) continue;
-
-		// RoomsToDraw.Add(RoomPool[Selection]->RoomManifest.Manifest(OwningController.Get()));
-		const int32 DEBUG_Selection = FMath::RandRange(0, DEBUG_RoomPool.Num() - 1);
-		FItemManifest Manifest = DEBUG_RoomPool[DEBUG_Selection];
-		
+		FItemManifest Manifest = RoomPool[Selection]->RoomManifest;
 		RoomsToDraw.Add(Manifest.Manifest(OwningController.Get()));
+
+		// const int32 DEBUG_Selection = FMath::RandRange(0, DEBUG_RoomPool.Num() - 1);
+		// FItemManifest Manifest = DEBUG_RoomPool[DEBUG_Selection];
+		// RoomsToDraw.Add(Manifest.Manifest(OwningController.Get()));
+		
 		RoomPool.RemoveAt(Selection);
 		RoomPool.Shrink();
 	}
@@ -296,6 +348,7 @@ void UDrawComponent::OpenDrawingBoard()
 	FInputModeUIOnly InputMode;
 	OwningController->SetInputMode(InputMode);
 	OwningController->SetShowMouseCursor(true);
+	OwningController->FlushPressedKeys();
 }
 
 void UDrawComponent::CloseDrawingBoard()
@@ -324,6 +377,7 @@ void UDrawComponent::OpenUnlockWidget()
 	FInputModeUIOnly InputMode;
 	OwningController->SetInputMode(InputMode);
 	OwningController->SetShowMouseCursor(true);
+	OwningController->FlushPressedKeys();
 }
 
 void UDrawComponent::CloseUnlockWidget()

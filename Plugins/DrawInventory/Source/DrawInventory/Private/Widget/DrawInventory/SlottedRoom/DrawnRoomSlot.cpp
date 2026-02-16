@@ -13,6 +13,7 @@
 FReply UDrawnRoomSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	OnDrawnRoomSlotClicked.Broadcast(this);
+	UE_LOG(LogTemp, Warning, TEXT("OnDrawnRoomSlot::NativeOnMouseButtonDown"));
 	return FReply::Handled();
 }
 
@@ -81,6 +82,10 @@ void UDrawnRoomSlot::SetValuable(const TMap<UTexture2D*, int32>& Valuables) cons
 
 void UDrawnRoomSlot::SetInventoryItem(UInventoryItem* Item)
 {
+	if (!IsValid(Item))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UDrawnRoomSlot::SetInventoryItem: Item is invalid"));
+	}
 	InventoryItem = Item;
 }
 

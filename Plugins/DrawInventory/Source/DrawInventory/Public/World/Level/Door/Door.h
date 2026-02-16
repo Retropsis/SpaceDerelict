@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
+enum class EDoorState : uint8;
+
 UCLASS()
 class DRAWINVENTORY_API ADoor : public AActor
 {
@@ -16,4 +18,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleDoor(bool bOpen);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwitchDoorState(EDoorState DoorState);
 };

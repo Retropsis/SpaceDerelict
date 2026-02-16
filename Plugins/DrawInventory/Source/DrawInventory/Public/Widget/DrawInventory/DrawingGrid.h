@@ -8,6 +8,7 @@
 #include "Data/GridTypes.h"
 #include "DrawingGrid.generated.h"
 
+class UImage;
 struct FItemManifest;
 struct FImageFragment;
 struct FGridFragment;
@@ -69,6 +70,8 @@ private:
 	FIntPoint GetItemDimensions(const FItemManifest& ItemManifest) const;
 	bool IsDestinationAvailable(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, int32 Yaw) const;
 
+	UFUNCTION()
+	void OnPlayerPositionUpdate(const FVector2D& Location, const float Angle);
 	
 	// bool IsUpperLeftSlot(const UInventoryGridSlot* GridSlot, const UInventoryGridSlot* SubGridSlot) const;
 	// bool DoesItemTypeMatch(const UInventoryItem* SubItem, const FGameplayTag& ItemType) const;
@@ -99,9 +102,16 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<USlottedRoom> SlottedRoomClass;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_PlayerCursor;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	FLinearColor PlayerColor;
 	
 	int32 Rows;
 	int32 Columns;
 	float TileSize;
+	float RoomSize;
 };
 
