@@ -25,6 +25,7 @@ void UInventoryGrid::NativeOnInitialized()
 	InventoryComponent->OnItemAdded.AddDynamic(this, &ThisClass::AddItem);
 	InventoryComponent->OnStackChange.AddDynamic(this, &ThisClass::AddStacks);
 	InventoryComponent->OnInventoryMenuToggled.AddDynamic(this, &ThisClass::OnInventoryMenuToggled);
+	InventoryComponent->OnItemStackChange.AddDynamic(this, &ThisClass::OnItemStackChange);
 }
 
 void UInventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -453,6 +454,34 @@ void UInventoryGrid::OnInventoryMenuToggled(bool bOpen)
 	}
 }
 
+void UInventoryGrid::OnItemStackChange(const FGameplayTag& ItemType, int32 Amount)
+{
+	TObjectPtr<UInventoryGridSlot>* FoundSlot = GridSlots.FindByPredicate([ItemType] (const UInventoryGridSlot* GridSlot)
+	{
+		if (IsValid(GridSlot->GetInventoryItem().Get()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item of Type %s"), *GridSlot->GetInventoryItem()->GetItemManifest().GetItemType().ToString());
+		}
+		return IsValid(GridSlot->GetInventoryItem().Get()) && GridSlot->GetInventoryItem()->GetItemManifest().GetItemType().MatchesTagExact(ItemType);
+	});
+	if (!FoundSlot) return;
+	
+	UInventoryItem* FoundItem = FoundSlot->Get()->GetInventoryItem().Get();
+	if (!IsValid(FoundItem)) return;
+	
+	const int32 UpperLeftIndex = GridSlots[FoundSlot->Get()->GetTileIndex()]->GetUpperLeftIndex();
+	UInventoryGridSlot* UpperLeftGridSlot = GridSlots[UpperLeftIndex];
+	const int32 NewStackCount = UpperLeftGridSlot->GetStackCount() - Amount;
+	
+	UpperLeftGridSlot->SetStackCount(NewStackCount);
+	SlottedItems.FindChecked(UpperLeftIndex)->UpdateStackCount(NewStackCount);
+	
+	if (NewStackCount <= 0)
+	{
+		RemoveItemFromGrid(FoundItem, FoundSlot->Get()->GetTileIndex());
+	}
+}
+
 void UInventoryGrid::DropItem()
 {
 	if (!IsValid(HoverItem)) return;
@@ -559,7 +588,7 @@ void UInventoryGrid::AssignHoverItem(UInventoryItem* InventoryItem, const int32 
 	HoverItem->UpdateStackCount(InventoryItem->IsStackable() ? GridSlots[GridIndex]->GetStackCount() : 0);
 }
 
-void UInventoryGrid::RemoveItemFromGrid(UInventoryItem* InventoryItem, const int32 GridIndex)
+void UInventoryGrid::RemoveItemFromGrid(const UInventoryItem* InventoryItem, const int32 GridIndex)
 {
 	const FGridFragment* GridFragment = GetFragment<FGridFragment>(InventoryItem, Fragment::Grid);
 	if (!GridFragment) return;
@@ -847,9 +876,9 @@ void UInventoryGrid::ConstructGrid()
 			GridCPS->SetPosition(TilePosition * TileSize);
 			
 			GridSlots.Add(GridSlot);
-			GridSlot->GridSlotClicked.AddDynamic(this, &ThisClass::UInventoryGrid::OnGridSlotClicked);
-			GridSlot->GridSlotHovered.AddDynamic(this, &ThisClass::UInventoryGrid::OnGridSlotHovered);
-			GridSlot->GridSlotUnhovered.AddDynamic(this, &ThisClass::UInventoryGrid::OnGridSlotUnhovered);
+			GridSlot->GridSlotClicked.AddDynamic(this, &ThisClass::OnGridSlotClicked);
+			GridSlot->GridSlotHovered.AddDynamic(this, &ThisClass::OnGridSlotHovered);
+			GridSlot->GridSlotUnhovered.AddDynamic(this, &ThisClass::OnGridSlotUnhovered);
 		}
 	}
 }

@@ -15,6 +15,10 @@ namespace Fragment
 	UE_DEFINE_GAMEPLAY_TAG(FlavorText, "Fragment.FlavorText");
 	UE_DEFINE_GAMEPLAY_TAG(SellValue, "Fragment.SellValue");
 	UE_DEFINE_GAMEPLAY_TAG(RequiredLevel, "Fragment.RequiredLevel");
+	
+	UE_DEFINE_GAMEPLAY_TAG(Room, "Fragment.Room");
+	UE_DEFINE_GAMEPLAY_TAG(Requirement, "Fragment.Requirement");
+	UE_DEFINE_GAMEPLAY_TAG(Valuable, "Fragment.Valuable");
 
 	namespace AttributeModifier
 	{

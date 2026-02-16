@@ -7,6 +7,9 @@ class UInventoryItem;
 UENUM(BlueprintType)
 enum class EGridCategory : uint8
 {
+	Equippable,
+	Consumable,
+	Craftable,
 	Item,
 	Room,
 	None

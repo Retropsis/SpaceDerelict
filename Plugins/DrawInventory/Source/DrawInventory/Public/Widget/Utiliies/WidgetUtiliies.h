@@ -17,6 +17,7 @@ class DRAWINVENTORY_API UWidgetUtiliies : public UBlueprintFunctionLibrary
 
 public:
 	static int32 GetIndexFromPosition(const FIntPoint& Position, const int32 Columns);
+	static int32 GetIndexFromPositionNoWrap(const FIntPoint& Position, const int32 Columns, const int32 Rows);
 	static FIntPoint GetPositionFromIndex(const int32 Index, const int32 Columns);
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")

@@ -1,6 +1,7 @@
 
 #include "Item/Fragment/ItemFragment.h"
 
+#include "DrawManagement/Room/RoomActor.h"
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "Widget/Composite/CompositeBase.h"
 #include "Widget/Composite/Leaf_Image.h"
@@ -202,4 +203,49 @@ void FEquipmentFragment::DestroyAttachedActor() const
 void FEquipmentFragment::SetEquippedActor(AEquipActor* EquipActor)
 {
 	EquippedActor = EquipActor;
+}
+
+void FRoomFragment::Assimilate(UCompositeBase* Composite) const
+{
+	FInventoryItemFragment::Assimilate(Composite);
+	// for (const auto& Modifier : EquipmentModifiers)
+	// {
+	// 	const auto& ModRef = Modifier.Get();
+	// 	ModRef.Assimilate(Composite);
+	// }
+}
+
+void FRoomFragment::Manifest()
+{
+	FInventoryItemFragment::Manifest();
+	// for (auto& Modifier : EquipmentModifiers)
+	// {
+	// 	auto& ModRef = Modifier.GetMutable();
+	// 	ModRef.Manifest();
+	// }
+}
+
+void FRoomFragment::OnSpawn(APlayerController* PC)
+{
+	// if (bEquipped) return;
+	// bEquipped = true;
+	//
+	// for (auto& Modifier : EquipmentModifiers)
+	// {
+	// 	auto& ModRef = Modifier.GetMutable();
+	// 	ModRef.OnEquip(PC);
+	// }
+}
+
+ARoomActor* FRoomFragment::SpawnRoomActor(UObject* Outer) const
+{
+	if (!IsValid(RoomActorClass) || !IsValid(Outer)) return nullptr;
+
+	ARoomActor* SpawnActor = Outer->GetWorld()->SpawnActor<ARoomActor>(RoomActorClass);
+	return SpawnActor;
+}
+
+void FRoomFragment::SetSpawnedRoomActor(ARoomActor* Room)
+{
+	RoomActor = Room;
 }

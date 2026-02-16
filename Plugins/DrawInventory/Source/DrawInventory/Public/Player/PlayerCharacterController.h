@@ -41,7 +41,7 @@ private:
 	void ToggleDrawingBoard();
 	
 	UPROPERTY(EditDefaultsOnly, Category=Inventory)
-	TObjectPtr<UInputMappingContext> DefaultIMC;
+	TArray<TObjectPtr<UInputMappingContext>> DefaultIMCs;
 	
 	UPROPERTY(EditDefaultsOnly, Category=Inventory)
 	TObjectPtr<UInputAction> PrimaryInteractAction;
@@ -59,11 +59,10 @@ private:
 	double TraceLength;
 
 	UPROPERTY(EditDefaultsOnly, Category=Inventory)
-	TEnumAsByte<ECollisionChannel> ItemTraceChannel;
+	TEnumAsByte<ECollisionChannel> InteractionTraceChannel;
 
 	TWeakObjectPtr<AActor> ThisActor;
 	TWeakObjectPtr<AActor> LastActor;
 	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
-	TWeakObjectPtr<UDoorComponent> DoorComponent;
 };

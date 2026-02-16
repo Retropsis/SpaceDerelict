@@ -5,6 +5,7 @@
 #include "StructUtils/InstancedStruct.h"
 #include "ItemFragment.generated.h"
 
+class ARoomActor;
 class AEquipActor;
 class UCompositeBase;
 class APlayerController;
@@ -27,7 +28,7 @@ struct FItemFragment
 	void SetFragmentTag(FGameplayTag Tag) { FragmentTag = Tag; }
 
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="Fragment"))
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Fragment"))
 	FGameplayTag FragmentTag = FGameplayTag::EmptyTag;
 };
 
@@ -56,10 +57,10 @@ struct FGridFragment : public FItemFragment
 	void SetGridPadding(float Padding) { GridPadding = Padding; }
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FIntPoint GridSize{ 1, 1 };
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	float GridPadding{ 0.f };
 };
 
@@ -72,10 +73,10 @@ struct FImageFragment : public FInventoryItemFragment
 	UTexture2D* GetIcon() const { return Icon; }
 
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TObjectPtr<UTexture2D> Icon{nullptr};
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FVector2D Dimensions{ 44.f, 44.f };
 };
 
@@ -89,7 +90,7 @@ struct FTextFragment : public FInventoryItemFragment
 	FText GetText() const { return FragmentText; }
 
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FText FragmentText;
 };
 
@@ -109,28 +110,28 @@ struct FLabeledNumberFragment : public FInventoryItemFragment
 	bool bRandomizeOnManifest{true};
 
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FText Text_Label;
 	
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	float Value{0.f};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	float Min{0.f};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	float Max{0.f};
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	bool bCollapseLabel{false};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	bool bCollapseValue{false};
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	int32 MinFractionalDigits{1};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	int32 MaxFractionalDigits{1};
 };
 
@@ -144,10 +145,10 @@ struct FStackableFragment : public FItemFragment
 	void SetStackCount(int32 Count) { StackCount = Count; }
 	
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	int32 MaxStackSize{1};
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	int32 StackCount{1};
 };
 
@@ -248,19 +249,84 @@ struct FEquipmentFragment : public FInventoryItemFragment
 	bool bEquipped{false};
 
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory"/*, meta=(ExcludeBaseStruct)*/)
+	UPROPERTY(EditAnywhere, Category="DrawInventory"/*, meta=(ExcludeBaseStruct)*/)
 	TArray<TInstancedStruct<FEquipmentModifier>> EquipmentModifiers;
 	
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AEquipActor> EquipActorClass = nullptr;
 
 	TWeakObjectPtr<AEquipActor> EquippedActor = nullptr;
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FName SocketAttachPoint{ NAME_None };
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FGameplayTag EquipmentType = FGameplayTag::EmptyTag;
 };
 
+USTRUCT(BlueprintType)
+struct FRoomFragment : public FInventoryItemFragment
+{
+	GENERATED_BODY()
+	
+public:
+	virtual void Assimilate(UCompositeBase* Composite) const override;
+	virtual void Manifest() override;
+	void OnSpawn(APlayerController* PC);
+	ARoomActor* SpawnRoomActor(UObject* Outer) const;
+	FGameplayTag GetRoomType() const { return RoomType; }
+	void SetSpawnedRoomActor(ARoomActor* Room);
+	TMap<FIntPoint, FName> GetSockets() const { return Sockets; }
+	int32 GetYaw() const { return Yaw; }
+	void SetYaw(int32 NewYaw) { Yaw = NewYaw; }
 
+private:	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<ARoomActor> RoomActorClass = nullptr;
+
+	TWeakObjectPtr<ARoomActor> RoomActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TMap<FIntPoint, FName> Sockets;
+
+	int32 Yaw{ 0 };
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	FGameplayTag RoomType = FGameplayTag::EmptyTag;
+};
+
+USTRUCT(BlueprintType)
+struct FRequirementFragment : public FItemFragment
+{
+	GENERATED_BODY()
+	
+public:
+	FGameplayTag GetItemType() const { return RequirementType; }
+	void SetRequirementType(FGameplayTag Type) { RequirementType = Type; }
+	int32 GetAmount() const { return RequirementAmount; }
+	void SetRequirementAmount(int32 NewAmount) { RequirementAmount = NewAmount; }
+	UTexture2D* GetIcon() const { return RequirementIcon; }
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	UTexture2D* RequirementIcon = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Item.Currency"))
+	FGameplayTag RequirementType = FGameplayTag::EmptyTag;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	int32 RequirementAmount{1};
+};
+
+USTRUCT(BlueprintType)
+struct FValuableFragment : public FItemFragment
+{
+	GENERATED_BODY()
+	
+public:
+	TMap<UTexture2D*, int32> GetValuables() const { return Valuables; };
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TMap<UTexture2D*, int32> Valuables;
+};

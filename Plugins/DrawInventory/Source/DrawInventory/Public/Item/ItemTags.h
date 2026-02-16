@@ -2,8 +2,13 @@
 
 #include "NativeGameplayTags.h"
 
-namespace GameItems
+namespace Item
 {
+	namespace Currency
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Key);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Battery);
+	}
 	namespace Equipment
 	{
 		namespace Weapons

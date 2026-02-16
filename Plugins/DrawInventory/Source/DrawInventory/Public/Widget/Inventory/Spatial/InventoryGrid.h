@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Types/GridTypes.h"
+#include "Data/GridTypes.h"
 #include "InventoryGrid.generated.h"
 
 class UItemPopUp;
@@ -60,6 +60,9 @@ public:
 	
 	UFUNCTION()
 	void OnInventoryMenuToggled(bool bOpen);
+
+	UFUNCTION()
+	void OnItemStackChange(const FGameplayTag& ItemType, int32 Amount);
 	
 	FSlotAvailabilityResult HasRoomForItem(const UItemComponent* ItemComponent);
 	EGridCategory GetItemCategory() const { return ItemCategory; }
@@ -100,7 +103,7 @@ private:
 	bool IsLeftClick(const FPointerEvent& MouseEvent) const;
 	void PickUp(UInventoryItem* ClickedInventoryItem, const int32 GridIndex);
 	void AssignHoverItem(UInventoryItem* InventoryItem, const int32 GridIndex, const int32 PreviousGridIndex);
-	void RemoveItemFromGrid(UInventoryItem* InventoryItem, const int32 GridIndex);
+	void RemoveItemFromGrid(const UInventoryItem* InventoryItem, const int32 GridIndex);
 	void UpdateTileParameters(const FVector2D& CanvasPosition, const FVector2D& MousePosition);
 	FIntPoint CalculateHoveredCoordinates(const FVector2D& CanvasPosition, const FVector2D& MousePosition) const;
 	ETileQuadrant CalculateTileQuadrant(const FVector2D& CanvasPosition, const FVector2D& MousePosition) const;

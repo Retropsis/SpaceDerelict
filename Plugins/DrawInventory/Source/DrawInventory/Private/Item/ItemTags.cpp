@@ -2,37 +2,42 @@
 #include "Item/ItemTags.h"
 
 
-namespace GameItems
+namespace Item
 {
+	namespace Currency
+	{
+		UE_DEFINE_GAMEPLAY_TAG(Key, "Item.Currency.Key");
+		UE_DEFINE_GAMEPLAY_TAG(Battery, "Item.Currency.Battery");
+	}
 	namespace Equipment
 	{
 		namespace Weapons
 		{
-			UE_DEFINE_GAMEPLAY_TAG(Axe, "GameItems.Equipment.Weapons.Axe");
-			UE_DEFINE_GAMEPLAY_TAG(Sword, "GameItems.Equipment.Weapons.Sword");
-			UE_DEFINE_GAMEPLAY_TAG(Knife, "GameItems.Equipment.Weapons.Knife")
-			UE_DEFINE_GAMEPLAY_TAG(Bloodthorn, "GameItems.Equipment.Weapons.Bloodthorn")
-			UE_DEFINE_GAMEPLAY_TAG(NightsEdge, "GameItems.Equipment.Weapons.NightsEdge")
-			UE_DEFINE_GAMEPLAY_TAG(Shadowbane, "GameItems.Equipment.Weapons.Shadowbane")
-			UE_DEFINE_GAMEPLAY_TAG(Staff, "GameItems.Equipment.Weapons.Staff")
+			UE_DEFINE_GAMEPLAY_TAG(Axe, "Item.Equipment.Weapons.Axe");
+			UE_DEFINE_GAMEPLAY_TAG(Sword, "Item.Equipment.Weapons.Sword");
+			UE_DEFINE_GAMEPLAY_TAG(Knife, "Item.Equipment.Weapons.Knife")
+			UE_DEFINE_GAMEPLAY_TAG(Bloodthorn, "Item.Equipment.Weapons.Bloodthorn")
+			UE_DEFINE_GAMEPLAY_TAG(NightsEdge, "Item.Equipment.Weapons.NightsEdge")
+			UE_DEFINE_GAMEPLAY_TAG(Shadowbane, "Item.Equipment.Weapons.Shadowbane")
+			UE_DEFINE_GAMEPLAY_TAG(Staff, "Item.Equipment.Weapons.Staff")
 		}
 		
 		namespace Cloaks
 		{
-			UE_DEFINE_GAMEPLAY_TAG(RedCloak, "GameItems.Equipment.Cloaks.RedCloak");
-			UE_DEFINE_GAMEPLAY_TAG(BlueCloak, "GameItems.Equipment.Cloaks.BlueCloak");
-			UE_DEFINE_GAMEPLAY_TAG(GreenCloak, "GameItems.Equipment.Cloaks.GreenCloak")
-			UE_DEFINE_GAMEPLAY_TAG(YellowCloak, "GameItems.Equipment.Cloaks.YellowCloak")
-			UE_DEFINE_GAMEPLAY_TAG(DarkGrayCloak, "GameItems.Equipment.Cloaks.DarkGrayCloak")
+			UE_DEFINE_GAMEPLAY_TAG(RedCloak, "Item.Equipment.Cloaks.RedCloak");
+			UE_DEFINE_GAMEPLAY_TAG(BlueCloak, "Item.Equipment.Cloaks.BlueCloak");
+			UE_DEFINE_GAMEPLAY_TAG(GreenCloak, "Item.Equipment.Cloaks.GreenCloak")
+			UE_DEFINE_GAMEPLAY_TAG(YellowCloak, "Item.Equipment.Cloaks.YellowCloak")
+			UE_DEFINE_GAMEPLAY_TAG(DarkGrayCloak, "Item.Equipment.Cloaks.DarkGrayCloak")
 		}
 		
 		namespace Masks
 		{
-			UE_DEFINE_GAMEPLAY_TAG(SteelMask, "GameItems.Equipment.Masks.SteelMask");
-			UE_DEFINE_GAMEPLAY_TAG(GreenMask, "GameItems.Equipment.Masks.GreenMask");
-			UE_DEFINE_GAMEPLAY_TAG(BlueMask, "GameItems.Equipment.Masks.BlueMask")
-			UE_DEFINE_GAMEPLAY_TAG(YellowMask, "GameItems.Equipment.Masks.YellowMask")
-			UE_DEFINE_GAMEPLAY_TAG(GrayMask, "GameItems.Equipment.Masks.GrayMask")
+			UE_DEFINE_GAMEPLAY_TAG(SteelMask, "Item.Equipment.Masks.SteelMask");
+			UE_DEFINE_GAMEPLAY_TAG(GreenMask, "Item.Equipment.Masks.GreenMask");
+			UE_DEFINE_GAMEPLAY_TAG(BlueMask, "Item.Equipment.Masks.BlueMask")
+			UE_DEFINE_GAMEPLAY_TAG(YellowMask, "Item.Equipment.Masks.YellowMask")
+			UE_DEFINE_GAMEPLAY_TAG(GrayMask, "Item.Equipment.Masks.GrayMask")
 		}
 	}
 
@@ -42,23 +47,23 @@ namespace GameItems
 		{
 			namespace Red
 			{
-				UE_DEFINE_GAMEPLAY_TAG(Small, "GameItems.Consumable.Potions.Red.Small");
-				UE_DEFINE_GAMEPLAY_TAG(Large, "GameItems.Consumable.Potions.Red.Large");
+				UE_DEFINE_GAMEPLAY_TAG(Small, "Item.Consumable.Potions.Red.Small");
+				UE_DEFINE_GAMEPLAY_TAG(Large, "Item.Consumable.Potions.Red.Large");
 			}
 			
 			namespace Blue
 			{
-				UE_DEFINE_GAMEPLAY_TAG(Small, "GameItems.Consumable.Potions.Blue.Small");
-				UE_DEFINE_GAMEPLAY_TAG(Large, "GameItems.Consumable.Potions.Blue.Large");
+				UE_DEFINE_GAMEPLAY_TAG(Small, "Item.Consumable.Potions.Blue.Small");
+				UE_DEFINE_GAMEPLAY_TAG(Large, "Item.Consumable.Potions.Blue.Large");
 			}
 		}
 	}
 	
 	namespace Craftable
 	{
-		UE_DEFINE_GAMEPLAY_TAG(FireFernFruit, "GameItems.Craftable.FireFernFruit");
-		UE_DEFINE_GAMEPLAY_TAG(LuminDaisy, "GameItems.Craftable.LuminDaisy");
-		UE_DEFINE_GAMEPLAY_TAG(ScorchPetalBlossom, "GameItems.Craftable.ScorchPetalBlossom");
+		UE_DEFINE_GAMEPLAY_TAG(FireFernFruit, "Item.Craftable.FireFernFruit");
+		UE_DEFINE_GAMEPLAY_TAG(LuminDaisy, "Item.Craftable.LuminDaisy");
+		UE_DEFINE_GAMEPLAY_TAG(ScorchPetalBlossom, "Item.Craftable.ScorchPetalBlossom");
 	}
 }
 

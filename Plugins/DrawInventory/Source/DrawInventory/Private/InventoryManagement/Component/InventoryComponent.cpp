@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryManagement/Component/InventoryComponent.h"
-
 #include "Data/GridTypes.h"
 #include "Item/InventoryItem.h"
 #include "Item/Fragment/ItemFragment.h"
@@ -160,6 +159,36 @@ void UInventoryComponent::Server_ConsumeItem_Implementation(UInventoryItem* Item
 	{
 		ConsumableFragment->OnConsume(OwningController.Get());
 	}
+}
+
+void UInventoryComponent::Server_ConsumeItemOfTypAndAmount_Implementation(const FGameplayTag& ItemType, const int32 Amount)
+{
+	UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+	
+	const int32 NewStackCount = FoundItem->GetTotalStackCount() - Amount;
+	if (NewStackCount <= 0)
+	{
+		InventoryList.RemoveEntry(FoundItem);
+	}
+	else
+	{
+		FoundItem->SetTotalStackCount(NewStackCount);
+	}
+	
+	OnItemStackChange.Broadcast(ItemType, Amount);
+
+	if (FConsumableFragment* ConsumableFragment = FoundItem->GetItemManifestMutable().GetFragmentOfTypeMutable<FConsumableFragment>())
+	{
+		ConsumableFragment->OnConsume(OwningController.Get());
+	}
+}
+
+bool UInventoryComponent::CheckItemOfTypAndAmount(const FGameplayTag& ItemType,  const int32 Amount)
+{
+	UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+	bool bHasItemWithAmount = IsValid(FoundItem) && FoundItem->GetTotalStackCount() >= Amount;
+	if (!bHasItemWithAmount) NoItemOfTypeInInventory.Broadcast(ItemType.GetTagLeafName());
+	return bHasItemWithAmount;
 }
 
 void UInventoryComponent::Server_EquippedSlottedItemClicked_Implementation(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip)

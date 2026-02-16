@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryManagement/Utilities/InventoryUtility.h"
-#include "Types/GridTypes.h"
+#include "Data/GridTypes.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "Widget/Inventory/InventoryBase/InventoryBase.h"
 

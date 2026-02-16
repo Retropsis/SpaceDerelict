@@ -13,9 +13,11 @@ class UInventoryBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemChange, UInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FNoRoomInInventory);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNoItemOfTypeInInventory, const FName&, ItemName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSlotAvailabilityResult&, Result);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged,  UInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryMenuToggled,  bool, bOpen);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemStackChange, const FGameplayTag&, ItemType, int32, Amount);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
@@ -30,6 +32,7 @@ public:
 	void ToggleInventoryMenu();
 	UInventoryBase* GetInventoryMenu() const { return InventoryMenu; }
 	bool IsMenuOpen() const { return bInventoryMenuOpen; }
+	bool CheckItemOfTypAndAmount(const FGameplayTag& ItemType, const int32 Amount);
 
 	UFUNCTION(Server, Reliable)
 	void Server_AddNewItem(UItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
@@ -42,6 +45,9 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_ConsumeItem(UInventoryItem* Item);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_ConsumeItemOfTypAndAmount(const FGameplayTag& ItemType, const int32 Amount);
 
 	UFUNCTION(Server, Reliable)
 	void Server_EquippedSlottedItemClicked(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip);
@@ -59,6 +65,8 @@ public:
 	FItemEquipStatusChanged OnItemEquipped;
 	FItemEquipStatusChanged OnItemUnequipped;
 	FInventoryMenuToggled OnInventoryMenuToggled;
+	FNoItemOfTypeInInventory NoItemOfTypeInInventory;
+	FItemStackChange OnItemStackChange;
 
 protected:
 	virtual void BeginPlay() override;

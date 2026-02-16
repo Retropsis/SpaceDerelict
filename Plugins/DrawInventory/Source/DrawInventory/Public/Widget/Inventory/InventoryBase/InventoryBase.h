@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Types/GridTypes.h"
+#include "Data/GridTypes.h"
 #include "InventoryBase.generated.h"
 
 class UHoverItem;

@@ -28,6 +28,7 @@ public class DrawInventory : ModuleRules
 				"Core",
 				"NetCore",
 				"GameplayTags",
+				"EnhancedInput", 
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -40,7 +41,6 @@ public class DrawInventory : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"EnhancedInput", 
 				"UMG",
 				"InputCore",
 				// ... add private dependencies that you statically link with here ...	

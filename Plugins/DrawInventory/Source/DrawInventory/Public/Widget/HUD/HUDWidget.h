@@ -30,4 +30,7 @@ private:
 
 	UFUNCTION()
 	void OnNoRoom();
+	
+	UFUNCTION()
+	void OnNoItemOfTypeAndAmount(const FName& ItemName);
 };

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Types/GridTypes.h"
+#include "Data/GridTypes.h"
 #include "StructUtils/InstancedStruct.h"
 #include "ItemManifest.generated.h"
 
@@ -46,7 +46,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Inventory")
 	EGridCategory ItemCategory{EGridCategory::None};
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="GameItems"))
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="Item"))
 	FGameplayTag ItemType;
 
 	UPROPERTY(EditAnywhere, Category="Inventory")

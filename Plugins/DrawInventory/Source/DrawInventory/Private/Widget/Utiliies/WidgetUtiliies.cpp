@@ -11,6 +11,15 @@ int32 UWidgetUtiliies::GetIndexFromPosition(const FIntPoint& Position, const int
 	return Position.X + Position.Y * Columns;
 }
 
+int32 UWidgetUtiliies::GetIndexFromPositionNoWrap(const FIntPoint& Position, const int32 Columns, const int32 Rows)
+{
+	if (Position.X >= 0 && Position.X < Columns && Position.Y >= 0 && Position.Y < Rows)
+	{
+		return Position.X + Position.Y * Columns;
+	}
+	return INDEX_NONE;
+}
+
 FIntPoint UWidgetUtiliies::GetPositionFromIndex(const int32 Index, const int32 Columns)
 {
 	return FIntPoint(Index % Columns, Index / Columns);

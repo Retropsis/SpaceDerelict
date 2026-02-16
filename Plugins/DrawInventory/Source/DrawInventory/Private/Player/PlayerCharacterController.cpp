@@ -5,7 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "DrawManagement/Component/DrawComponent.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
-#include "Item/Component/ItemComponent.h"
+#include "Interaction/InteractionComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widget/HUD/HUDWidget.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -14,7 +14,7 @@ APlayerCharacterController::APlayerCharacterController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	TraceLength = 500.0;
-	ItemTraceChannel = ECC_GameTraceChannel1;
+	InteractionTraceChannel = ECC_GameTraceChannel2;
 }
 
 void APlayerCharacterController::Tick(float DeltaTime)
@@ -27,11 +27,12 @@ void APlayerCharacterController::BeginPlay()
 {
 	Super::BeginPlay();
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if (IsValid(Subsystem))
+	for (UInputMappingContext* CurrentContext : DefaultIMCs)
 	{
-		Subsystem->AddMappingContext(DefaultIMC, 0);
+		Subsystem->AddMappingContext(CurrentContext, 0);
 	}
 	InventoryComponent = FindComponentByClass<UInventoryComponent>();
+	DrawComponent = FindComponentByClass<UDrawComponent>();
 	CreateHUDWidget();
 }
 
@@ -49,14 +50,16 @@ void APlayerCharacterController::PrimaryInteract()
 	if (!ThisActor.IsValid()) return;
 
 	UItemComponent* ItemComponent = ThisActor->FindComponentByClass<UItemComponent>();
-	if (!IsValid(ItemComponent) || !InventoryComponent.IsValid()) return;
-
-	InventoryComponent->TryAddItem(ItemComponent);
+	if (IsValid(ItemComponent) && InventoryComponent.IsValid())
+	{
+		InventoryComponent->TryAddItem(ItemComponent);
+		return;
+	}
 	
 	UDoorComponent* DoorComponent = ThisActor->FindComponentByClass<UDoorComponent>();
 	if (!IsValid(DoorComponent) || !DrawComponent.IsValid()) return;
 
-	DrawComponent->TryAddItem(DoorComponent);
+	DrawComponent->TryDrawing(DoorComponent);
 }
 
 void APlayerCharacterController::CreateHUDWidget()
@@ -73,7 +76,8 @@ void APlayerCharacterController::CreateHUDWidget()
 
 void APlayerCharacterController::ToggleInventory()
 {
-	if (!InventoryComponent.IsValid()) return;
+	if (DrawComponent.IsValid() && DrawComponent->IsDrawingBoardOpen()) return;
+	if (!InventoryComponent.IsValid() ) return;
 	InventoryComponent->ToggleInventoryMenu();
 	if (InventoryComponent->IsMenuOpen())
 	{
@@ -99,7 +103,7 @@ void APlayerCharacterController::TraceForItem()
 
 	const FVector TraceEnd = TraceStart + Forward * TraceLength;
 	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ItemTraceChannel);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, InteractionTraceChannel);
 
 	LastActor = ThisActor;
 	ThisActor = HitResult.GetActor();
@@ -113,9 +117,9 @@ void APlayerCharacterController::TraceForItem()
 
 	if (ThisActor.IsValid())
 	{		
-		UItemComponent* ItemComponent = ThisActor->FindComponentByClass<UItemComponent>();
-		if (!IsValid(ItemComponent)) return;
-		if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(ItemComponent->GetInteractionMessage());
+		UInteractionComponent* InteractionComponent = ThisActor->FindComponentByClass<UInteractionComponent>();
+		if (!IsValid(InteractionComponent)) return;
+		if (IsValid(HUDWidget)) HUDWidget->ShowPickupMessage(InteractionComponent->GetInteractionMessage());
 	}
 
 	if (LastActor.IsValid())
