@@ -8,6 +8,8 @@
 #include "Item/Fragment/ItemFragment.h"
 #include "DrawingBoard.generated.h"
 
+class UTextBlock;
+class UButton;
 struct FItemManifest;
 class UDrawingGrid;
 struct FImageFragment;
@@ -28,6 +30,7 @@ public:
 	void ClearDrawingBoard();
 	void DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool bRequirementMet);
 	FDestinationAvailabilityResult HasRoom(const FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 DestinationYaw) const;
+	void SetRedrawCount(int32 Count) const;
 
 private:
 	UFUNCTION()
@@ -38,6 +41,9 @@ private:
 	
 	UFUNCTION()
 	void OnDrawnRoomSlotUnhovered(UDrawnRoomSlot* DrawnRoomSlot);
+	
+	UFUNCTION()
+	void OnRedrawButtonClicked();
 
 	void SetDrawnRoomSlotImage(const UDrawnRoomSlot* DrawnRoomSlot, const FGridFragment* GridFragment, const FImageFragment* ImageFragment) const;
 	FVector2D GetDrawSize(const FGridFragment* GridFragment) const;
@@ -47,6 +53,15 @@ private:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_DrawnRoomSlots;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> Button_Redraw;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> Text_RedrawCount;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UHorizontalBox> HorizontalBox_RedrawBox;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<UDrawnRoomSlot> DrawnRoomSlotClass;

@@ -60,6 +60,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_OpenConnectedDoor(int32 Index, const FName& Socket);
 	
+	UFUNCTION(Server, Reliable)
+	void Server_Redraw();
+	
 	// UFUNCTION(Server, Reliable)
 	// void Server_AddNewItem(UItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
 	//
@@ -137,4 +140,5 @@ private:
 	int32 NumberOfDrawnRooms;
 	float RoomSize;
 	float LockedDoorChance;
+	int32 NumberOfRedraws;
 };

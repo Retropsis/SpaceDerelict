@@ -37,4 +37,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	float LockedDoorChance{50.f};
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	int32 NumberOfRedraws{1};
 };

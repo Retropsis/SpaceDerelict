@@ -66,6 +66,7 @@ void UDrawComponent::InitializeFromRoomData()
 	NumberOfDrawnRooms = RoomData->NumberOfDrawnRooms;
 	RoomSize = RoomData->RoomSize;
 	LockedDoorChance = RoomData->LockedDoorChance;
+	NumberOfRedraws = RoomData->NumberOfRedraws;
 }
 
 void UDrawComponent::BuildPresetRooms()
@@ -216,6 +217,12 @@ void UDrawComponent::Server_OpenConnectedDoor_Implementation(int32 Index, const 
 	}
 }
 
+void UDrawComponent::Server_Redraw_Implementation()
+{
+	NumberOfRedraws = FMath::Min(0, --NumberOfRedraws);
+	DrawRooms();
+}
+
 void UDrawComponent::DetermineLockedDoors(FDestinationAvailabilityResult& Result) const
 {
 	if (Result.DestinationAvailabilities.Num() < 2) return;
@@ -321,6 +328,7 @@ void UDrawComponent::DrawRooms()
 		}
 		DrawingBoard->DrawRoom(Room, InteractingDoorComponent->GetDestinationIndex(), InteractingDoorComponent->GetRoomYaw(), bRequirementMet);
 	}
+	DrawingBoard->SetRedrawCount(NumberOfRedraws);
 }
 
 void UDrawComponent::ToggleDrawingBoard()

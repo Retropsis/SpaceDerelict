@@ -2,6 +2,7 @@
 
 #include "Widget/DrawInventory/DrawingBoard.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/Button.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "DrawManagement/Component/DrawComponent.h"
@@ -16,6 +17,7 @@ void UDrawingBoard::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	DrawComponent = UDrawingUtility::GetDrawComponent(GetOwningPlayer());
+	Button_Redraw->OnClicked.AddDynamic(this, &ThisClass::UDrawingBoard::OnRedrawButtonClicked);
 }
 
 void UDrawingBoard::ClearDrawingBoard()
@@ -95,6 +97,25 @@ void UDrawingBoard::OnDrawnRoomSlotUnhovered(UDrawnRoomSlot* DrawnRoomSlot)
 {
 	check(DrawComponent.IsValid());
 	DrawComponent->OnRoomUnhovered.Broadcast(DrawnRoomSlot->GetInventoryItem().Get(), DrawnRoomSlot->GetGridIndex());
+}
+
+void UDrawingBoard::OnRedrawButtonClicked()
+{
+	check(DrawComponent.IsValid());
+	DrawComponent->Server_Redraw();
+}
+
+void UDrawingBoard::SetRedrawCount(int32 Count) const
+{
+	if (Count > 0)
+	{
+		HorizontalBox_RedrawBox->SetVisibility(ESlateVisibility::Visible);
+		Text_RedrawCount->SetText(FText::AsNumber(Count));
+	}
+	else
+	{
+		HorizontalBox_RedrawBox->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UDrawingBoard::SetDrawnRoomSlotImage(const UDrawnRoomSlot* DrawnRoomSlot, const FGridFragment* GridFragment, const FImageFragment* ImageFragment) const
