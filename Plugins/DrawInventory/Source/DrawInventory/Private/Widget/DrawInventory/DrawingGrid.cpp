@@ -79,20 +79,23 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 		Availability.Socket = Socket.Value;
 		Availability.DestinationIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(ShiftedCoordinates, Columns, Rows);
 
-		FName ConnectedDoorSocket = FName();;
+		if (RoomIndex == Availability.DestinationIndex) continue;
 
 		if (Availability.DestinationIndex < 0)
 		{
 			Availability.DoorState = EDoorState::Sealed;
 		}
-		else if (IsDestinationOccupied(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw, ConnectedDoorSocket))
+		else if (IsDestinationOccupied(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw))
 		{
 			if (SlottedRooms.Contains(Availability.DestinationIndex))
 			{
 				Availability.DoorState = EDoorState::Opened;
 				const FRoomFragment* DestinationRoomFragment = SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+				ARoomActor* ConnectedRoom = DestinationRoomFragment->GetRoomActor();
+				FName ConnectedDoorSocket = UDrawingUtility::FindConnectedDoorSocket(ShiftedOffset, DestinationRoomFragment->GetYaw());
 				UE_LOG(LogTemp, Error, TEXT("SocketName: %s"), *ConnectedDoorSocket.ToString());
-				DrawComponent->Server_OpenConnectedDoor(DestinationRoomFragment->GetRoomActor(), ConnectedDoorSocket);
+				
+				DrawComponent->Server_OpenConnectedDoor(ConnectedRoom, ConnectedDoorSocket);
 			}
 			continue;
 		}
@@ -114,14 +117,12 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 			*ShiftedOffset.ToString(),
 			*Availability.Socket.ToString());
 		
-		if (RoomIndex == Availability.DestinationIndex) continue;
-		
 		Result.DestinationAvailabilities.Add(Availability);
 	}	
 	return Result;
 }
 
-bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, const int32 Yaw, FName& OutSocket) const
+bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, const int32 Yaw) const
 {	
 	UE_LOG(LogTemp, Warning, TEXT("Checking Destination for Room Index %d"), Index);
 	if (SlottedRooms.Contains(Index))
@@ -144,7 +145,6 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 				UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.Value.ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
 				if (ShiftedCoordinates == RoomCoordinates)
 				{
-					OutSocket = UDrawingUtility::GetSocketNameFromOffset(ShiftedOffset);
 					return true;
 				}
 			}

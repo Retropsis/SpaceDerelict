@@ -11,7 +11,7 @@ UDoorComponent::UDoorComponent()
 }
 
 void UDoorComponent::ToggleDoor(const bool bOpen)
-{
+{	
 	ADoor* Door = Cast<ADoor>(GetOwner());
 	if (IsValid(Door))
 	{

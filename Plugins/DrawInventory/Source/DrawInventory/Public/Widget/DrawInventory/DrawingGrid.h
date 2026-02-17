@@ -74,8 +74,7 @@ private:
 	bool IsIndexClaimed(int32 Index) const;
 	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& Dimensions) const;
 	FIntPoint GetItemDimensions(const FItemManifest& ItemManifest) const;
-	bool IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates,
-	                           const FIntPoint& DestinationCoordinates, int32 Yaw, FName& OutSocket) const;
+	bool IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates,  const FIntPoint& DestinationCoordinates, int32 Yaw) const;
 
 	UFUNCTION()
 	void OnPlayerPositionUpdate(const FVector2D& Location, const float Angle);

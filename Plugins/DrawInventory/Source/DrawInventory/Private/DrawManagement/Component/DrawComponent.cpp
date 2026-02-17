@@ -90,6 +90,7 @@ void UDrawComponent::BuildPresetRooms()
 		RoomActor->ConstructDoors(Result);
 		UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
 		FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
+		NewRoomFragment->SetYaw(0);
 		NewRoomFragment->SetSpawnedRoomActor(RoomActor);
 		OnRoomAdded.Broadcast(NewRoom, CurrentRoomIndex);
 	}
@@ -174,6 +175,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	SpawnValuables(RoomToSpawn, RoomActor);
 
 	InteractingDoorComponent->ToggleDoor(true);
+	
 	ToggleDrawingBoard();
 
 	PooledRoomList.RemoveEntry(RoomToSpawn);

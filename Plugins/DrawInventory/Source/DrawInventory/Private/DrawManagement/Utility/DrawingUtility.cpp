@@ -54,31 +54,31 @@ FName UDrawingUtility::GetSocketNameFromOffset(const FIntPoint& Offset)
 	return FName("None");
 }
 
-FName UDrawingUtility::FindConnectedDoorSocket(const FName& Socket, const int32 Yaw)
+FName UDrawingUtility::FindConnectedDoorSocket(const FIntPoint& OriginOffset, const int32 Yaw)
 {
 	switch (Yaw)
 	{
 	case 0:
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
+		if (OriginOffset == FIntPoint(-1, 0 )) return FName("East");
+		if (OriginOffset == FIntPoint(1, 0 )) return FName("West");
+		if (OriginOffset == FIntPoint(0, -1 )) return FName("North");
+		if (OriginOffset == FIntPoint(0, 1 )) return FName("South");
 	case 90: 
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		case -180: 
+		if (OriginOffset == FIntPoint(-1, 0 )) return FName("North");
+		if (OriginOffset == FIntPoint(1, 0 )) return FName("South");
+		if (OriginOffset == FIntPoint(0, -1 )) return FName("West");
+		if (OriginOffset == FIntPoint(0, 1 )) return FName("East");
+	case -180: 
 	case 180:
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
+		if (OriginOffset == FIntPoint(-1, 0 )) return FName("West");
+		if (OriginOffset == FIntPoint(1, 0 )) return FName("East");
+		if (OriginOffset == FIntPoint(0, -1 )) return FName("South");
+		if (OriginOffset == FIntPoint(0, 1 )) return FName("North");
 	case -90: 
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
-		if (Socket == "South") return FName("North");
+		if (OriginOffset == FIntPoint(-1, 0 )) return FName("South");
+		if (OriginOffset == FIntPoint(1, 0 )) return FName("North");
+		if (OriginOffset == FIntPoint(0, -1 )) return FName("East");
+		if (OriginOffset == FIntPoint(0, 1 )) return FName("West");
 		default: return FName("None");
 	}
 }
