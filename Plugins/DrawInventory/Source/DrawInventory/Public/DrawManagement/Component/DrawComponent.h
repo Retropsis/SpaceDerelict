@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/DestinationData.h"
+#include "DrawManagement/FastArray/RoomFastArray.h"
 #include "DrawManagement/Room/RoomActor.h"
+#include "InventoryManagement/Component/InventoryComponent.h"
 #include "DrawComponent.generated.h"
 
 struct FItemManifest;
@@ -19,6 +21,7 @@ class UDoorComponent;
 class UDrawingBoard;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRoomStatusChange, UInventoryItem*, RoomItem, int32, Index);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoomStatusChange, UInventoryItem*, RoomItem);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSlotAvailabilityResult&, Result);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged,  UInventoryItem*, Item);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryMenuToggled,  bool, bOpen);
@@ -36,6 +39,7 @@ public:
 	void InitializeFromRoomData();
 	void BuildPresetRooms();
 	void BuildRoomPool();
+	void SpawnValuables(const UInventoryItem* RoomToSpawn, const ARoomActor* RoomActor) const;
 	ARoomActor* SpawnRoomActor(FRoomFragment* RoomFragment) const;
 	void TryDrawing(UDoorComponent* DoorComponent);
 
@@ -58,7 +62,7 @@ public:
 	void Server_DrawnRoomSlotClicked(UInventoryItem* RoomToSpawn);
 	
 	UFUNCTION(Server, Reliable)
-	void Server_OpenConnectedDoor(int32 Index, const FName& Socket);
+	void Server_OpenConnectedDoor(ARoomActor* RoomActor, const FName& Socket);
 	
 	UFUNCTION(Server, Reliable)
 	void Server_Redraw();
@@ -75,9 +79,12 @@ public:
 	// UFUNCTION(NetMulticast, Reliable)
 	// void Multicast_EquippedSlottedItemClicked(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip);
 	
+	// FOnRoomStatusChange OnRoomAdded;
+	FOnRoomStatusChange OnRoomRemoved;
 	FRoomStatusChange OnRoomAdded;
 	FRoomStatusChange OnRoomHovered;
 	FRoomStatusChange OnRoomUnhovered;
+	FToggleHUD OnToggleHUD;
 	// FInventoryItemChange OnItemRemoved;
 	// FNoRoomInInventory NoRoomInInventory;
 	// FStackChange OnStackChange;
@@ -91,7 +98,6 @@ protected:
 private:
 	UFUNCTION()
 	void InitializeDrawComponent();
-	
 	void ConstructDrawingBoard();
 	void ConstructUnlockWidget();
 	void DrawRooms();
@@ -109,9 +115,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UDrawingBoard> DrawingBoard;
 
-	UPROPERTY()
-	TMap<int32, TObjectPtr<ARoomActor>> SpawnedRooms; 
-
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UUnlockWidget> UnlockWidgetClass;
 
@@ -123,6 +126,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	TArray<TObjectPtr<URoomAsset>> RoomPool;
+	
+	UPROPERTY(Replicated)
+	FRoomFastArray PooledRoomList;
+	
+	UPROPERTY(Replicated)
+	FRoomFastArray SpawnedRoomList;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TArray<FItemManifest> DEBUG_RoomPool;

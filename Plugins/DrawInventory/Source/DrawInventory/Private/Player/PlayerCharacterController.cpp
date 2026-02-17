@@ -34,7 +34,10 @@ void APlayerCharacterController::BeginPlay()
 		Subsystem->AddMappingContext(CurrentContext, 0);
 	}
 	InventoryComponent = FindComponentByClass<UInventoryComponent>();
+	InventoryComponent->OnToggleHUD.AddDynamic(this, &APlayerCharacterController::ToggleHUD);
 	DrawComponent = FindComponentByClass<UDrawComponent>();
+	DrawComponent->OnToggleHUD.AddDynamic(this, &APlayerCharacterController::ToggleHUD);
+	
 	CreateHUDWidget();
 	
 	SetTimerPlayerPositionUpdate();
@@ -104,6 +107,11 @@ void APlayerCharacterController::ToggleInventory()
 	{
 		HUDWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
+}
+
+void APlayerCharacterController::ToggleHUD(bool bShow)
+{
+	HUDWidget->ToggleHUD(bShow);
 }
 
 void APlayerCharacterController::CalculateAOPitch()

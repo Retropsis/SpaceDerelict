@@ -33,7 +33,7 @@ private:
 
 	TMap<FName, FIntPoint> DestinationOffsets;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TMap<FName, TObjectPtr<UDoorComponent>> DoorComponentToSockets;
 	
 	FGameplayTag RoomType = FGameplayTag::EmptyTag;

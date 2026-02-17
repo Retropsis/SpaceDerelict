@@ -27,4 +27,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "DrawInventory")
 	static FName GetSocketNameFromOffset(const FIntPoint& Offset);
+	
+	UFUNCTION(BlueprintCallable, Category = "DrawInventory")
+	static FName FindConnectedDoorSocket(const FName& Socket, int32 Yaw);
 };

@@ -8,6 +8,7 @@ namespace Item
 	{
 		UE_DEFINE_GAMEPLAY_TAG(Key, "Item.Currency.Key");
 		UE_DEFINE_GAMEPLAY_TAG(Battery, "Item.Currency.Battery");
+		UE_DEFINE_GAMEPLAY_TAG(Oxygen, "Item.Currency.Oxygen");
 	}
 	namespace Equipment
 	{

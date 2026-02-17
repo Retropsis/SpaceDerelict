@@ -36,6 +36,15 @@ public:
 	int32 GetGridIndex() const { return GridIndex; }
 	void SetYaw(int32 NewYaw) { Yaw = NewYaw; }
 	int32 GetYaw() const { return Yaw; }
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSlotHoveredVisualEffects();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSlotUnhoveredVisualEffects();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDrawVisualEffects();
 	
 	// UEquippedSlottedItem* OnItemEquipped(UInventoryItem* Item, const FGameplayTag& Type, float TileSize);
 

@@ -78,6 +78,7 @@ void UInventoryComponent::Server_AddNewItem_Implementation(UItemComponent* ItemC
 {
 	UInventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
 	NewItem->SetTotalStackCount(StackCount);
+	OnHUDCounterItemStackChange.Broadcast(NewItem->GetItemManifest().GetItemType(), StackCount);
 
 	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone)
 	{
@@ -102,6 +103,7 @@ void UInventoryComponent::Server_AddStacksToItem_Implementation(UItemComponent* 
 	if (!IsValid(Item)) return;
 
 	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
+	OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), Item->GetTotalStackCount());
 
 	if (Remainder == 0)
 	{
@@ -123,6 +125,7 @@ void UInventoryComponent::Server_DropItem_Implementation(UInventoryItem* Item, i
 	else
 	{
 		Item->SetTotalStackCount(NewStackCount);
+		OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
 	}
 	SpawnDroppedItem(Item, StackCount);
 }
@@ -154,6 +157,7 @@ void UInventoryComponent::Server_ConsumeItem_Implementation(UInventoryItem* Item
 	else
 	{
 		Item->SetTotalStackCount(NewStackCount);
+		OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
 	}
 
 	if (FConsumableFragment* ConsumableFragment = Item->GetItemManifestMutable().GetFragmentOfTypeMutable<FConsumableFragment>())
@@ -174,9 +178,10 @@ void UInventoryComponent::Server_ConsumeItemOfTypAndAmount_Implementation(const 
 	else
 	{
 		FoundItem->SetTotalStackCount(NewStackCount);
+		OnHUDCounterItemStackChange.Broadcast(FoundItem->GetItemManifest().GetItemType(), NewStackCount);
 	}
 	
-	OnItemStackChange.Broadcast(ItemType, Amount);
+	OnConsumeItemStackChange.Broadcast(ItemType, Amount);
 
 	if (FConsumableFragment* ConsumableFragment = FoundItem->GetItemManifestMutable().GetFragmentOfTypeMutable<FConsumableFragment>())
 	{
@@ -215,6 +220,7 @@ void UInventoryComponent::ToggleInventoryMenu()
 		OpenInventoryMenu();
 	}
 	OnInventoryMenuToggled.Broadcast(bInventoryMenuOpen);
+	OnToggleHUD.Broadcast(!bInventoryMenuOpen);
 }
 
 void UInventoryComponent::OpenInventoryMenu()

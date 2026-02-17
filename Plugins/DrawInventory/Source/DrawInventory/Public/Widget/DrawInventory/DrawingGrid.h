@@ -35,6 +35,12 @@ class DRAWINVENTORY_API UDrawingGrid : public UUserWidget
 	UFUNCTION()
 	void RemoveRoom(UInventoryItem* Item, int32 Index);
 	
+	UFUNCTION()
+	void OnHover(UInventoryItem* Item, int32 Index);
+	
+	UFUNCTION()
+	void OnUnhover(UInventoryItem* Item, int32 Index);
+	
 	// UFUNCTION()
 	// void AddStacks(const FSlotAvailabilityResult& Result);
 	//
@@ -68,7 +74,8 @@ private:
 	bool IsIndexClaimed(int32 Index) const;
 	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& Dimensions) const;
 	FIntPoint GetItemDimensions(const FItemManifest& ItemManifest) const;
-	bool IsDestinationAvailable(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, int32 Yaw) const;
+	bool IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates,
+	                           const FIntPoint& DestinationCoordinates, int32 Yaw, FName& OutSocket) const;
 
 	UFUNCTION()
 	void OnPlayerPositionUpdate(const FVector2D& Location, const float Angle);
@@ -99,6 +106,8 @@ private:
 
 	UPROPERTY()
 	TMap<int32, TObjectPtr<USlottedRoom>> SlottedRooms;
+	
+	TWeakObjectPtr<USlottedRoom> HoverSlottedRoom;
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<USlottedRoom> SlottedRoomClass;

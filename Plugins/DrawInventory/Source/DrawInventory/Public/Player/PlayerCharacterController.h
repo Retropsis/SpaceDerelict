@@ -28,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
+	
+	UFUNCTION()
+	void ToggleHUD(bool bShow);
 
 	FPlayerPositionUpdated OnPlayerPositionUpdated;
 

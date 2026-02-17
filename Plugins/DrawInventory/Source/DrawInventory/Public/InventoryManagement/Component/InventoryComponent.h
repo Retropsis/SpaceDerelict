@@ -19,6 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSlotAvailabilit
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged,  UInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryMenuToggled,  bool, bOpen);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemStackChange, const FGameplayTag&, ItemType, int32, Amount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleHUD, bool, bShow);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
@@ -68,7 +69,9 @@ public:
 	FItemEquipStatusChanged OnItemUnequipped;
 	FInventoryMenuToggled OnInventoryMenuToggled;
 	FNoItemOfTypeInInventory NoItemOfTypeInInventory;
-	FItemStackChange OnItemStackChange;
+	FItemStackChange OnConsumeItemStackChange;
+	FItemStackChange OnHUDCounterItemStackChange;
+	FToggleHUD OnToggleHUD;
 
 protected:
 	virtual void BeginPlay() override;

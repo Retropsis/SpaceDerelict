@@ -62,7 +62,7 @@ void UDrawingBoard::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool 
 	{
 		DrawnRoomSlot->SetValuable(ValuableFragment->GetValuables());
 	}
-		
+	DrawnRoomSlot->OnDrawVisualEffects();
 	DrawnRoomSlots.Add(DrawnRoomSlot);
 }
 

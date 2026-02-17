@@ -2,8 +2,10 @@
 
 
 #include "Widget/HUD/HUDWidget.h"
+#include "Blueprint/WidgetTree.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "InventoryManagement/Utilities/InventoryUtility.h"
+#include "Widget/DrawInventory/HUD/HUDCounter.h"
 #include "Widget/HUD/InfoMessage.h"
 
 void UHUDWidget::NativeOnInitialized()
@@ -15,6 +17,32 @@ void UHUDWidget::NativeOnInitialized()
 	{
 		InventoryComponent->NoRoomInInventory.AddDynamic(this, &ThisClass::OnNoRoom);
 		InventoryComponent->NoItemOfTypeInInventory.AddDynamic(this, &ThisClass::OnNoItemOfTypeAndAmount);
+		InventoryComponent->OnHUDCounterItemStackChange.AddDynamic(this, &ThisClass::UpdateHUDCounter);
+	}
+	InitializeHUDCounters();
+}
+
+void UHUDWidget::InitializeHUDCounters()
+{
+	WidgetTree->ForEachWidget([this] (UWidget* Widget)
+	{
+		if (UHUDCounter* HUDCounter = Cast<UHUDCounter>(Widget); IsValid(HUDCounter))
+		{
+			HUDCounters.Add(HUDCounter->GetItemType(), HUDCounter);
+		}
+	});
+}
+
+void UHUDWidget::ToggleHUD(bool bShow)
+{
+	SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+}
+
+void UHUDWidget::UpdateHUDCounter(const FGameplayTag& ItemType, int32 NewCount)
+{
+	if (HUDCounters.Contains(ItemType))
+	{
+		HUDCounters[ItemType]->SetCount(NewCount);
 	}
 }
 

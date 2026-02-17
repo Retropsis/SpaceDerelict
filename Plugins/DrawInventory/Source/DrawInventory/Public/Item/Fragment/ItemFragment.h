@@ -285,8 +285,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<ARoomActor> RoomActorClass = nullptr;
 
-	UPROPERTY()
-	TObjectPtr<ARoomActor> RoomActor = nullptr;
+	TWeakObjectPtr<ARoomActor> RoomActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TMap<FIntPoint, FName> Sockets;

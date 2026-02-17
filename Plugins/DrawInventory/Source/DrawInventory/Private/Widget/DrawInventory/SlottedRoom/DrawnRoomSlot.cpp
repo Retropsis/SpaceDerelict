@@ -20,12 +20,14 @@ FReply UDrawnRoomSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, cons
 void UDrawnRoomSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	OnSlotHoveredVisualEffects();
 	OnDrawnRoomSlotHovered.Broadcast(this);
 }
 
 void UDrawnRoomSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
+	OnSlotUnhoveredVisualEffects();
 	OnDrawnRoomSlotUnhovered.Broadcast(this);
 }
 
@@ -33,26 +35,25 @@ void UDrawnRoomSlot::SetRequirement(UTexture2D* Icon, const int32 Amount, bool b
 {
 	HorizontalBox_Requirement->SetVisibility(ESlateVisibility::Visible);
 
-	UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-	Image->SetBrushResourceObject(Icon);
-	FSlateBrush Brush;
-	Brush.DrawAs = ESlateBrushDrawType::Image;
-
 	HorizontalBox_Requirement->SetRenderTranslation(FVector2D(0.f, /*Image_Icon->GetCachedGeometry().GetLocalSize().Y*/ 160.f));
 	
 	for (int i = 0; i < Amount; ++i)
 	{
+		UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+		Image->SetBrushResourceObject(Icon);
+		FSlateBrush Brush;
+		Brush.DrawAs = ESlateBrushDrawType::Image;
+		
 		HorizontalBox_Requirement->AddChildToHorizontalBox(Image);
+	
+		UHorizontalBoxSlot* ImageSlot = UWidgetLayoutLibrary::SlotAsHorizontalBoxSlot(Image);
+		FSlateChildSize Size;
+		Size.SizeRule = ESlateSizeRule::Automatic;
+		ImageSlot->SetSize(Size);
+		ImageSlot->SetPadding(FMargin(5.f, 0.f, 5.f, 0.f));
+		Image->SetColorAndOpacity(bRequirementMet ? RequirementMetColor : RequirementNotMatchedColor);
 	}
-	
-	UHorizontalBoxSlot* ImageSlot = UWidgetLayoutLibrary::SlotAsHorizontalBoxSlot(Image);
-	FSlateChildSize Size;
-	Size.SizeRule = ESlateSizeRule::Automatic;
-	ImageSlot->SetSize(Size);
-	ImageSlot->SetPadding(FMargin(5.f, 0.f, 5.f, 0.f));
-	
 	Text_Requirement->SetColorAndOpacity(bRequirementMet ? RequirementMetColor : RequirementNotMatchedColor);
-	Image->SetColorAndOpacity(bRequirementMet ? RequirementMetColor : RequirementNotMatchedColor);
 }
 
 void UDrawnRoomSlot::SetValuable(const TMap<UTexture2D*, int32>& Valuables) const

@@ -32,6 +32,9 @@ public:
 	FDestinationAvailabilityResult HasRoom(const FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 DestinationYaw) const;
 	void SetRedrawCount(int32 Count) const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayOpeningVisualEffects();
+
 private:
 	UFUNCTION()
 	void OnDrawnRoomSlotClicked(UDrawnRoomSlot* DrawnRoomSlot);

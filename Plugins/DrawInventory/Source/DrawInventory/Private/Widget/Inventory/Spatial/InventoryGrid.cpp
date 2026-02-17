@@ -25,7 +25,7 @@ void UInventoryGrid::NativeOnInitialized()
 	InventoryComponent->OnItemAdded.AddDynamic(this, &ThisClass::AddItem);
 	InventoryComponent->OnStackChange.AddDynamic(this, &ThisClass::AddStacks);
 	InventoryComponent->OnInventoryMenuToggled.AddDynamic(this, &ThisClass::OnInventoryMenuToggled);
-	InventoryComponent->OnItemStackChange.AddDynamic(this, &ThisClass::OnItemStackChange);
+	InventoryComponent->OnConsumeItemStackChange.AddDynamic(this, &ThisClass::OnItemStackChange);
 }
 
 void UInventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -255,6 +255,7 @@ void UInventoryGrid::AddStacks(const FSlotAvailabilityResult& Result)
 			const auto& GridSlot = GridSlots[SlotAvailability.Index];
 			const auto&  SlottedItem = SlottedItems.FindChecked(SlotAvailability.Index);
 			SlottedItem->UpdateStackCount(GridSlot->GetStackCount() + SlotAvailability.AmountToFill);
+			
 			GridSlot->SetStackCount(GridSlot->GetStackCount() + SlotAvailability.AmountToFill);
 		}
 		else

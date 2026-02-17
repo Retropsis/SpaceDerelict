@@ -2,3 +2,8 @@
 
 
 #include "Data/RoomAsset.h"
+
+void URoomAsset::InitializeRoomManifest(FItemManifest CopyOfRoomManifest)
+{
+	RoomManifest = CopyOfRoomManifest;
+}

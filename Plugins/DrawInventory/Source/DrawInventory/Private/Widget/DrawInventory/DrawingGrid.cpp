@@ -21,8 +21,8 @@ void UDrawingGrid::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	DrawComponent = UDrawingUtility::GetDrawComponent(GetOwningPlayer());
 	DrawComponent->OnRoomAdded.AddDynamic(this, &ThisClass::AddRoom);
-	DrawComponent->OnRoomHovered.AddDynamic(this, &ThisClass::AddRoom);
-	DrawComponent->OnRoomUnhovered.AddDynamic(this, &ThisClass::RemoveRoom);
+	DrawComponent->OnRoomHovered.AddDynamic(this, &ThisClass::OnHover);
+	DrawComponent->OnRoomUnhovered.AddDynamic(this, &ThisClass::OnUnhover);
 
 	if (APlayerCharacterController* PC = Cast<APlayerCharacterController>(GetOwningPlayer()))
 	{
@@ -39,7 +39,7 @@ void UDrawingGrid::NativeOnInitialized()
 }
 
 void UDrawingGrid::ConstructGrid()
-{
+{	
 	GridSlots.Reserve(Rows * Columns);
 
 	for (int j = 0; j < Rows; j++)
@@ -54,7 +54,7 @@ void UDrawingGrid::ConstructGrid()
 
 			UCanvasPanelSlot* GridCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(GridSlot);
 			GridCPS->SetSize(FVector2D(TileSize));
-			GridCPS->SetPosition(FVector2D(TilePosition.X * TileSize, (Columns - TilePosition.Y) * TileSize)); // TODO: From Bottom to Top
+			GridCPS->SetPosition(FVector2D(TilePosition.X * TileSize, (Columns - TilePosition.Y) * TileSize)); 
 			
 			GridSlots.Add(GridSlot);
 		}
@@ -79,18 +79,21 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 		Availability.Socket = Socket.Value;
 		Availability.DestinationIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(ShiftedCoordinates, Columns, Rows);
 
+		FName ConnectedDoorSocket = FName();;
+
 		if (Availability.DestinationIndex < 0)
 		{
 			Availability.DoorState = EDoorState::Sealed;
 		}
-		else if (IsDestinationAvailable(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw))
+		else if (IsDestinationOccupied(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw, ConnectedDoorSocket))
 		{
-			Availability.DoorState = EDoorState::Opened;
-			DrawComponent->Server_OpenConnectedDoor(Availability.DestinationIndex, Availability.Socket);
-			// if (SlottedRooms.Contains(Availability.DestinationIndex) && IsValid(SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()))
-			// {
-			// 	DrawComponent->Server_OpenConnectedDoor(SlottedRooms[Availability.DestinationIndex]->GetInventoryItem(), Availability.Socket);
-			// }
+			if (SlottedRooms.Contains(Availability.DestinationIndex))
+			{
+				Availability.DoorState = EDoorState::Opened;
+				const FRoomFragment* DestinationRoomFragment = SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+				UE_LOG(LogTemp, Error, TEXT("SocketName: %s"), *ConnectedDoorSocket.ToString());
+				DrawComponent->Server_OpenConnectedDoor(DestinationRoomFragment->GetRoomActor(), ConnectedDoorSocket);
+			}
 			continue;
 		}
 		
@@ -118,7 +121,7 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 	return Result;
 }
 
-bool UDrawingGrid::IsDestinationAvailable(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, const int32 Yaw) const
+bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, const int32 Yaw, FName& OutSocket) const
 {	
 	UE_LOG(LogTemp, Warning, TEXT("Checking Destination for Room Index %d"), Index);
 	if (SlottedRooms.Contains(Index))
@@ -130,8 +133,8 @@ bool UDrawingGrid::IsDestinationAvailable(const int32 Index, const FIntPoint& Ro
 			UE_LOG(LogTemp, Warning, TEXT("Checking Destination Available with Yaw %d"), Yaw);
 			if (!RoomFragment)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Has NOT found a valid RoomFragment"));
-				return false;
+				UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid RoomFragment"));
+				return false;;
 			}
 
 			for (const TTuple<FIntPoint, FName>& Socket : RoomFragment->GetSockets())
@@ -141,16 +144,20 @@ bool UDrawingGrid::IsDestinationAvailable(const int32 Index, const FIntPoint& Ro
 				UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.Value.ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
 				if (ShiftedCoordinates == RoomCoordinates)
 				{
+					OutSocket = UDrawingUtility::GetSocketNameFromOffset(ShiftedOffset);
 					return true;
 				}
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Has NOT found a valid Item"));
+			UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid Item"));
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Has NOT found SlottedRoom at Index %d"), Index);
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Has NOT found SlottedRoom at Index %d"), Index);
+	}
 	return false;
 }
 
@@ -168,6 +175,39 @@ void UDrawingGrid::AddRoom(UInventoryItem* Item, int32 Index)
 void UDrawingGrid::RemoveRoom(UInventoryItem* Item, int32 Index)
 {
 	RemoveRoomFromGrid(Item, Index);
+}
+
+void UDrawingGrid::OnHover(UInventoryItem* Item, int32 Index)
+{
+	const FGridFragment* GridFragment = GetFragment<FGridFragment>(Item, Fragment::Grid);
+	const FImageFragment* ImageFragment = GetFragment<FImageFragment>(Item, Fragment::Icon);
+	const FRoomFragment* RoomFragment = GetFragment<FRoomFragment>(Item, Fragment::Room);
+	if (!GridFragment || !ImageFragment || !RoomFragment) return;
+
+	USlottedRoom* SlottedRoom = CreateSlottedRoom(Item, GridFragment, ImageFragment, Index, RoomFragment->GetYaw());
+	AddSlottedRoomToCanvas(Index, GridFragment, SlottedRoom);
+	HoverSlottedRoom = SlottedRoom;
+	UpdateGridSlots(Item, Index);
+}
+
+void UDrawingGrid::OnUnhover(UInventoryItem* Item, int32 Index)
+{
+	const FGridFragment* GridFragment = GetFragment<FGridFragment>(Item, Fragment::Grid);
+	if (!GridFragment) return;
+
+	UInventoryUtility::ForEach2D(GridSlots, Index, GridFragment->GetGridSize(), Columns, [&] (UInventoryGridSlot* GridSlot)
+	{
+		GridSlot->SetInventoryItem(nullptr);
+		GridSlot->SetUpperLeftIndex(INDEX_NONE);
+		GridSlot->SetUnoccupiedTexture();
+		GridSlot->SetAvailable(true);
+	});
+
+	if (HoverSlottedRoom.IsValid())
+	{
+		HoverSlottedRoom->RemoveFromParent();
+		HoverSlottedRoom.Reset();
+	}
 }
 
 void UDrawingGrid::AddRoomAtIndex(UInventoryItem* Item, const int32 Index)

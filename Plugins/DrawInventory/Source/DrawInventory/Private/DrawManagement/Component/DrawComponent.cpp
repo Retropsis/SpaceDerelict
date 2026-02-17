@@ -16,7 +16,7 @@
 #include "Widget/Utiliies/WidgetUtiliies.h"
 #include "World/Level/Door/DoorComponent.h"
 
-UDrawComponent::UDrawComponent()
+UDrawComponent::UDrawComponent() : PooledRoomList(this), SpawnedRoomList(this)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
@@ -28,7 +28,8 @@ void UDrawComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// DOREPLIFETIME(ThisClass, RoomList);
+	DOREPLIFETIME(ThisClass, SpawnedRoomList);
+	DOREPLIFETIME(ThisClass, PooledRoomList);
 }
 
 void UDrawComponent::AddRepSubObj(UObject* SubObj)
@@ -73,7 +74,7 @@ void UDrawComponent::BuildPresetRooms()
 {
 	for (const TTuple<FIntPoint, URoomAsset*>& PresetRoom : RoomData->PresetRooms)
 	{
-		FRoomFragment* RoomFragment = PresetRoom.Value->RoomManifest.GetFragmentOfTypeMutable<FRoomFragment>();
+		FRoomFragment* RoomFragment = PresetRoom.Value->GetRoomManifest().GetFragmentOfTypeMutable<FRoomFragment>();
 		if (!RoomFragment) continue;
 		
 		ARoomActor* RoomActor = SpawnRoomActor(RoomFragment);
@@ -87,10 +88,10 @@ void UDrawComponent::BuildPresetRooms()
 		Result.DestinationYaw = 0;
 		
 		RoomActor->ConstructDoors(Result);
-		RoomFragment->SetSpawnedRoomActor(RoomActor);
-		SpawnedRooms.Add(CurrentRoomIndex, RoomActor);
-		FItemManifest Manifest = PresetRoom.Value->RoomManifest;
-		OnRoomAdded.Broadcast(Manifest.Manifest(OwningController.Get()), CurrentRoomIndex);
+		UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
+		FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
+		NewRoomFragment->SetSpawnedRoomActor(RoomActor);
+		OnRoomAdded.Broadcast(NewRoom, CurrentRoomIndex);
 	}
 }
 
@@ -115,7 +116,7 @@ void UDrawComponent::BuildRoomPool()
 	for (int32 i = 0; i < Columns * Rows; ++i)
 	{
 		const int32 Selection = FMath::RandRange(0, RoomData->Rooms.Num() - 1);
-		RoomPool.Add(RoomData->Rooms[Selection]);
+		PooledRoomList.AddEntry(RoomData->Rooms[Selection]);
 	}
 }
 
@@ -170,11 +171,20 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
 	RoomActor->ConstructDestinationOffsets();
 	RoomActor->ConstructDoors(Result);
-	RoomFragment->SetSpawnedRoomActor(RoomActor);
-	SpawnedRooms.Add(RoomIndex, RoomActor);
+	SpawnValuables(RoomToSpawn, RoomActor);
+
+	InteractingDoorComponent->ToggleDoor(true);
+	ToggleDrawingBoard();
+
+	PooledRoomList.RemoveEntry(RoomToSpawn);
+	SpawnedRoomList.AddEntry(RoomToSpawn);
 	
-	const FValuableFragment* ValuableFragment = RoomToSpawn->GetItemManifest().GetFragmentOfType<FValuableFragment>();
-	if (ValuableFragment)
+	OnRoomAdded.Broadcast(RoomToSpawn, DestinationIndex);
+}
+
+void UDrawComponent::SpawnValuables(const UInventoryItem* RoomToSpawn, const ARoomActor* RoomActor) const
+{
+	if (const FValuableFragment* ValuableFragment = RoomToSpawn->GetItemManifest().GetFragmentOfType<FValuableFragment>())
 	{
 		TArray<FTransform> SpawnerTransforms = RoomActor->GetAvailableSpawnerTransforms();
 		TArray<TSubclassOf<AActor>> ItemToSpawns = ValuableFragment->GetValuableItems();
@@ -185,13 +195,9 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 			GetWorld()->SpawnActor<AActor>(ItemToSpawn, SpawnerTransforms[i]);
 		}
 	}
-
-	OnRoomAdded.Broadcast(RoomToSpawn, DestinationIndex);
-	InteractingDoorComponent->ToggleDoor(true);
-	CloseDrawingBoard();
 }
 
-void UDrawComponent::Server_OpenConnectedDoor_Implementation(int32 Index, const FName& Socket)
+void UDrawComponent::Server_OpenConnectedDoor_Implementation(ARoomActor* RoomActor, const FName& Socket)
 {
 	// if (!IsValid(Room))
 	// {
@@ -204,9 +210,9 @@ void UDrawComponent::Server_OpenConnectedDoor_Implementation(int32 Index, const 
 	// 	UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: RoomFragment is invalid"));
 	// 	return;
 	// }
-	if (SpawnedRooms.Contains(Index) && IsValid(SpawnedRooms[Index]))
+	if (IsValid(RoomActor))
 	{
-		UDoorComponent* DoorComponent = SpawnedRooms[Index]->GetDoorComponentBySocket(Socket);
+		UDoorComponent* DoorComponent = RoomActor->GetDoorComponentBySocket(Socket);
 		if (!IsValid(DoorComponent))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: DoorComponent is invalid"));
@@ -304,30 +310,25 @@ void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)
 void UDrawComponent::DrawRooms()
 {
 	RoomsToDraw.Empty();
+	DrawingBoard->ClearDrawingBoard();
+	const int32 DestinationIndex = InteractingDoorComponent->GetDestinationIndex();
+	const int32 DestinationYaw = InteractingDoorComponent->GetRoomYaw();
+	
 	for (int32 i = 0; i < NumberOfDrawnRooms; ++i)
 	{
-		const int32 Selection = FMath::RandRange(0, RoomPool.Num() - 1);
-		// if (!IsValid(DEBUG_RoomPool[Selection])) continue;
-		FItemManifest Manifest = RoomPool[Selection]->RoomManifest;
-		RoomsToDraw.Add(Manifest.Manifest(OwningController.Get()));
+		const int32 Selection = FMath::RandRange(0, PooledRoomList.GetAllRooms().Num() - 1);
+		UInventoryItem* Room = PooledRoomList.GetAllRooms()[Selection];
+		RoomsToDraw.Add(Room);
 
-		// const int32 DEBUG_Selection = FMath::RandRange(0, DEBUG_RoomPool.Num() - 1);
-		// FItemManifest Manifest = DEBUG_RoomPool[DEBUG_Selection];
-		// RoomsToDraw.Add(Manifest.Manifest(OwningController.Get()));
-		
-		RoomPool.RemoveAt(Selection);
-		RoomPool.Shrink();
-	}
-	DrawingBoard->ClearDrawingBoard();
-	for (UInventoryItem* Room : RoomsToDraw)
-	{
 		bool bRequirementMet = false;
 		if (const FRequirementFragment* RequirementFragment = Room->GetItemManifest().GetFragmentOfType<FRequirementFragment>())
 		{
 			bRequirementMet = InventoryComponent->CheckItemOfTypAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount());
 		}
-		DrawingBoard->DrawRoom(Room, InteractingDoorComponent->GetDestinationIndex(), InteractingDoorComponent->GetRoomYaw(), bRequirementMet);
+		DrawingBoard->DrawRoom(Room, DestinationIndex,DestinationYaw, bRequirementMet);
 	}
+	
+	DrawingBoard->PlayOpeningVisualEffects();
 	DrawingBoard->SetRedrawCount(NumberOfRedraws);
 }
 
@@ -341,7 +342,7 @@ void UDrawComponent::ToggleDrawingBoard()
 	{
 		OpenDrawingBoard();
 	}
-	// OnInventoryMenuToggled.Broadcast(bDrawingBoardOpen);
+	OnToggleHUD.Broadcast(!bDrawingBoardOpen);
 }
 
 void UDrawComponent::OpenDrawingBoard()

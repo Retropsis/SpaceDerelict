@@ -12,8 +12,15 @@ UCLASS()
 class DRAWINVENTORY_API URoomAsset : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-
+	
 public:
+	// virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void InitializeRoomManifest(FItemManifest CopyOfRoomManifest);
+	FItemManifest GetRoomManifest() const { return RoomManifest; }
+	FItemManifest& GeRoomManifestMutable() { return RoomManifest; }
+
+private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FItemManifest RoomManifest;
 };

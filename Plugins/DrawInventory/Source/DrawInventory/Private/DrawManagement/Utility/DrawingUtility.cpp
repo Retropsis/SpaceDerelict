@@ -53,3 +53,32 @@ FName UDrawingUtility::GetSocketNameFromOffset(const FIntPoint& Offset)
 	if (Offset == FIntPoint(0, 1 )) return FName("North");
 	return FName("None");
 }
+
+FName UDrawingUtility::FindConnectedDoorSocket(const FName& Socket, const int32 Yaw)
+{
+	switch (Yaw)
+	{
+	case 0:
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+	case 90: 
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		case -180: 
+	case 180:
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+	case -90: 
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		if (Socket == "South") return FName("North");
+		default: return FName("None");
+	}
+}
