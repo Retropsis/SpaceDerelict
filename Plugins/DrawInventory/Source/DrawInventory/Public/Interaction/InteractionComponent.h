@@ -15,6 +15,7 @@ class DRAWINVENTORY_API UInteractionComponent : public UActorComponent
 public:
 	UInteractionComponent();
 	FString GetInteractionMessage() const { return InteractionMessage; }
+	void SetInteractionMessage(FString NewMessage) { InteractionMessage = NewMessage; }
 
 protected:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

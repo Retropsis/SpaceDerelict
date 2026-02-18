@@ -88,6 +88,7 @@ void UDrawComponent::BuildPresetRooms()
 		Result.DestinationYaw = 0;
 		
 		RoomActor->ConstructDoors(Result);
+		RoomActor->ConstructPuzzle();
 		UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
 		FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 		NewRoomFragment->SetYaw(0);
@@ -172,6 +173,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
 	RoomActor->ConstructDestinationOffsets();
 	RoomActor->ConstructDoors(Result);
+	RoomActor->ConstructPuzzle();
 	SpawnValuables(RoomToSpawn, RoomActor);
 
 	InteractingDoorComponent->ToggleDoor(true);

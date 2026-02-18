@@ -19,6 +19,7 @@ public:
 	ARoomActor();
 	TMap<FName, FIntPoint>  ConstructDestinationOffsets();
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
+	void ConstructPuzzle() const;
 	void SetRoomType(const FGameplayTag& Type) { RoomType = Type; }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
 	UDoorComponent* GetDoorComponentBySocket(const FName& Socket);

@@ -9,6 +9,7 @@ namespace Item
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Key);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Battery);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Oxygen);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoxKey);
 	}
 	namespace Equipment
 	{

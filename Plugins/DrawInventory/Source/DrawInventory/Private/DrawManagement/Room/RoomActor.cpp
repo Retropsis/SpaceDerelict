@@ -4,6 +4,7 @@
 #include "Data/DestinationData.h"
 #include "DrawManagement/Room/ItemSpawner.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
+#include "PuzzleManagement/PuzzleComponent.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
 
@@ -83,6 +84,15 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 		
 		DoorComponentToSockets.Add(Availability.Socket, DoorComponent);
 		// UE_LOG(LogTemp, Warning, TEXT("Constructing Door with destination index %d and Yaw %d, at socket %s"), Availability.DestinationIndex, DestinationYaw, *Availability.Socket.ToString());
+	}
+}
+
+void ARoomActor::ConstructPuzzle() const
+{
+	UPuzzleComponent* PuzzleComponent = FindComponentByClass<UPuzzleComponent>();
+	if (IsValid(PuzzleComponent))
+	{
+		PuzzleComponent->ConstructPuzzle();
 	}
 }
 

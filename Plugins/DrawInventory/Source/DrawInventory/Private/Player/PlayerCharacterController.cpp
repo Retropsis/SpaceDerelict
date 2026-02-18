@@ -6,7 +6,9 @@
 #include "DrawManagement/Component/DrawComponent.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "Interaction/InteractionComponent.h"
+#include "Item/ItemTags.h"
 #include "Kismet/GameplayStatics.h"
+#include "PuzzleManagement/Component/LockComponent.h"
 #include "Widget/HUD/HUDWidget.h"
 #include "World/Level/Door/DoorComponent.h"
 
@@ -73,6 +75,17 @@ void APlayerCharacterController::PrimaryInteract()
 	{
 		InventoryComponent->TryAddItem(ItemComponent);
 		return;
+	}
+	
+	ULockComponent* LockComponent = ThisActor->FindComponentByClass<ULockComponent>();
+	if (IsValid(LockComponent) || !DrawComponent.IsValid())
+	{
+		const FGameplayTag LockType = LockComponent->GetLockType();
+		if (InventoryComponent->CheckItemOfTypAndAmount(LockType, 1))
+		{
+			InventoryComponent->Server_ConsumeItemOfTypAndAmount(LockType, 1);
+			LockComponent->Unlock();
+		}
 	}
 	
 	UDoorComponent* DoorComponent = ThisActor->FindComponentByClass<UDoorComponent>();
