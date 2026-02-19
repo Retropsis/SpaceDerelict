@@ -13,9 +13,7 @@ class DRAWINVENTORY_API UPuzzleComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UPuzzleComponent();
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	virtual void OnComponentCreated() override;
 	virtual void ConstructPuzzle();
 	virtual void ConstructSpawners();
 };

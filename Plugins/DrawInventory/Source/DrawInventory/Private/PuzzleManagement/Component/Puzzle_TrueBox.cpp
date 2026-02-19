@@ -12,6 +12,12 @@ UPuzzle_TrueBox::UPuzzle_TrueBox()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UPuzzle_TrueBox::OnComponentCreated()
+{
+	Super::OnComponentCreated();
+	ConstructSpawners();
+}
+
 void UPuzzle_TrueBox::ConstructPuzzle()
 {
 	GetOwner()->GetComponents(ItemSpawnerClass, ItemSpawners);
@@ -43,7 +49,38 @@ void UPuzzle_TrueBox::ConstructPuzzle()
 	}
 }
 
+#if WITH_EDITOR
 void UPuzzle_TrueBox::ConstructSpawners()
 {
+	if (!IsValid(ItemSpawnerClass))
+	{
+		UE_LOG(LogTemp, Error, TEXT("ItemSpawnerClass is invalid please fill in Puzzle_TrueBox."));
+		return;
+	}
+	
+	ItemSpawners.Empty();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	for (int32 i = 0; i < BoxClasses.Num(); ++i)
+	{
+		const FName Label = FName(FString::Printf(TEXT("ItemSpawner_%d"), i));
+		UItemSpawner* ItemSpawner = NewObject<UItemSpawner>(GetOwner(), ItemSpawnerClass, Label);
+		ItemSpawner->RegisterComponent();
+		GetOwner()->AddInstanceComponent(ItemSpawner);
+		ItemSpawner->SetSpawnerTag(Puzzle::Box::True);
+		ItemSpawner->SetupAttachment(GetOwner()->GetRootComponent());
+
+		ItemSpawners.Add(ItemSpawner);
+	}
+	
+	const FName Label = FName(FString::Printf(TEXT("ItemSpawner_BoxKey")));
+	UItemSpawner* ItemSpawner = NewObject<UItemSpawner>(GetOwner(), ItemSpawnerClass, Label);
+	ItemSpawner->RegisterComponent();
+	GetOwner()->AddInstanceComponent(ItemSpawner);
+	ItemSpawner->SetSpawnerTag(Item::Currency::BoxKey);
+	ItemSpawner->SetupAttachment(GetOwner()->GetRootComponent());
+
+	ItemSpawners.Add(ItemSpawner);
 }
+#endif
 

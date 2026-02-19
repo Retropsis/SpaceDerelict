@@ -15,6 +15,11 @@ class DRAWINVENTORY_API UPuzzle_TrueBox : public UPuzzleComponent
 
 public:
 	UPuzzle_TrueBox();
+	
+#if WITH_EDITOR
+	virtual void OnComponentCreated() override;
+#endif
+	
 	virtual void ConstructPuzzle() override;
 	virtual void ConstructSpawners() override;
 

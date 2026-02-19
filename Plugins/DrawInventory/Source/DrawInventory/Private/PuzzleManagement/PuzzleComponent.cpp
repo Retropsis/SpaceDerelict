@@ -5,17 +5,6 @@
 #include "Interaction/InteractionComponent.h"
 #include "Item/ItemTags.h"
 
-UPuzzleComponent::UPuzzleComponent()
-{
-	PrimaryComponentTick.bCanEverTick = false;
-}
-
-inline void UPuzzleComponent::OnComponentCreated()
-{
-	Super::OnComponentCreated();
-	// ConstructSpawners();
-}
-
 void UPuzzleComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
