@@ -6,6 +6,7 @@
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_TrueBox.generated.h"
 
+class ARewardBox;
 class UItemSpawner;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -17,7 +18,7 @@ public:
 	UPuzzle_TrueBox();
 	
 #if WITH_EDITOR
-	virtual void OnComponentCreated() override;
+	virtual void InitializeComponent() override;
 #endif
 	
 	virtual void ConstructPuzzle() override;
@@ -31,13 +32,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AActor> KeyItemClass;
-
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<AActor> LootItemClass;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<TSubclassOf<AActor>> BoxClasses;
-
+	TMap<FGameplayTag, TSubclassOf<ARewardBox>> BoxClasses;
+	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FString> HintMessages;
+	TArray<FTrueBoxPattern> TrueBoxPatterns;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TArray<FPuzzleReward> Rewards;
 };

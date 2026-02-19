@@ -27,3 +27,11 @@ void UItemComponent::PickedUp()
 	GetOwner()->Destroy();
 }
 
+void UItemComponent::ToggleItemMeshCollision(const bool bEnabled) const
+{
+	if (UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(GetOwner()->FindComponentByClass(UStaticMeshComponent::StaticClass())); IsValid(Mesh))
+	{
+		Mesh->SetCollisionEnabled(bEnabled ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	}
+}
+

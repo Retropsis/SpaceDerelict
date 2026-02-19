@@ -2,8 +2,10 @@
 
 #include "PuzzleManagement/Component/Puzzle_SafeBox.h"
 #include "DrawManagement/Room/ItemSpawner.h"
-#include "Item/ItemTags.h"
 #include "PuzzleManagement/PuzzleTags.h"
+#include "Item/ItemTags.h"
+#include "Item/Component/ItemComponent.h"
+#include "Item/Fragment/ItemFragment.h"
 #include "PuzzleManagement/Piece/SafeBox.h"
 
 UPuzzle_SafeBox::UPuzzle_SafeBox()
@@ -18,19 +20,40 @@ void UPuzzle_SafeBox::ConstructPuzzle()
 	
 	GetOwner()->GetComponents(UItemSpawner::StaticClass(), ItemSpawners);
 
-	for (const UItemSpawner* Spawner : ItemSpawners)
+	const int32 PatternSelection = FMath::RandRange(0, SafeBoxPatterns.Num() - 1);
+	FSafeBoxPattern Pattern = SafeBoxPatterns[PatternSelection];
+	TSubclassOf<ASafeBox> ChosenSafeBoxClass = Pattern.GetSafeBoxClass();
+	TSubclassOf<AActor> ChosenCodeItemClass = Pattern.GetCodeItemClass();
+	
+	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
+	TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
+	
+	TMap<FGameplayTag, UItemSpawner*> TaggedItemSpawners;
+	for (UItemSpawner* Spawner : ItemSpawners)
 	{
-		if (Spawner->GetSpawnerTag().MatchesTagExact(Item::Puzzle::Code) && IsValid(CodeItemClass))
+		TaggedItemSpawners.Add(Spawner->GetSpawnerTag(), Spawner);
+	}
+	
+	for (const TTuple<FGameplayTag, UItemSpawner*>& Spawner : TaggedItemSpawners)
+	{
+		if (Spawner.Key.MatchesTagExact(Item::Puzzle::Code) && IsValid(ChosenCodeItemClass))
 		{
-			GetWorld()->SpawnActor<AActor>(CodeItemClass, Spawner->GetComponentTransform(), SpawnParams);
-		}
-		if (Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Box::Safe) && IsValid(SafeBoxClass))
-		{
-			ASafeBox* SafeBox = GetWorld()->SpawnActor<ASafeBox>(SafeBoxClass, Spawner->GetComponentTransform(), SpawnParams);
-			if (UItemSpawner* ItemSpawner = SafeBox->FindComponentByClass<UItemSpawner>(); IsValid(ItemSpawner) && IsValid(LootItemClass))
+			AActor* Item = GetWorld()->SpawnActor<AActor>(ChosenCodeItemClass, Spawner.Value->GetComponentTransform(), SpawnParams);
+			UItemComponent* ItemComponent = Item->FindComponentByClass<UItemComponent>();
+			if (IsValid(ItemComponent))
 			{
-				GetWorld()->SpawnActor<AActor>(LootItemClass, ItemSpawner->GetComponentTransform(), SpawnParams);
+				if (FTextFragment* TextFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeMutable<FTextFragment>())
+				{
+					FString NewText = FString::Printf(TEXT("The code is %s."), *Pattern.GetSafeBoxCode());
+					TextFragment->SetText(FText::FromString(NewText));
+				}
 			}
+		}
+		if (Spawner.Key.MatchesTagExact(Puzzle::Box::Safe) && IsValid(ChosenRewardClass))
+		{
+			ASafeBox* SafeBox = GetWorld()->SpawnActor<ASafeBox>(ChosenSafeBoxClass, Spawner.Value->GetComponentTransform(), SpawnParams);
+			SafeBox->SetSafeBoxCode(Pattern.GetSafeBoxCode());
+			SafeBox->SetLootItemClass(ChosenRewardClass);
 		}
 	}
 }

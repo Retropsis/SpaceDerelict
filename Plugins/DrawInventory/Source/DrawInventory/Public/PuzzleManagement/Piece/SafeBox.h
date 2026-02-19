@@ -19,6 +19,9 @@ class DRAWINVENTORY_API ASafeBox : public AActor
 
 public:
 	ASafeBox();
+	void SetSafeBoxCode(const FString& Code);
+	void SpawnReward() const;
+	void SetLootItemClass(const TSubclassOf<AActor>& Class) { LootItemClass = Class; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Unlock();
@@ -33,10 +36,8 @@ private:
 	void ResetInputCode();
 	UWidgetComponent* ConstructDigitWidgetComponent(const FName& Name);
 	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<uint32> SafeBoxCode;
-	
-	TArray<uint32> InputCode;
+	TArray<int32> SafeBoxCode;
+	TArray<int32> InputCode;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TObjectPtr<USkeletalMeshComponent> SafeBoxMesh;
@@ -93,4 +94,5 @@ private:
 	TObjectPtr<UWidgetComponent> DigitWidgetComponent;
 
 	bool bUnlocked = false;
+	TSubclassOf<AActor> LootItemClass;
 };

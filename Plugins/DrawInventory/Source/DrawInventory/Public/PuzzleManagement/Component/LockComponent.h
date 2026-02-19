@@ -24,6 +24,6 @@ public:
 	FUnlock OnUnlock;
 
 private:
-	UPROPERTY(EditAnywhere, meta=(Categories="Item.Currency"))
+	UPROPERTY(EditAnywhere, meta=(Categories="Item"))
 	FGameplayTag LockType = FGameplayTag::EmptyTag;
 };

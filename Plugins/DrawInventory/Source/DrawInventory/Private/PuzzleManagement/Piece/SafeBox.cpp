@@ -3,6 +3,7 @@
 #include "PuzzleManagement/Piece/SafeBox.h"
 
 #include "Components/WidgetComponent.h"
+#include "DrawManagement/Room/ItemSpawner.h"
 #include "PuzzleManagement/Piece/Component/DigitComponent.h"
 #include "PuzzleManagement/PuzzleTags.h"
 #include "Widget/Puzzle/DigitWidget.h"
@@ -86,6 +87,18 @@ ASafeBox::ASafeBox()
 	DigitWidgetComponent->SetDrawSize(FVector2D( 200.f, 200.f ));
 }
 
+void ASafeBox::SetSafeBoxCode(const FString& Code)
+{
+	for (const TCHAR Char : Code.GetCharArray())
+	{
+		if (FChar::IsDigit(Char))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Converting %c to %d"), Char, FChar::ConvertCharDigitToInt(Char))
+			SafeBoxCode.Add(FChar::ConvertCharDigitToInt(Char));
+		}
+	}
+}
+
 void ASafeBox::OnNumericInput(const FName& Digit)
 {
 	if (bUnlocked) return;
@@ -115,9 +128,20 @@ void ASafeBox::OnNumericInput(const FName& Digit)
 	if (bCodeCorrect)
 	{
 		Unlock();
+		SpawnReward();
 		bUnlocked = true;
 	}
 	else ResetInputCode();
+}
+
+void ASafeBox::SpawnReward() const
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (const UItemSpawner* ItemSpawner = FindComponentByClass<UItemSpawner>(); IsValid(ItemSpawner) && IsValid(LootItemClass))
+	{
+		GetWorld()->SpawnActor<AActor>(LootItemClass, ItemSpawner->GetComponentTransform(), SpawnParams);
+	}
 }
 
 void ASafeBox::BeginPlay()

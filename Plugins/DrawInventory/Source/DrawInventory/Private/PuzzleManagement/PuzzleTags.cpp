@@ -7,6 +7,9 @@ namespace Puzzle
 	{
 		UE_DEFINE_GAMEPLAY_TAG(True, "Puzzle.Box.True");
 		UE_DEFINE_GAMEPLAY_TAG(Safe, "Puzzle.Box.Safe");
+		UE_DEFINE_GAMEPLAY_TAG(Blue, "Puzzle.Box.Blue");
+		UE_DEFINE_GAMEPLAY_TAG(Red, "Puzzle.Box.Red");
+		UE_DEFINE_GAMEPLAY_TAG(Gold, "Puzzle.Box.Gold");
 	}
 	namespace Numeric
 	{

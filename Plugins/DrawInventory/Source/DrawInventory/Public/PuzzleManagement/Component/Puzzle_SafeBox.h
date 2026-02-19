@@ -20,16 +20,10 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<AActor> SafeBoxClass;
+	TArray<FSafeBoxPattern> SafeBoxPatterns;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<AActor> CodeItemClass;
-
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<AActor> LootItemClass;
-
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	FString Code;
+	TArray<FPuzzleReward> Rewards;
 	
 	TArray<UItemSpawner*> ItemSpawners;
 };

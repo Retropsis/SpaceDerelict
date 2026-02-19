@@ -22,6 +22,8 @@ public:
 	FItemManifest& GetItemManifestMutable() { return ItemManifest; }
 	void PickedUp();
 
+	void ToggleItemMeshCollision(bool bEnabled) const;
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category="Inventory")
 	void OnPickedUp();
