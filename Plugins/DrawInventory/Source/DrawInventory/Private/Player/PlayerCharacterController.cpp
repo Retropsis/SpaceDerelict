@@ -9,6 +9,7 @@
 #include "Item/ItemTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "PuzzleManagement/Component/LockComponent.h"
+#include "PuzzleManagement/Piece/Component/DigitComponent.h"
 #include "Widget/HUD/HUDWidget.h"
 #include "World/Level/Door/DoorComponent.h"
 
@@ -85,6 +86,17 @@ void APlayerCharacterController::PrimaryInteract()
 		{
 			InventoryComponent->Server_ConsumeItemOfTypAndAmount(LockType, 1);
 			LockComponent->Unlock();
+			return;
+		}
+	}
+
+	if (ThisComponent.IsValid())
+	{
+		UDigitComponent* DigitComponent = Cast<UDigitComponent>(ThisComponent);
+		if (IsValid(DigitComponent))
+		{
+			DigitComponent->PressInput();
+			return;
 		}
 	}
 	
@@ -158,7 +170,9 @@ void APlayerCharacterController::TraceForItem()
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, InteractionTraceChannel);
 
 	LastActor = ThisActor;
+	LastComponent = ThisComponent;
 	ThisActor = HitResult.GetActor();
+	ThisComponent = HitResult.GetComponent();
 
 	if (!ThisActor.IsValid())
 	{

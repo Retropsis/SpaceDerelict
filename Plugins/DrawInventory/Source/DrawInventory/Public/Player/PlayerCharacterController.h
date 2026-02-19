@@ -67,6 +67,8 @@ private:
 
 	TWeakObjectPtr<AActor> ThisActor;
 	TWeakObjectPtr<AActor> LastActor;
+	TWeakObjectPtr<UActorComponent> ThisComponent;
+	TWeakObjectPtr<UActorComponent> LastComponent;
 	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
 	float AO_Pitch;

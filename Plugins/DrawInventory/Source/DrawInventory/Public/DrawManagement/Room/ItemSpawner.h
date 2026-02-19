@@ -18,6 +18,6 @@ public:
 	void SetSpawnerTag(const FGameplayTag& Tag) { SpawnerTag = Tag; };
 
 private:
-	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Item"))
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FGameplayTag SpawnerTag;
 };

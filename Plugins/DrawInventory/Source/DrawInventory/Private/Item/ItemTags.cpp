@@ -11,6 +11,10 @@ namespace Item
 		UE_DEFINE_GAMEPLAY_TAG(Oxygen, "Item.Currency.Oxygen");
 		UE_DEFINE_GAMEPLAY_TAG(BoxKey, "Item.Currency.BoxKey");
 	}
+	namespace Puzzle
+	{
+		UE_DEFINE_GAMEPLAY_TAG(Code, "Item.Puzzle.Code");
+	}
 	namespace Equipment
 	{
 		namespace Weapons

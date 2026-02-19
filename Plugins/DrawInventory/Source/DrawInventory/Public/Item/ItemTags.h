@@ -11,6 +11,10 @@ namespace Item
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Oxygen);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoxKey);
 	}
+	namespace Puzzle
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Code);
+	}
 	namespace Equipment
 	{
 		namespace Weapons
