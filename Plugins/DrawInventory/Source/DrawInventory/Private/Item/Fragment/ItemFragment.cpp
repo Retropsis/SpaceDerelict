@@ -237,9 +237,9 @@ void FRoomFragment::OnSpawn(APlayerController* PC)
 	// }
 }
 
-ARoomActor* FRoomFragment::SpawnRoomActor(UObject* Outer) const
+ARoomActor* FRoomFragment::SpawnRoomActor(const UObject* Outer) const
 {
-	if (!IsValid(RoomActorClass) || !IsValid(Outer)) return nullptr;
+	if (RoomActorClass == nullptr || !IsValid(Outer)) return nullptr;
 
 	ARoomActor* SpawnActor = Outer->GetWorld()->SpawnActor<ARoomActor>(RoomActorClass);
 	return SpawnActor;

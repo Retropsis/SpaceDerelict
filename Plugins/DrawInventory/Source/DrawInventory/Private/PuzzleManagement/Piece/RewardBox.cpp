@@ -8,9 +8,9 @@ void ARewardBox::SpawnReward()
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (const UItemSpawner* ItemSpawner = FindComponentByClass<UItemSpawner>(); IsValid(ItemSpawner) && IsValid(LootItemClass))
+	if (IsValid(LootItemClass))
 	{
-		GetWorld()->SpawnActor<AActor>(LootItemClass, ItemSpawner->GetComponentTransform(), SpawnParams);
+		GetWorld()->SpawnActor<AActor>(LootItemClass, GetSpawnTransform(), SpawnParams);
 	}
 }
 

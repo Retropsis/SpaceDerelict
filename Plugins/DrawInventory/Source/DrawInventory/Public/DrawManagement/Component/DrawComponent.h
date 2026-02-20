@@ -49,6 +49,9 @@ public:
 	UFUNCTION()
 	void OnKeyConsume();
 
+	UFUNCTION()
+	void OnOxygenConsume();
+
 	bool IsDrawingBoardOpen() const { return bDrawingBoardOpen; }
 	
 	int32 GetRows() const { return Rows; }

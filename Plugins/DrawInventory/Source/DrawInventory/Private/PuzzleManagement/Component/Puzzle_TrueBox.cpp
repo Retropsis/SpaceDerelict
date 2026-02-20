@@ -12,15 +12,9 @@ UPuzzle_TrueBox::UPuzzle_TrueBox()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPuzzle_TrueBox::InitializeComponent()
-{
-	Super::InitializeComponent();
-	// ConstructSpawners();
-}
-
 void UPuzzle_TrueBox::ConstructPuzzle()
 {
-	GetOwner()->GetComponents(ItemSpawnerClass, ItemSpawners);
+	GetOwner()->GetComponents(UItemSpawner::StaticClass(), ItemSpawners);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -40,14 +34,20 @@ void UPuzzle_TrueBox::ConstructPuzzle()
 	
 	for (const TTuple<FGameplayTag, UItemSpawner*>& Spawner : TaggedItemSpawners)
 	{
-		if (Spawner.Key.MatchesTagExact(Item::Puzzle::BoxKey) && IsValid(KeyItemClass))
+		if (Spawner.Key.MatchesTagExact(Item::Puzzle::BoxKey) && IsValid(KeyItemClass) && IsValid(SpawnerClass))
 		{
-			GetWorld()->SpawnActor<AActor>(KeyItemClass, TaggedItemSpawners[Item::Puzzle::BoxKey]->GetComponentTransform(), SpawnParams);
+			ASpawner* SpawnerActor = GetWorld()->SpawnActor<ASpawner>(SpawnerClass, TaggedItemSpawners[Item::Puzzle::BoxKey]->GetComponentTransform(), SpawnParams);
+			SpawnerActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
+			AActor* Item = GetWorld()->SpawnActor<AActor>(KeyItemClass, SpawnerActor->GetSpawnTransform(), SpawnParams);
+			Item->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 		}
 				
-		if (TaggedItemSpawners.Contains(Spawner.Key) && BoxClasses.Contains(Spawner.Key))
+		if (TaggedItemSpawners.Contains(Spawner.Key) && BoxClasses.Contains(Spawner.Key) && IsValid(SpawnerClass))
 		{
-			ARewardBox* TrueBox = GetWorld()->SpawnActor<ARewardBox>(BoxClasses[Spawner.Key], TaggedItemSpawners[Spawner.Key]->GetComponentTransform(), SpawnParams);
+			ASpawner* SpawnerActor = GetWorld()->SpawnActor<ASpawner>(SpawnerClass, TaggedItemSpawners[Spawner.Key]->GetComponentTransform(), SpawnParams);
+			SpawnerActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
+			ARewardBox* TrueBox = GetWorld()->SpawnActor<ARewardBox>(BoxClasses[Spawner.Key], SpawnerActor->GetSpawnTransform(), SpawnParams);
+			TrueBox->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 		
 			UInteractionComponent* InteractionComponent = TrueBox->FindComponentByClass<UInteractionComponent>();
 			if (IsValid(InteractionComponent) && Pattern.GetHintMessages().Contains(Spawner.Key))
@@ -66,7 +66,7 @@ void UPuzzle_TrueBox::ConstructPuzzle()
 #if WITH_EDITOR
 void UPuzzle_TrueBox::ConstructSpawners()
 {
-	if (!IsValid(ItemSpawnerClass))
+	if (!IsValid(SpawnerClass))
 	{
 		UE_LOG(LogTemp, Error, TEXT("ItemSpawnerClass is invalid please fill in Puzzle_TrueBox."));
 		return;

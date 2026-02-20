@@ -15,7 +15,7 @@ class DRAWINVENTORY_API UItemSpawner : public USceneComponent
 
 public:
 	FGameplayTag GetSpawnerTag() const { return SpawnerTag; }
-	void SetSpawnerTag(const FGameplayTag& Tag) { SpawnerTag = Tag; };
+	void SetSpawnerTag(const FGameplayTag& Tag) { SpawnerTag = Tag; }
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "World/Spawner/Spawner.h"
 #include "RewardBox.generated.h"
 
 
 UCLASS()
-class DRAWINVENTORY_API ARewardBox : public AActor
+class DRAWINVENTORY_API ARewardBox : public ASpawner
 {
 	GENERATED_BODY()
 

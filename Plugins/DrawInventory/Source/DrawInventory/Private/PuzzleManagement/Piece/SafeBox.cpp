@@ -18,7 +18,7 @@ ASafeBox::ASafeBox()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	NumericPadRoot = CreateDefaultSubobject<USceneComponent>("NumericPadRoot");
-	SetRootComponent(NumericPadRoot);
+	// SetRootComponent(NumericPadRoot);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_1);
 	Digit_1->SetDigitCode(Puzzle::Numeric::One);
@@ -138,9 +138,9 @@ void ASafeBox::SpawnReward() const
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (const UItemSpawner* ItemSpawner = FindComponentByClass<UItemSpawner>(); IsValid(ItemSpawner) && IsValid(LootItemClass))
+	if (IsValid(LootItemClass))
 	{
-		GetWorld()->SpawnActor<AActor>(LootItemClass, ItemSpawner->GetComponentTransform(), SpawnParams);
+		GetWorld()->SpawnActor<AActor>(LootItemClass, GetSpawnTransform(), SpawnParams);
 	}
 }
 
@@ -148,6 +148,16 @@ void ASafeBox::BeginPlay()
 {
 	Super::BeginPlay();
 	DigitWidget = Cast<UDigitWidget>(DigitWidgetComponent->GetWidget());
+
+	if (!IsValid(DigitWidget)) return;
+	
+	TArray<UWidgetComponent*> Widgets;
+	GetComponents(UWidgetComponent::StaticClass(), Widgets);
+
+	for (UWidgetComponent* Widget : Widgets)
+	{
+		Widget->SetWidget(DigitWidget);
+	}
 }
 
 void ASafeBox::ResetInputCode()
@@ -165,7 +175,6 @@ UWidgetComponent* ASafeBox::ConstructDigitWidgetComponent(const FName& Name)
 	NewWidget->SetWidgetSpace(EWidgetSpace::World);
 	NewWidget->SetDrawAtDesiredSize(true);
 	NewWidget->SetDrawSize(FVector2D( 16.f, 16.f ));
-	NewWidget->SetWidget(DigitWidget);
 	return NewWidget;
 }
 

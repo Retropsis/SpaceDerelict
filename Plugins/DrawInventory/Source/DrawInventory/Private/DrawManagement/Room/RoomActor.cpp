@@ -1,9 +1,12 @@
 // Retropsis 2026
 
 #include "DrawManagement/Room/RoomActor.h"
+
+#include "Components/BoxComponent.h"
 #include "Data/DestinationData.h"
 #include "DrawManagement/Room/ItemSpawner.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
+#include "GameFramework/Character.h"
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -12,6 +15,14 @@ ARoomActor::ARoomActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
+
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+
+	RoomBoundary = CreateDefaultSubobject<UBoxComponent>("RoomBoundary");
+	RoomBoundary->SetupAttachment(GetRootComponent());
+	RoomBoundary->SetBoxExtent(FVector( 4200.f, 4200.f, 10000.f ));
+	RoomBoundary->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 TMap<FName, FIntPoint>  ARoomActor::ConstructDestinationOffsets()
@@ -27,16 +38,23 @@ TMap<FName, FIntPoint>  ARoomActor::ConstructDestinationOffsets()
 		return DestinationOffsets;
 	}
 		
-	USkeletalMeshComponent* SkeletalMeshComponent = FindComponentByClass<USkeletalMeshComponent>();
-	if (IsValid(SkeletalMeshComponent))
-	{
-		for (const FName& Socket : SkeletalMeshComponent->GetAllSocketNames())
-		{
-			FIntPoint Offset = UDrawingUtility::GetOffsetFromSocketName(Socket);
-			DestinationOffsets.Add(Socket, Offset);
-		}
-	}
+	// USkeletalMeshComponent* SkeletalMeshComponent = FindComponentByClass<USkeletalMeshComponent>();
+	// if (IsValid(SkeletalMeshComponent))
+	// {
+	// 	for (const FName& Socket : SkeletalMeshComponent->GetAllSocketNames())
+	// 	{
+	// 		FIntPoint Offset = UDrawingUtility::GetOffsetFromSocketName(Socket);
+	// 		DestinationOffsets.Add(Socket, Offset);
+	// 	}
+	// }
 	return DestinationOffsets;
+}
+
+void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result)
+{
+	ConstructDoors(Result);
+	ConstructPuzzle();
+	RoomBoundary->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnRoomBoundaryBeginOverlap);
 }
 
 void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
@@ -48,8 +66,10 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 	for (const FDestinationAvailability Availability : Result.DestinationAvailabilities)
 	{
 		ADoor* Door = GetWorld()->SpawnActor<ADoor>(DoorClass);
+#if WITH_EDITOR
 		const FString NewLabel = FString::Printf(TEXT("%s_%s"), *Door->GetName(), *Availability.Socket.ToString());
 		Door->SetActorLabel(NewLabel);
+#endif
 		float Yaw{ 0 };
 
 		UStaticMeshComponent* StaticMeshComponent = FindComponentByClass<UStaticMeshComponent>();
@@ -59,12 +79,12 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 			Yaw = StaticMeshComponent->GetSocketTransform(Availability.Socket, RTS_Component).Rotator().Yaw;
 		}
 		
-		USkeletalMeshComponent* SkeletalMeshComponent = FindComponentByClass<USkeletalMeshComponent>();
-		if (IsValid(SkeletalMeshComponent))
-		{
-			Door->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Availability.Socket);
-			Yaw = SkeletalMeshComponent->GetSocketTransform(Availability.Socket, RTS_Component).Rotator().Yaw;
-		}
+		// USkeletalMeshComponent* SkeletalMeshComponent = FindComponentByClass<USkeletalMeshComponent>();
+		// if (IsValid(SkeletalMeshComponent))
+		// {
+		// 	Door->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Availability.Socket);
+		// 	Yaw = SkeletalMeshComponent->GetSocketTransform(Availability.Socket, RTS_Component).Rotator().Yaw;
+		// }
 
 		Door->SwitchDoorState(Availability.DoorState);
 
@@ -114,5 +134,13 @@ TArray<FTransform> ARoomActor::GetAvailableSpawnerTransforms() const
 		if (IsValid(SceneComponent)) SpawnerTransforms.Add(SceneComponent->GetComponentTransform());
 	}
 	return SpawnerTransforms;
+}
+
+void ARoomActor::OnRoomBoundaryBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		OnPlayerEnter.Broadcast();
+	}
 }
 

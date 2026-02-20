@@ -6,6 +6,7 @@
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_SafeBox.generated.h"
 
+class ASpawner;
 class UItemSpawner;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -19,6 +20,9 @@ public:
 	virtual void ConstructSpawners() override;
 
 private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<ASpawner> SpawnerClass;
+	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FSafeBoxPattern> SafeBoxPatterns;
 	

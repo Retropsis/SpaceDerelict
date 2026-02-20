@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "World/Spawner/Spawner.h"
 #include "SafeBox.generated.h"
 
 class UWidgetComponent;
@@ -13,7 +14,7 @@ class UBoxComponent;
 
 
 UCLASS()
-class DRAWINVENTORY_API ASafeBox : public AActor
+class DRAWINVENTORY_API ASafeBox : public ASpawner
 {
 	GENERATED_BODY()
 

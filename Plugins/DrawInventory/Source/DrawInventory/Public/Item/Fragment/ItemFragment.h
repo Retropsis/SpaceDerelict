@@ -273,7 +273,7 @@ public:
 	virtual void Assimilate(UCompositeBase* Composite) const override;
 	virtual void Manifest() override;
 	void OnSpawn(APlayerController* PC);
-	ARoomActor* SpawnRoomActor(UObject* Outer) const;
+	ARoomActor* SpawnRoomActor(const UObject* Outer) const;
 	ARoomActor* GetRoomActor() const { return RoomActor.Get(); }
 	FGameplayTag GetRoomType() const { return RoomType; }
 	void SetSpawnedRoomActor(ARoomActor* Room);

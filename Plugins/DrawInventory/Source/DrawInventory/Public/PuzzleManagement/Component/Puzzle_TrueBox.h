@@ -6,6 +6,7 @@
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_TrueBox.generated.h"
 
+class ASpawner;
 class ARewardBox;
 class UItemSpawner;
 
@@ -18,15 +19,15 @@ public:
 	UPuzzle_TrueBox();
 	
 #if WITH_EDITOR
-	virtual void InitializeComponent() override;
+	// virtual void InitializeComponent() override;
+	virtual void ConstructSpawners() override;
 #endif
 	
 	virtual void ConstructPuzzle() override;
-	virtual void ConstructSpawners() override;
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<UItemSpawner> ItemSpawnerClass;
+	TSubclassOf<ASpawner> SpawnerClass;
 
 	TArray<UItemSpawner*> ItemSpawners;
 

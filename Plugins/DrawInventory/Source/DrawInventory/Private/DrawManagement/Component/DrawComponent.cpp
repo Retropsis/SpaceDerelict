@@ -74,7 +74,7 @@ void UDrawComponent::BuildPresetRooms()
 {
 	for (const TTuple<FIntPoint, URoomAsset*>& PresetRoom : RoomData->PresetRooms)
 	{
-		FRoomFragment* RoomFragment = PresetRoom.Value->GetRoomManifest().GetFragmentOfTypeMutable<FRoomFragment>();
+		FRoomFragment* RoomFragment = PresetRoom.Value->GetRoomManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 		if (!RoomFragment) continue;
 		
 		ARoomActor* RoomActor = SpawnRoomActor(RoomFragment);
@@ -87,8 +87,8 @@ void UDrawComponent::BuildPresetRooms()
 		Result.RoomIndex = CurrentRoomIndex;
 		Result.DestinationYaw = 0;
 		
-		RoomActor->ConstructDoors(Result);
-		RoomActor->ConstructPuzzle();
+		RoomActor->ConstructRoom(Result);
+		RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnOxygenConsume);
 		UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
 		FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 		NewRoomFragment->SetYaw(0);
@@ -172,8 +172,8 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	RoomActor->SetActorLocation(FVector(Coordinates.X * RoomSize,  - Coordinates.Y * RoomSize, 0.f));
 	RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
 	RoomActor->ConstructDestinationOffsets();
-	RoomActor->ConstructDoors(Result);
-	RoomActor->ConstructPuzzle();
+	RoomActor->ConstructRoom(Result);
+	RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnOxygenConsume);
 	SpawnValuables(RoomToSpawn, RoomActor);
 
 	InteractingDoorComponent->ToggleDoor(true);
@@ -291,6 +291,11 @@ void UDrawComponent::OnKeyConsume()
 	InteractingDoorComponent->Unlock();
 	ToggleDrawingBoard();
 	DrawRooms();
+}
+
+void UDrawComponent::OnOxygenConsume()
+{
+	OnItemConsume(Item::Currency::Oxygen, 1);
 }
 
 void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)

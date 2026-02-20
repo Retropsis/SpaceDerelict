@@ -38,7 +38,11 @@ void UPuzzle_SafeBox::ConstructPuzzle()
 	{
 		if (Spawner.Key.MatchesTagExact(Item::Puzzle::Code) && IsValid(ChosenCodeItemClass))
 		{
-			AActor* Item = GetWorld()->SpawnActor<AActor>(ChosenCodeItemClass, Spawner.Value->GetComponentTransform(), SpawnParams);
+			ASpawner* SpawnerActor = GetWorld()->SpawnActor<ASpawner>(SpawnerClass, Spawner.Value->GetComponentTransform(), SpawnParams);
+			SpawnerActor->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
+			AActor* Item = GetWorld()->SpawnActor<AActor>(ChosenCodeItemClass, SpawnerActor->GetSpawnTransform(), SpawnParams);
+			Item->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
+			
 			UItemComponent* ItemComponent = Item->FindComponentByClass<UItemComponent>();
 			if (IsValid(ItemComponent))
 			{
@@ -49,17 +53,14 @@ void UPuzzle_SafeBox::ConstructPuzzle()
 				}
 			}
 		}
-		if (Spawner.Key.MatchesTagExact(Puzzle::Box::Safe) && IsValid(ChosenRewardClass))
+		if (Spawner.Key.MatchesTagExact(Puzzle::Box::Safe) && IsValid(ChosenRewardClass) && IsValid(SpawnerClass))
 		{
 			ASafeBox* SafeBox = GetWorld()->SpawnActor<ASafeBox>(ChosenSafeBoxClass, Spawner.Value->GetComponentTransform(), SpawnParams);
+			SafeBox->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 			SafeBox->SetSafeBoxCode(Pattern.GetSafeBoxCode());
 			SafeBox->SetLootItemClass(ChosenRewardClass);
 		}
 	}
 }
 
-void UPuzzle_SafeBox::ConstructSpawners()
-{
-	
-}
-
+void UPuzzle_SafeBox::ConstructSpawners() {}

@@ -80,6 +80,12 @@ void APlayerCharacterController::PrimaryInteract()
 		InventoryComponent->TryAddItem(ItemComponent);
 		return;
 	}
+
+	UInteractionComponent* InteractionComponent = ThisActor->FindComponentByClass<UInteractionComponent>();
+	if (IsValid(InteractionComponent))
+	{
+		InteractionComponent->Interact();
+	}
 	
 	ULockComponent* LockComponent = ThisActor->FindComponentByClass<ULockComponent>();
 	if (IsValid(LockComponent) || !DrawComponent.IsValid())

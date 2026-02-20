@@ -18,7 +18,7 @@ public:
 
 	void InitializeRoomManifest(FItemManifest CopyOfRoomManifest);
 	FItemManifest GetRoomManifest() const { return RoomManifest; }
-	FItemManifest& GeRoomManifestMutable() { return RoomManifest; }
+	FItemManifest& GetRoomManifestMutable() { return RoomManifest; }
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

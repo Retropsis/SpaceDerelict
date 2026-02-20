@@ -16,6 +16,7 @@ public:
 	UInteractionComponent();
 	FString GetInteractionMessage() const { return InteractionMessage; }
 	void SetInteractionMessage(FString NewMessage) { InteractionMessage = NewMessage; }
+	virtual void Interact() {}
 
 protected:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
