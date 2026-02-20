@@ -30,4 +30,5 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!PlayerController.IsValid()) return;
 
 	Pitch = PlayerController->GetAOPitch();
+	bGloveRaised = PlayerController->IsGloveRaised();
 }

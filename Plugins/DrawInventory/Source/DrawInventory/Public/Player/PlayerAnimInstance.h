@@ -19,8 +19,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetPitch() const { return Pitch; }
+	
+	UFUNCTION(BlueprintCallable)
+	bool IsGloveRaised() const { return bGloveRaised; }
 
 private:
 	TWeakObjectPtr<APlayerCharacterController> PlayerController;
 	float Pitch;
+	bool bGloveRaised;
 };

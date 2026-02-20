@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerCharacterController.generated.h"
 
+struct FInputActionValue;
 class UDrawComponent;
 class UDoorComponent;
 class UInventoryComponent;
@@ -25,6 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void SetTimerPlayerPositionUpdate() const;
 	float GetAOPitch() const { return AO_Pitch; }
+	bool IsGloveRaised() const { return bGloveRaised; }
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
@@ -43,26 +45,30 @@ private:
 	void CreateHUDWidget();
 	void TraceForItem();
 	void CalculateAOPitch();
+	void ToggleGlove(const FInputActionValue& Value);
 	
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TArray<TObjectPtr<UInputMappingContext>> DefaultIMCs;
 	
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> PrimaryInteractAction;
 	
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> ToggleInventoryAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TObjectPtr<UInputAction> ToggleGloveAction;
 
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
 
 	UPROPERTY()
 	TObjectPtr<UHUDWidget> HUDWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	double TraceLength;
 
-	UPROPERTY(EditDefaultsOnly, Category=Inventory)
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TEnumAsByte<ECollisionChannel> InteractionTraceChannel;
 
 	TWeakObjectPtr<AActor> ThisActor;
@@ -72,4 +78,5 @@ private:
 	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
 	float AO_Pitch;
+	bool bGloveRaised;
 };

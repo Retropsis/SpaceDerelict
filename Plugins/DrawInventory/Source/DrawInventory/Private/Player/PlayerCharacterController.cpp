@@ -19,6 +19,7 @@ APlayerCharacterController::APlayerCharacterController()
 	TraceLength = 500.0;
 	InteractionTraceChannel = ECC_GameTraceChannel2;
 	AO_Pitch = 0.f;
+	bGloveRaised = false;
 }
 
 void APlayerCharacterController::Tick(float DeltaTime)
@@ -65,6 +66,8 @@ void APlayerCharacterController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::PrimaryInteract);
 	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleInventory);
+	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleGlove);
+	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ToggleGlove);
 }
 
 void APlayerCharacterController::PrimaryInteract()
@@ -151,6 +154,19 @@ void APlayerCharacterController::CalculateAOPitch()
 		const FVector2D OutRange(-90.f, 0.f);
 		AO_Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, AO_Pitch);
 	}
+}
+
+void APlayerCharacterController::ToggleGlove(const FInputActionValue& Value)
+{
+	if (Value.Get<bool>()) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::Red, "Glove Raised");
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::Red, "Glove Off");
+	}
+	bGloveRaised = Value.Get<bool>();
 }
 
 void APlayerCharacterController::TraceForItem()
