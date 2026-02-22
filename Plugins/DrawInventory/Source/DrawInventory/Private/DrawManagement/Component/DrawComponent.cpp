@@ -118,6 +118,11 @@ void UDrawComponent::BuildRoomPool()
 	for (int32 i = 0; i < Columns * Rows; ++i)
 	{
 		const int32 Selection = FMath::RandRange(0, RoomData->Rooms.Num() - 1);
+		
+		// FRuleFragment* RuleFragment = RoomData->Rooms[Selection]->GetRoomManifestMutable().GetFragmentOfTypeMutable<FRuleFragment>();
+		// if (!RuleFragment) continue;
+		// if (!RuleFragment->ApplyRules(this, RoomData->Rooms[Selection]->GetRoomManifest().GetItemType())) continue;
+		
 		PooledRoomList.AddEntry(RoomData->Rooms[Selection]);
 	}
 }
@@ -276,6 +281,7 @@ void UDrawComponent::ConstructUnlockWidget()
 	UnlockWidget = CreateWidget<UUnlockWidget>(OwningController.Get(), UnlockWidgetClass);
 	UnlockWidget->AddToViewport();
 	UnlockWidget->UnlockButtonClicked.AddDynamic(this, &ThisClass::OnKeyConsume);
+	UnlockWidget->CancelButtonClicked.AddDynamic(this, &ThisClass::CloseUnlockWidget);
 	CloseUnlockWidget();
 }
 
@@ -295,7 +301,19 @@ void UDrawComponent::OnKeyConsume()
 
 void UDrawComponent::OnOxygenConsume()
 {
-	OnItemConsume(Item::Currency::Oxygen, 1);
+	if (InventoryComponent->CheckItemOfTypAndAmount(Item::Currency::Oxygen, 1))
+	{
+		OnItemConsume(Item::Currency::Oxygen, 1);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnOxygenConsume"));
+	}
+}
+
+bool UDrawComponent::DrawRuleMaxCount(const FGameplayTag& RoomTag)
+{
+	return true;
 }
 
 void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)

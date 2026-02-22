@@ -6,10 +6,10 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DrawingUtility.generated.h"
 
+struct FGameplayTag;
 class UDrawComponent;
-/**
- * 
- */
+
+
 UCLASS()
 class DRAWINVENTORY_API UDrawingUtility : public UBlueprintFunctionLibrary
 {
@@ -30,4 +30,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "DrawInventory")
 	static FName FindConnectedDoorSocket(const FIntPoint& OriginOffset, int32 Yaw);
+	
+	UFUNCTION(BlueprintCallable, Category = "DrawInventory")
+	static bool DrawRuleMaxCount(const FGameplayTag& RoomType, const APlayerController* PC);
 };

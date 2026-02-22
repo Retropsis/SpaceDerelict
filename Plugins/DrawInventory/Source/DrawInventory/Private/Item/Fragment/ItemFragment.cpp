@@ -1,6 +1,7 @@
 
 #include "Item/Fragment/ItemFragment.h"
 
+#include "DrawManagement/Component/DrawComponent.h"
 #include "DrawManagement/Room/RoomActor.h"
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "Widget/Composite/CompositeBase.h"
@@ -248,4 +249,29 @@ ARoomActor* FRoomFragment::SpawnRoomActor(const UObject* Outer) const
 void FRoomFragment::SetSpawnedRoomActor(ARoomActor* Room)
 {
 	RoomActor = Room;
+}
+
+bool FRankRequirementModifier::ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType)
+{
+	return true;
+}
+
+bool FDrawChanceModifier::ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType)
+{
+	return FMath::FRandRange(0.f, 100.f) <= DrawChance;
+}
+
+bool FMaxCountModifier::ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType)
+{
+	return /*DrawComponent->DrawRuleMaxCount()*/ true;
+}
+
+bool FRuleFragment::ApplyRules(UDrawComponent* DrawComponent, const FGameplayTag& RoomType)
+{
+	for (auto& Rule : RuleModifiers)
+	{
+		auto& RuleRef = Rule.GetMutable();
+		if (!RuleRef.ApplyRule(DrawComponent, RoomType)) return false;
+	}
+	return true;
 }

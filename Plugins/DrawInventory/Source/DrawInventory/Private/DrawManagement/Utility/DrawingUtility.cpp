@@ -82,3 +82,12 @@ FName UDrawingUtility::FindConnectedDoorSocket(const FIntPoint& OriginOffset, co
 		default: return FName("None");
 	}
 }
+
+bool UDrawingUtility::DrawRuleMaxCount(const FGameplayTag& RoomType, const APlayerController* PC)
+{
+	if (UDrawComponent* DrawComponent = GetDrawComponent(PC))
+	{
+		return DrawComponent->DrawRuleMaxCount(RoomType);
+	}
+	return false;
+}

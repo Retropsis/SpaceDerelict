@@ -51,6 +51,9 @@ public:
 
 	UFUNCTION()
 	void OnOxygenConsume();
+	
+	UFUNCTION()
+	void CloseUnlockWidget();
 
 	bool IsDrawingBoardOpen() const { return bDrawingBoardOpen; }
 	
@@ -58,6 +61,8 @@ public:
 	int32 GetColumns() const { return Columns; }
 	float GetTileSize() const { return TileSize; }
 	float GetRoomSize() const { return RoomSize; }
+
+	bool DrawRuleMaxCount(const FGameplayTag& RoomTag);
 	
 	// UInventoryBase* GetInventoryMenu() const { return InventoryMenu; }
 
@@ -107,7 +112,6 @@ private:
 	void OpenDrawingBoard();
 	void CloseDrawingBoard();
 	void OpenUnlockWidget();
-	void CloseUnlockWidget();
 	void DetermineLockedDoors(FDestinationAvailabilityResult& Result) const;
 	
 	FDestinationAvailabilityResult BuildDestinationAvailabilities(const FIntPoint& OffsetCoordinates, TMap<FName, FIntPoint> DestinationsOffsets) const;

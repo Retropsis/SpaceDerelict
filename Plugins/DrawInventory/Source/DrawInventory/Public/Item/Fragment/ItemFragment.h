@@ -5,6 +5,7 @@
 #include "StructUtils/InstancedStruct.h"
 #include "ItemFragment.generated.h"
 
+class UDrawComponent;
 class ARoomActor;
 class AEquipActor;
 class UCompositeBase;
@@ -264,6 +265,9 @@ private:
 	FGameplayTag EquipmentType = FGameplayTag::EmptyTag;
 };
 
+/*
+ * Rooms
+ */
 USTRUCT(BlueprintType)
 struct FRoomFragment : public FInventoryItemFragment
 {
@@ -334,4 +338,64 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<TSubclassOf<AActor>> ValuableItems;
+};
+
+/*
+ * Rules
+ */
+USTRUCT(BlueprintType)
+struct FRuleModifier : public FItemFragment
+{
+	GENERATED_BODY()
+
+	virtual bool ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType) { return true; }
+};
+
+USTRUCT(BlueprintType)
+struct FRankRequirementModifier : public FRuleModifier
+{
+	GENERATED_BODY()
+	
+	virtual bool ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType) override;
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	FGameplayTag RequiredRank = FGameplayTag::EmptyTag;
+};
+
+USTRUCT(BlueprintType)
+struct FDrawChanceModifier : public FRuleModifier
+{
+	GENERATED_BODY()
+	
+	virtual bool ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType) override;
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	float DrawChance{1.f};
+};
+
+USTRUCT(BlueprintType)
+struct FMaxCountModifier : public FRuleModifier
+{
+	GENERATED_BODY()
+	
+	virtual bool ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType) override;
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	int32 MaxDrawCount{INDEX_NONE};
+};
+
+USTRUCT(BlueprintType)
+struct FRuleFragment : public FItemFragment
+{
+	GENERATED_BODY()
+	
+public:
+	bool ApplyRules(UDrawComponent* DrawComponent, const FGameplayTag& RoomType);
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TArray<TInstancedStruct<FRuleModifier>> RuleModifiers;	
 };

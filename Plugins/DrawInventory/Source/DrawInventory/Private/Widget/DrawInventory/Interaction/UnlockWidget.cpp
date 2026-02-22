@@ -19,5 +19,6 @@ void UUnlockWidget::OnUnlockButtonClicked()
 
 void UUnlockWidget::OnCancelButtonClicked()
 {
+	CancelButtonClicked.Broadcast();
 	SetVisibility(ESlateVisibility::Collapsed);
 }

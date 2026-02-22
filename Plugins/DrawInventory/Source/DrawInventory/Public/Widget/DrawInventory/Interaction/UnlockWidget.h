@@ -9,6 +9,7 @@
 class UButton;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUnlockButtonClicked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCancelButtonClicked);
 
 UCLASS()
 class DRAWINVENTORY_API UUnlockWidget : public UUserWidget
@@ -19,6 +20,7 @@ public:
 	virtual void NativeOnInitialized() override;
 
 	FOnUnlockButtonClicked UnlockButtonClicked;
+	FOnCancelButtonClicked CancelButtonClicked;
 	
 private:
 	UFUNCTION()
