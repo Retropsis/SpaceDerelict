@@ -11,6 +11,7 @@ enum class EGridCategory : uint8
 	Consumable,
 	Craftable,
 	Item,
+	KeyItem,
 	Room,
 	None
 };

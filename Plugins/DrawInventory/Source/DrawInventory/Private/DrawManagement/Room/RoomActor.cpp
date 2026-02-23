@@ -7,6 +7,7 @@
 #include "DrawManagement/Room/ItemSpawner.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -140,7 +141,8 @@ void ARoomActor::OnRoomBoundaryBeginOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		OnPlayerEnter.Broadcast();
+		UKismetSystemLibrary::DrawDebugSphere(this, Character->GetActorLocation(), 25.f, 12, FLinearColor::Red, 60.f);
+		OnPlayerEnter.Broadcast(Character->GetActorLocation());
 	}
 }
 

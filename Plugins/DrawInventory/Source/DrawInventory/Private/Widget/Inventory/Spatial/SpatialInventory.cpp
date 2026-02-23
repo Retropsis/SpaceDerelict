@@ -22,15 +22,15 @@ void USpatialInventory::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	Button_Equippables->OnClicked.AddDynamic(this, &ThisClass::ShowEquippables);
-	Button_Consumables->OnClicked.AddDynamic(this, &ThisClass::ShowConsumables);
-	Button_Craftables->OnClicked.AddDynamic(this, &ThisClass::ShowCraftables);
+	Button_Items->OnClicked.AddDynamic(this, &ThisClass::ShowItems);
+	Button_KeyItems->OnClicked.AddDynamic(this, &ThisClass::ShowKeyItems);
+	// Button_Craftables->OnClicked.AddDynamic(this, &ThisClass::ShowCraftables);
 
-	Grid_Equippables->SetOwningCanvas(CanvasPanel);
-	Grid_Consumables->SetOwningCanvas(CanvasPanel);
-	Grid_Craftables->SetOwningCanvas(CanvasPanel);
+	Grid_Items->SetOwningCanvas(CanvasPanel);
+	Grid_KeyItems->SetOwningCanvas(CanvasPanel);
+	// Grid_Craftables->SetOwningCanvas(CanvasPanel);
 
-	ShowEquippables();
+	ShowItems();
 
 	WidgetTree->ForEachWidget([this] (UWidget* Widget)
 	{
@@ -65,7 +65,7 @@ void USpatialInventory::EquippedGridSlotClicked(UEquippedGridSlot* EquippedGridS
 	}
 		
 	// Clear the Hover Item
-	Grid_Equippables->ClearHoverItem();
+	Grid_Items->ClearHoverItem();
 }
 
 void USpatialInventory::EquippedSlottedItemClicked(UEquippedSlottedItem* EquippedSlottedItem)
@@ -88,7 +88,7 @@ void USpatialInventory::EquippedSlottedItemClicked(UEquippedSlottedItem* Equippe
 	ClearSlotOfItem(EquippedGridSlot);
 	
 	// Assign previously equipped item as the hover item
-	Grid_Equippables->AssignHoverItem(ItemToUnequip);
+	Grid_Items->AssignHoverItem(ItemToUnequip);
 	
 	// Remove of the equipped slotted item from the equipped grid slot
 	RemoveEquippedSlottedItem(EquippedSlottedItem);
@@ -224,12 +224,12 @@ FSlotAvailabilityResult USpatialInventory::HasRoomForItem(UItemComponent* ItemCo
 {
 	switch (UInventoryUtility::GetItemCategoryFromItemComponent(ItemComponent))
 	{
-	case EGridCategory::Equippable:
-		 return Grid_Equippables->HasRoomForItem(ItemComponent);
-	case EGridCategory::Consumable:
-		 return Grid_Consumables->HasRoomForItem(ItemComponent);
-	case EGridCategory::Craftable:
-		 return Grid_Craftables->HasRoomForItem(ItemComponent);
+	case EGridCategory::Item:
+		 return Grid_Items->HasRoomForItem(ItemComponent);
+	case EGridCategory::KeyItem:
+		 return Grid_KeyItems->HasRoomForItem(ItemComponent);
+	// case EGridCategory::Craftable:
+		 // return Grid_Craftables->HasRoomForItem(ItemComponent);
 	default:
 		UE_LOG(LogInventory, Error, TEXT("Item Component doesn't have an Item Category"));
 		return FSlotAvailabilityResult();
@@ -290,9 +290,9 @@ UItemDescription* USpatialInventory::GetEquippedItemDescription()
 
 bool USpatialInventory::HasHoverItem() const
 {
-	if (Grid_Equippables->HasHoverItem()) return true;
-	if (Grid_Consumables->HasHoverItem()) return true;
-	if (Grid_Craftables->HasHoverItem()) return true;
+	if (Grid_Items->HasHoverItem()) return true;
+	if (Grid_KeyItems->HasHoverItem()) return true;
+	// if (Grid_Craftables->HasHoverItem()) return true;
 	return false;
 }
 
@@ -304,7 +304,7 @@ UHoverItem* USpatialInventory::GetHoverItem() const
 
 float USpatialInventory::GetTileSize() const
 {
-	return Grid_Equippables->GetTileSize();
+	return Grid_Items->GetTileSize();
 }
 
 void USpatialInventory::ShowEquippedItemDescription(UInventoryItem* Item)
@@ -342,26 +342,26 @@ void USpatialInventory::ShowEquippedItemDescription(UInventoryItem* Item)
 	EquippedItemManifest.AssimilateInventoryFragments(EquippedDescriptionWidget);
 }
 
-void USpatialInventory::ShowEquippables()
+void USpatialInventory::ShowItems()
 {
-	SetActiveGrid(Grid_Equippables, Button_Equippables);
+	SetActiveGrid(Grid_Items, Button_Items);
 }
 
-void USpatialInventory::ShowConsumables()
+void USpatialInventory::ShowKeyItems()
 {
-	SetActiveGrid(Grid_Consumables, Button_Consumables);	
+	SetActiveGrid(Grid_KeyItems, Button_KeyItems);	
 }
 
 void USpatialInventory::ShowCraftables()
 {
-	SetActiveGrid(Grid_Craftables, Button_Craftables);	
+	// SetActiveGrid(Grid_Craftables, Button_Craftables);	
 }
 
 void USpatialInventory::DisableButton(UButton* Button)
 {
-	Button_Equippables->SetIsEnabled(true);
-	Button_Consumables->SetIsEnabled(true);
-	Button_Craftables->SetIsEnabled(true);
+	Button_Items->SetIsEnabled(true);
+	Button_KeyItems->SetIsEnabled(true);
+	// Button_Craftables->SetIsEnabled(true);
 	Button->SetIsEnabled(false);
 }
 

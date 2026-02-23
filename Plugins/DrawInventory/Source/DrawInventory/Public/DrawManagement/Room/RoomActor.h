@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "RoomActor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerEnter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerEnter, const FVector&, Location);
 
 struct FDestinationAvailabilityResult;
 class UBoxComponent;

@@ -40,4 +40,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	int32 NumberOfRedraws{1};
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TArray<TSubclassOf<AActor>> GivenItems;
 };

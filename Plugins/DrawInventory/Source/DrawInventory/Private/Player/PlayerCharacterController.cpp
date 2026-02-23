@@ -29,6 +29,11 @@ void APlayerCharacterController::Tick(float DeltaTime)
 	CalculateAOPitch();
 }
 
+void APlayerCharacterController::RestartLevel()
+{
+	Super::RestartLevel();
+}
+
 void APlayerCharacterController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -53,6 +58,8 @@ void APlayerCharacterController::SetTimerPlayerPositionUpdate() const
 	GetWorld()->GetTimerManager().SetTimer(PositionUpdateTimer, [this] ()
 	{
 		const APawn* Pawn = GetPawn();
+		if (!IsValid(Pawn)) return;
+		
 		const FVector2D Location = FVector2D(Pawn->GetActorLocation().X, Pawn->GetActorLocation().Y);
 		const float Angle = Pawn->GetActorRotation().Yaw;
 		OnPlayerPositionUpdated.Broadcast(Location, Angle);

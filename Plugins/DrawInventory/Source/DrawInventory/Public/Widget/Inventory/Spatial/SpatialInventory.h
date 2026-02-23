@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/Button.h"
-#include "Item/InventoryItem.h"
 #include "Widget/Inventory/InventoryBase/InventoryBase.h"
 #include "SpatialInventory.generated.h"
 
@@ -44,22 +43,16 @@ private:
 	TObjectPtr<UWidgetSwitcher> Switcher;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UInventoryGrid> Grid_Equippables;
+	TObjectPtr<UInventoryGrid> Grid_Items;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UInventoryGrid> Grid_Consumables;
+	TObjectPtr<UInventoryGrid> Grid_KeyItems;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UInventoryGrid> Grid_Craftables;
+	TObjectPtr<UButton> Button_Items;
 	
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButton> Button_Equippables;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButton> Button_Consumables;
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButton> Button_Craftables;
+	TObjectPtr<UButton> Button_KeyItems;
 
 	UPROPERTY(EditAnywhere, Category="Inventory")
 	TSubclassOf<UItemDescription> ItemDescriptionClass;
@@ -89,10 +82,10 @@ private:
 	void ShowEquippedItemDescription(UInventoryItem* Item);
 
 	UFUNCTION()
-	void ShowEquippables();
+	void ShowItems();
 	
 	UFUNCTION()
-	void ShowConsumables();
+	void ShowKeyItems();
 	
 	UFUNCTION()
 	void ShowCraftables();

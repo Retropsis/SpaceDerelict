@@ -34,6 +34,11 @@ public:
 	UFUNCTION()
 	void ToggleHUD(bool bShow);
 
+	void SetSavedPlayerLocation(const FVector& Location) { SavedPlayerLocation = Location; }
+	
+	UFUNCTION(BlueprintCallable)
+	FVector GetSavedPlayerLocation() const { return SavedPlayerLocation; }
+
 	FPlayerPositionUpdated OnPlayerPositionUpdated;
 
 protected:
@@ -46,7 +51,11 @@ private:
 	void TraceForItem();
 	void CalculateAOPitch();
 	void ToggleGlove(const FInputActionValue& Value);
-	
+
+public:
+	virtual void RestartLevel() override;
+
+private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TArray<TObjectPtr<UInputMappingContext>> DefaultIMCs;
 	
@@ -79,4 +88,5 @@ private:
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
 	float AO_Pitch;
 	bool bGloveRaised;
+	FVector SavedPlayerLocation = FVector::ZeroVector;
 };

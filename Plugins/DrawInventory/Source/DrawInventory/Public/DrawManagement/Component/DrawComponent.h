@@ -50,6 +50,8 @@ public:
 	void OnKeyConsume();
 
 	UFUNCTION()
+	void OnPlayerEnterRoom(const FVector& Location);
+	
 	void OnOxygenConsume();
 	
 	UFUNCTION()
@@ -106,6 +108,7 @@ protected:
 private:
 	UFUNCTION()
 	void InitializeDrawComponent();
+	void GiveItemsFromRoomData();
 	void ConstructDrawingBoard();
 	void ConstructUnlockWidget();
 	void DrawRooms();

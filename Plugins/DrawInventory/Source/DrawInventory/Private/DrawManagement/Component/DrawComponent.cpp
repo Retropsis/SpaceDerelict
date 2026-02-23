@@ -5,12 +5,14 @@
 #include "Data/RoomAsset.h"
 #include "Data/RoomData.h"
 #include "DrawManagement/Room/RoomActor.h"
+#include "GameFramework/GameModeBase.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Item/InventoryItem.h"
 #include "Item/ItemTags.h"
 #include "Item/Fragment/ItemFragment.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/PlayerCharacterController.h"
 #include "Widget/DrawInventory/DrawingBoard.h"
 #include "Widget/DrawInventory/Interaction/UnlockWidget.h"
 #include "Widget/Utiliies/WidgetUtiliies.h"
@@ -56,6 +58,11 @@ void UDrawComponent::BeginPlay()
 void UDrawComponent::InitializeDrawComponent()
 {
 	BuildPresetRooms();
+
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this] ()
+	{
+		GiveItemsFromRoomData();
+	});
 }
 
 void UDrawComponent::InitializeFromRoomData()
@@ -68,6 +75,20 @@ void UDrawComponent::InitializeFromRoomData()
 	RoomSize = RoomData->RoomSize;
 	LockedDoorChance = RoomData->LockedDoorChance;
 	NumberOfRedraws = RoomData->NumberOfRedraws;
+}
+
+void UDrawComponent::GiveItemsFromRoomData()
+{
+	for (const TSubclassOf<AActor>& ItemClass : RoomData->GivenItems)
+	{
+		AActor* Item = GetWorld()->SpawnActor<AActor>(ItemClass);
+		UItemComponent* ItemComponent = Item->FindComponentByClass<UItemComponent>();
+		if (IsValid(ItemComponent))
+		{
+			InventoryComponent->TryAddItem(ItemComponent);
+			ItemComponent->PickedUp();
+		}
+	}
 }
 
 void UDrawComponent::BuildPresetRooms()
@@ -88,7 +109,7 @@ void UDrawComponent::BuildPresetRooms()
 		Result.DestinationYaw = 0;
 		
 		RoomActor->ConstructRoom(Result);
-		RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnOxygenConsume);
+		RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnPlayerEnterRoom);
 		UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
 		FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 		NewRoomFragment->SetYaw(0);
@@ -178,7 +199,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
 	RoomActor->ConstructDestinationOffsets();
 	RoomActor->ConstructRoom(Result);
-	RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnOxygenConsume);
+	RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnPlayerEnterRoom);
 	SpawnValuables(RoomToSpawn, RoomActor);
 
 	InteractingDoorComponent->ToggleDoor(true);
@@ -299,6 +320,15 @@ void UDrawComponent::OnKeyConsume()
 	DrawRooms();
 }
 
+void UDrawComponent::OnPlayerEnterRoom(const FVector& Location)
+{
+	if (APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(OwningController.Get()))
+	{
+		PlayerCharacterController->SetSavedPlayerLocation(Location);
+	}
+	OnOxygenConsume();
+}
+
 void UDrawComponent::OnOxygenConsume()
 {
 	if (InventoryComponent->CheckItemOfTypAndAmount(Item::Currency::Oxygen, 1))
@@ -307,6 +337,12 @@ void UDrawComponent::OnOxygenConsume()
 	}
 	else
 	{
+		if (AGameModeBase* GameModeBase = GetWorld()->GetAuthGameMode())
+		{
+			// GameModeBase->ResetLevel();
+			OwningController->RestartLevel();
+			// UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		}
 		UE_LOG(LogTemp, Warning, TEXT("OnOxygenConsume"));
 	}
 }
