@@ -141,7 +141,6 @@ void ARoomActor::OnRoomBoundaryBeginOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		UKismetSystemLibrary::DrawDebugSphere(this, Character->GetActorLocation(), 25.f, 12, FLinearColor::Red, 60.f);
 		OnPlayerEnter.Broadcast(Character->GetActorLocation());
 	}
 }

@@ -1,9 +1,13 @@
 
 #include "Item/Manifest/ItemManifest.h"
+
+#include "DrawManagement/Room/RoomActor.h"
+#include "Engine/LevelStreamingDynamic.h"
 #include "Item/InventoryItem.h"
 #include "Item/Component/ItemComponent.h"
 #include "Item/Fragment/ItemFragment.h"
 #include "Widget/Composite/CompositeBase.h"
+#include "World/Utility/LevelUtility.h"
 
 UInventoryItem* FItemManifest::Manifest(UObject* NewOuter)
 {
@@ -40,6 +44,11 @@ void FItemManifest::SpawnPickupActor(const UObject* WorldContextObject, const FV
 	check(ItemComponent);
 
 	ItemComponent->InitializeItemManifest(*this);
+}
+
+ULevelStreaming* FItemManifest::LoadRoom(UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation, bool& bOutSuccess) const
+{
+	return  ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(WorldContextObject, RoomLevel, SpawnLocation, SpawnRotation, bOutSuccess);
 }
 
 void FItemManifest::AssimilateInventoryFragments(UCompositeBase* Composite) const

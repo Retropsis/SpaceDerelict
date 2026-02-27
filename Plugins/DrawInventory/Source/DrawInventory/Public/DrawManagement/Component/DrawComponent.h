@@ -22,6 +22,7 @@ class UDrawingBoard;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRoomStatusChange, UInventoryItem*, RoomItem, int32, Index);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoomStatusChange, UInventoryItem*, RoomItem);
+DECLARE_MULTICAST_DELEGATE(FOnRoomShown);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStackChange, const FSlotAvailabilityResult&, Result);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged,  UInventoryItem*, Item);
 // DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryMenuToggled,  bool, bOpen);
@@ -56,6 +57,9 @@ public:
 	
 	UFUNCTION()
 	void CloseUnlockWidget();
+
+	UFUNCTION()
+	void OnLevelShown();
 
 	bool IsDrawingBoardOpen() const { return bDrawingBoardOpen; }
 	
@@ -95,6 +99,7 @@ public:
 	FRoomStatusChange OnRoomHovered;
 	FRoomStatusChange OnRoomUnhovered;
 	FToggleHUD OnToggleHUD;
+	FOnRoomShown RoomShown;
 	// FInventoryItemChange OnItemRemoved;
 	// FNoRoomInInventory NoRoomInInventory;
 	// FStackChange OnStackChange;

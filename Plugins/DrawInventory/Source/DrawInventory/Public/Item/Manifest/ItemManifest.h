@@ -6,6 +6,8 @@
 #include "StructUtils/InstancedStruct.h"
 #include "ItemManifest.generated.h"
 
+class ARoomActor;
+class ALevelInstance;
 class UCompositeBase;
 struct FItemFragment;
 
@@ -23,6 +25,7 @@ public:
 	EGridCategory GetItemCategory() const { return ItemCategory; }
 	FGameplayTag GetItemType() const { return ItemType; }
 	void SpawnPickupActor(const UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	ULevelStreaming* LoadRoom(UObject* WorldContextObject, const FVector& SpawnLocation, const FRotator& SpawnRotation, bool& bOutSuccess) const;
 	void AssimilateInventoryFragments(UCompositeBase* Composite) const;
 
 	template<typename T> requires std::derived_from<T, FItemFragment>
@@ -40,17 +43,20 @@ public:
 private:
 	void ClearFragments();
 	
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(ExcludeBaseStruct))
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(ExcludeBaseStruct))
 	TArray<TInstancedStruct<FItemFragment>> Fragments;
 		
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	EGridCategory ItemCategory{EGridCategory::None};
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="Item"))
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Item"))
 	FGameplayTag ItemType;
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AActor> PickupActorClass;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSoftObjectPtr<UWorld> RoomLevel;
 };
 
 template<typename T> requires std::derived_from<T, FItemFragment>
