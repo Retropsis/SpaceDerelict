@@ -13,10 +13,10 @@ UDrawComponent* UDrawingUtility::GetDrawComponent(const APlayerController* Playe
 
 FIntPoint UDrawingUtility::GetOffsetFromSocketName(const FName& Socket)
 {
-	if (Socket == "South") return FIntPoint(0, -1);
-	if (Socket == "West") return FIntPoint(-1, 0);
-	if (Socket == "North") return FIntPoint(0, 1);
-	if (Socket == "East") return FIntPoint(1, 0);
+	if (Socket.ToString().Contains("South")) return FIntPoint(0, -1);
+	if (Socket.ToString().Contains("West")) return FIntPoint(-1, 0);
+	if (Socket.ToString().Contains("North")) return FIntPoint(0, 1);
+	if (Socket.ToString().Contains("East")) return FIntPoint(1, 0);
 	return FIntPoint(0, 0);
 }
 

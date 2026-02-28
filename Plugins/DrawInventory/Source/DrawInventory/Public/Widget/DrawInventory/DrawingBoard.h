@@ -8,12 +8,13 @@
 #include "Item/Fragment/ItemFragment.h"
 #include "DrawingBoard.generated.h"
 
-class UTextBlock;
-class UButton;
 struct FItemManifest;
-class UDrawingGrid;
 struct FImageFragment;
 struct FGridFragment;
+class UWidgetSwitcher;
+class UTextBlock;
+class UButton;
+class UDrawingGrid;
 class UHorizontalBox;
 class UInventoryItem;
 class UDrawComponent;
@@ -28,8 +29,9 @@ class DRAWINVENTORY_API UDrawingBoard : public UUserWidget
 public:
 	virtual void NativeOnInitialized() override;
 	void ClearDrawingBoard();
-	void DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool bRequirementMet);
-	FDestinationAvailabilityResult HasRoom(const FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 DestinationYaw) const;
+	void DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, const FGameplayTag& Layer, bool bRequirementMet);
+	FDestinationAvailabilityResult HasRoom(FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 DestinationYaw, const TSet<FGameplayTag>&
+	                                       Layers, const FGameplayTag& Layer) const;
 	void SetRedrawCount(int32 Count) const;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -48,11 +50,43 @@ private:
 	UFUNCTION()
 	void OnRedrawButtonClicked();
 
+	UFUNCTION()
+	void OnPlayerLayerUpdate(const FGameplayTag& Layer);
+	
+	UFUNCTION()
+	void ShowLowerLayerGrid();
+	
+	UFUNCTION()
+	void ShowMiddleLayerGrid();
+	
+	UFUNCTION()
+	void ShowUpperLayerGrid();
+	
 	void SetDrawnRoomSlotImage(const UDrawnRoomSlot* DrawnRoomSlot, const FGridFragment* GridFragment, const FImageFragment* ImageFragment) const;
 	FVector2D GetDrawSize(const FGridFragment* GridFragment) const;
+	void SetActiveGrid(UDrawingGrid* Grid, UButton* Button);
+	void DisableButton(UButton* Button);
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UDrawingGrid> Grid_Room;
+	TObjectPtr<UDrawingGrid> Grid_Upper;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UDrawingGrid> Grid_Middle;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UDrawingGrid> Grid_Lower;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UWidgetSwitcher> Switcher_Layers;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Button_LowerLayer;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Button_MiddleLayer;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Button_UpperLayer;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UHorizontalBox> HorizontalBox_DrawnRoomSlots;
@@ -76,4 +110,5 @@ private:
 	TArray<TObjectPtr<UDrawnRoomSlot>> DrawnRoomSlots;
 
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
+	TWeakObjectPtr<UDrawingGrid> ActiveGrid;
 };

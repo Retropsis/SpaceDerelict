@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameplayTagContainer.h"
 #include "DestinationData.generated.h"
 
 UENUM(BlueprintType)
@@ -18,9 +19,10 @@ struct FDestinationAvailability
 	GENERATED_BODY()
 
 	FDestinationAvailability() {}
-	FDestinationAvailability(int32 Index, EDoorState State, FName SocketToAttach) : DestinationIndex(Index), DoorState(State), Socket(SocketToAttach) {}
+	FDestinationAvailability(int32 Index, FGameplayTag NewLayer, EDoorState State, FName SocketToAttach) : DestinationIndex(Index), Layer(NewLayer), DoorState(State), Socket(SocketToAttach) {}
 
 	int32 DestinationIndex{INDEX_NONE};
+	FGameplayTag Layer = FGameplayTag::EmptyTag;
 	EDoorState DoorState{EDoorState::None};
 	FName Socket = NAME_None;
 };
@@ -36,5 +38,6 @@ struct FDestinationAvailabilityResult
 
 	int32 RoomIndex{INDEX_NONE};
 	int32 DestinationYaw{ INDEX_NONE };
+	FGameplayTag Layer = FGameplayTag::EmptyTag;
 	TArray<FDestinationAvailability> DestinationAvailabilities;
 };

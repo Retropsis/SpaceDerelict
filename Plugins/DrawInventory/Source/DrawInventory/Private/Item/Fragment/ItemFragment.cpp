@@ -3,6 +3,7 @@
 
 #include "DrawManagement/Component/DrawComponent.h"
 #include "DrawManagement/Room/RoomActor.h"
+#include "DrawManagement/Room/SocketFragment.h"
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "Widget/Composite/CompositeBase.h"
 #include "Widget/Composite/Leaf_Image.h"
@@ -249,6 +250,27 @@ ARoomActor* FRoomFragment::SpawnRoomActor(const UObject* Outer) const
 void FRoomFragment::SetSpawnedRoomActor(ARoomActor* Room)
 {
 	RoomActor = Room;
+}
+
+TArray<FSocketFragment> FRoomFragment::GetSocketFragments()
+{
+	TArray<FSocketFragment> Fragments;
+	for (auto& Fragment : SocketFragments)
+	{
+		Fragments.Add(Fragment.GetMutable());
+	}
+	return Fragments;
+}
+
+TArray<FSocketFragment> FRoomFragment::GetSocketFragmentsOfLayer(const FGameplayTag& Layer)
+{
+	TArray<FSocketFragment> Fragments;
+	for (auto& Fragment : SocketFragments)
+	{
+		auto& FragmentRef = Fragment.GetMutable();
+		if (FragmentRef.GetLayer().MatchesTagExact(Layer)) Fragments.Add(Fragment.GetMutable());
+	}
+	return Fragments;
 }
 
 bool FRankRequirementModifier::ApplyRule(UDrawComponent* DrawComponent, const FGameplayTag& RoomType)

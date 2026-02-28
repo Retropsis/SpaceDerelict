@@ -28,3 +28,10 @@ namespace Fragment
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(AttributeModifier_3);
 	}
 }
+
+namespace Layer
+{
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Lower);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Middle);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Upper);
+}

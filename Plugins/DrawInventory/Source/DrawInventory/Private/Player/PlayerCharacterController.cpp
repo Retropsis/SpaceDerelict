@@ -7,6 +7,7 @@
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "Interaction/InteractionComponent.h"
 #include "Item/ItemTags.h"
+#include "Item/Fragment/FragmentTags.h"
 #include "Kismet/GameplayStatics.h"
 #include "PuzzleManagement/Component/LockComponent.h"
 #include "PuzzleManagement/Piece/Component/DigitComponent.h"
@@ -52,7 +53,7 @@ void APlayerCharacterController::BeginPlay()
 	SetTimerPlayerPositionUpdate();
 }
 
-void APlayerCharacterController::SetTimerPlayerPositionUpdate() const
+void APlayerCharacterController::SetTimerPlayerPositionUpdate()
 {
 	FTimerHandle PositionUpdateTimer;
 	GetWorld()->GetTimerManager().SetTimer(PositionUpdateTimer, [this] ()
@@ -62,6 +63,12 @@ void APlayerCharacterController::SetTimerPlayerPositionUpdate() const
 		
 		const FVector2D Location = FVector2D(Pawn->GetActorLocation().X, Pawn->GetActorLocation().Y);
 		const float Angle = Pawn->GetActorRotation().Yaw;
+		const FGameplayTag Layer = Pawn->GetActorLocation().Z > 12000.f ? Layer::Upper : Pawn->GetActorLocation().Z < 0.f ? Layer::Lower : Layer::Middle;
+		if (!PreviousLayer.MatchesTagExact(Layer))
+		{
+			OnPlayerLayerUpdated.Broadcast(Layer);
+			PreviousLayer = Layer;
+		}
 		OnPlayerPositionUpdated.Broadcast(Location, Angle);
 	}, .2f, true);
 }

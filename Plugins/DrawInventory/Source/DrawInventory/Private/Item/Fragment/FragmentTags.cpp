@@ -28,3 +28,9 @@ namespace Fragment
 		
 	}
 }
+namespace Layer
+{
+	UE_DEFINE_GAMEPLAY_TAG(Lower, "Layer.Lower");
+	UE_DEFINE_GAMEPLAY_TAG(Middle, "Layer.Middle");
+	UE_DEFINE_GAMEPLAY_TAG(Upper, "Layer.Upper");
+}

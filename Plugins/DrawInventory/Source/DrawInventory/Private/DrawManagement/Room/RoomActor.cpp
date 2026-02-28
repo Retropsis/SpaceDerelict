@@ -22,7 +22,6 @@ ARoomActor::ARoomActor()
 
 	RoomBoundary = CreateDefaultSubobject<UBoxComponent>("RoomBoundary");
 	RoomBoundary->SetupAttachment(GetRootComponent());
-	RoomBoundary->SetBoxExtent(FVector( 4200.f, 4200.f, 10000.f ));
 	RoomBoundary->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
@@ -51,10 +50,11 @@ TMap<FName, FIntPoint>  ARoomActor::ConstructDestinationOffsets()
 	return DestinationOffsets;
 }
 
-void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result)
+void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize)
 {
 	ConstructDoors(Result);
 	ConstructPuzzle();
+	RoomBoundary->SetBoxExtent(FVector( RoomSize/ 2.f, RoomSize/ 2.f, 20000.f ));
 	RoomBoundary->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnRoomBoundaryBeginOverlap);
 }
 
@@ -77,6 +77,7 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 		if (IsValid(StaticMeshComponent))
 		{
 			Door->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Availability.Socket);
+			UE_LOG(LogTemp, Warning, TEXT("Adding door for socket: %s"), *Availability.Socket.ToString())
 			Yaw = StaticMeshComponent->GetSocketTransform(Availability.Socket, RTS_Component).Rotator().Yaw;
 		}
 		
@@ -99,6 +100,7 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 		DoorComponent->SetDoorState(Availability.DoorState);
 		DoorComponent->SetRoomIndex(Result.RoomIndex);
 		DoorComponent->SetDestinationIndex(Availability.DestinationIndex);
+		DoorComponent->SetLayer(Availability.Layer);
 		if (Availability.DoorState == EDoorState::Locked) DoorComponent->SetInteractionMessageToLocked();
 		const int32 DestinationYaw = FMath::Modulo(static_cast<int32>(Yaw) + Result.DestinationYaw, 360);
 		DoorComponent->SetRoomYaw(DestinationYaw);

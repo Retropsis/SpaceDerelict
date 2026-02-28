@@ -27,10 +27,13 @@ public:
 	void SetRoomYaw(int32 NewYaw) { Yaw = NewYaw; }
 	float GetRoomYaw() const { return Yaw; }
 	void SetInteractionMessageToLocked();
+	FGameplayTag GetLayer() const { return Layer; }
+	void SetLayer(FGameplayTag NewLayer) { Layer = NewLayer; }
 
 private:
 	EDoorState DoorState;
 	int32 RoomIndex{ INDEX_NONE };
 	int32 DestinationIndex{ INDEX_NONE };
 	int32 Yaw{ INDEX_NONE };
+	FGameplayTag Layer = FGameplayTag::EmptyTag;
 };

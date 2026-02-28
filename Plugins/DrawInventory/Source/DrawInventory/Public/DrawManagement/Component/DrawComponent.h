@@ -61,6 +61,9 @@ public:
 	UFUNCTION()
 	void OnLevelShown();
 
+	UFUNCTION()
+	void OnPlayerLayerUpdate(const FGameplayTag& Layer);
+
 	bool IsDrawingBoardOpen() const { return bDrawingBoardOpen; }
 	
 	int32 GetRows() const { return Rows; }
@@ -122,7 +125,7 @@ private:
 	void OpenUnlockWidget();
 	void DetermineLockedDoors(FDestinationAvailabilityResult& Result) const;
 	
-	FDestinationAvailabilityResult BuildDestinationAvailabilities(const FIntPoint& OffsetCoordinates, TMap<FName, FIntPoint> DestinationsOffsets) const;
+	FDestinationAvailabilityResult BuildDestinationAvailabilities(const FIntPoint& OffsetCoordinates, TMap<FName, FIntPoint> DestinationsOffsets, const FGameplayTag& Layer) const;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UDrawingBoard> DrawingBoardClass;
@@ -165,4 +168,5 @@ private:
 	float RoomSize;
 	float LockedDoorChance;
 	int32 NumberOfRedraws;
+	FGameplayTag ActiveLayer = FGameplayTag::EmptyTag;
 };

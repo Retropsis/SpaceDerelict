@@ -36,6 +36,8 @@ public:
 	int32 GetGridIndex() const { return GridIndex; }
 	void SetYaw(int32 NewYaw) { Yaw = NewYaw; }
 	int32 GetYaw() const { return Yaw; }
+	FGameplayTag GetLayer() const { return Layer; }
+	void SetLayer(FGameplayTag NewLayer) { Layer = NewLayer; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSlotHoveredVisualEffects();
@@ -77,10 +79,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	FLinearColor RequirementNotMatchedColor;
 	
+	
 	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Item.Room"))
 	FGameplayTag RoomType;
 	
 	TWeakObjectPtr<UInventoryItem> InventoryItem;
 	int32 GridIndex{ INDEX_NONE };
 	int32 Yaw{ INDEX_NONE };
+	FGameplayTag Layer = FGameplayTag::EmptyTag;
 };

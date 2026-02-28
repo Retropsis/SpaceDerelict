@@ -5,11 +5,13 @@
 #include "Components/Button.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Components/WidgetSwitcher.h"
 #include "DrawManagement/Component/DrawComponent.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "Item/InventoryItem.h"
 #include "Item/Fragment/FragmentTags.h"
 #include "Item/Fragment/ItemFragment.h"
+#include "Player/PlayerCharacterController.h"
 #include "Widget/DrawInventory/DrawingGrid.h"
 #include "Widget/DrawInventory/SlottedRoom/DrawnRoomSlot.h"
 
@@ -18,6 +20,21 @@ void UDrawingBoard::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	DrawComponent = UDrawingUtility::GetDrawComponent(GetOwningPlayer());
 	Button_Redraw->OnClicked.AddDynamic(this, &ThisClass::UDrawingBoard::OnRedrawButtonClicked);
+	
+	ShowMiddleLayerGrid();
+	
+	Button_LowerLayer->OnClicked.AddDynamic(this, &ThisClass::ShowLowerLayerGrid);
+	Button_MiddleLayer->OnClicked.AddDynamic(this, &ThisClass::ShowMiddleLayerGrid);
+	Button_UpperLayer->OnClicked.AddDynamic(this, &ThisClass::ShowUpperLayerGrid);
+
+	// Grid_Lower->SetOwningCanvas(CanvasPanel);
+	// Grid_Middle->SetOwningCanvas(CanvasPanel);
+	// Grid_Upper->SetOwningCanvas(CanvasPanel);
+	
+	if (APlayerCharacterController* PC = Cast<APlayerCharacterController>(GetOwningPlayer()))
+	{
+		PC->OnPlayerLayerUpdated.AddDynamic(this, &ThisClass::OnPlayerLayerUpdate);
+	}
 }
 
 void UDrawingBoard::ClearDrawingBoard()
@@ -26,7 +43,7 @@ void UDrawingBoard::ClearDrawingBoard()
 	DrawnRoomSlots.Empty();
 }
 
-void UDrawingBoard::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool bRequirementMet)
+void UDrawingBoard::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, const FGameplayTag& Layer, bool bRequirementMet)
 {
 	const FImageFragment* ImageFragment = Room->GetItemManifest().GetFragmentOfType<FImageFragment>();
 	const FTextFragment* TextFragment = Room->GetItemManifest().GetFragmentOfType<FTextFragment>();
@@ -49,6 +66,7 @@ void UDrawingBoard::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool 
 	DrawnRoomSlot->SetInventoryItem(Room);
 	DrawnRoomSlot->SetRoomName(TextFragment->GetText());
 	DrawnRoomSlot->SetGridIndex(Index);
+	DrawnRoomSlot->SetLayer(Layer);
 	SetDrawnRoomSlotImage(DrawnRoomSlot, GridFragment, ImageFragment);
 	DrawnRoomSlot->OnDrawnRoomSlotClicked.AddDynamic(this, &ThisClass::OnDrawnRoomSlotClicked);
 	DrawnRoomSlot->OnDrawnRoomSlotHovered.AddDynamic(this, &ThisClass::OnDrawnRoomSlotHovered);
@@ -66,9 +84,18 @@ void UDrawingBoard::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, bool 
 	DrawnRoomSlots.Add(DrawnRoomSlot);
 }
 
-FDestinationAvailabilityResult UDrawingBoard::HasRoom(const FItemManifest& Manifest, const int32 RoomIndex, const int32 DestinationIndex, const int32 DestinationYaw) const
+FDestinationAvailabilityResult UDrawingBoard::HasRoom(FItemManifest& Manifest, const int32 RoomIndex, const int32 DestinationIndex, const int32 DestinationYaw, const TSet<FGameplayTag>& Layers, const FGameplayTag& Layer) const
 {
-	return Grid_Room->HasRoom(Manifest, RoomIndex, DestinationIndex, DestinationYaw);
+	FDestinationAvailabilityResult Result;
+	Result.RoomIndex = DestinationIndex;
+	Result.DestinationYaw = DestinationYaw;
+	Result.Layer = Layer;
+	
+	if (Layers.Contains(Layer::Lower)) Grid_Lower->HasRoom(Manifest, RoomIndex, DestinationIndex, DestinationYaw, Result);
+	if (Layers.Contains(Layer::Middle)) Grid_Upper->HasRoom(Manifest, RoomIndex, DestinationIndex, DestinationYaw, Result);
+	if (Layers.Contains(Layer::Upper)) Grid_Middle->HasRoom(Manifest, RoomIndex, DestinationIndex, DestinationYaw, Result);
+	
+	return Result;
 }
 
 void UDrawingBoard::OnDrawnRoomSlotClicked(UDrawnRoomSlot* DrawnRoomSlot)
@@ -103,6 +130,49 @@ void UDrawingBoard::OnRedrawButtonClicked()
 {
 	check(DrawComponent.IsValid());
 	DrawComponent->Server_Redraw();
+}
+
+void UDrawingBoard::OnPlayerLayerUpdate(const FGameplayTag& Layer)
+{
+	if (Layer.MatchesTagExact(Layer::Lower)) Switcher_Layers->SetActiveWidget(Grid_Lower);
+	if (Layer.MatchesTagExact(Layer::Middle)) Switcher_Layers->SetActiveWidget(Grid_Middle);
+	if (Layer.MatchesTagExact(Layer::Upper)) Switcher_Layers->SetActiveWidget(Grid_Upper);
+}
+
+void UDrawingBoard::ShowLowerLayerGrid()
+{
+	SetActiveGrid(Grid_Lower, Button_LowerLayer);	
+}
+
+void UDrawingBoard::ShowMiddleLayerGrid()
+{
+	SetActiveGrid(Grid_Middle, Button_MiddleLayer);	
+}
+
+void UDrawingBoard::ShowUpperLayerGrid()
+{
+	SetActiveGrid(Grid_Upper, Button_UpperLayer);	
+}
+
+void UDrawingBoard::SetActiveGrid(UDrawingGrid* Grid, UButton* Button)
+{
+	if (ActiveGrid.IsValid())
+	{
+		// ActiveGrid->HideCursor();
+		// ActiveGrid->OnHide();
+	}
+	ActiveGrid = Grid;
+	// if (ActiveGrid.IsValid()) ActiveGrid->ShowCursor();
+	DisableButton(Button);
+	Switcher_Layers->SetActiveWidget(Grid);
+}
+
+void UDrawingBoard::DisableButton(UButton* Button)
+{
+	Button_LowerLayer->SetIsEnabled(true);
+	Button_MiddleLayer->SetIsEnabled(true);
+	Button_UpperLayer->SetIsEnabled(true);
+	Button->SetIsEnabled(false);
 }
 
 void UDrawingBoard::SetRedrawCount(int32 Count) const

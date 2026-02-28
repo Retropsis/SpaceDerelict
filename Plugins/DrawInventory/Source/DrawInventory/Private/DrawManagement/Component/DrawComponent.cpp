@@ -11,6 +11,7 @@
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Item/InventoryItem.h"
 #include "Item/ItemTags.h"
+#include "Item/Fragment/FragmentTags.h"
 #include "Item/Fragment/ItemFragment.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacterController.h"
@@ -26,6 +27,7 @@ UDrawComponent::UDrawComponent() : PooledRoomList(this), SpawnedRoomList(this)
 	SetIsReplicatedByDefault(true);
 	bReplicateUsingRegisteredSubObjectList = true;
 	bDrawingBoardOpen = false;
+	ActiveLayer = Layer::Middle;
 }
 
 void UDrawComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -47,6 +49,11 @@ void UDrawComponent::AddRepSubObj(UObject* SubObj)
 void UDrawComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (APlayerCharacterController* PC = Cast<APlayerCharacterController>(GetOwner()))
+	{
+		PC->OnPlayerLayerUpdated.AddDynamic(this, &ThisClass::OnPlayerLayerUpdate);
+	}
 
 	InventoryComponent = UInventoryUtility::GetInventoryComponent(Cast<APlayerController>(GetOwner()));
 	InventoryComponent->OnConstructInventory.AddDynamic(this, &ThisClass::InitializeDrawComponent);
@@ -108,47 +115,40 @@ void UDrawComponent::BuildPresetRooms()
 		if (!bSuccess) continue;
 		
 		LevelStreaming->OnLevelShown.AddDynamic(this, &ThisClass::OnLevelShown);
-		FDelegateHandle RoomShowHandle = RoomShown.AddWeakLambda(this, [this, LevelStreaming, RoomFragment, PresetRoom, RoomShowHandle] ()
+		RoomShown.AddWeakLambda(this, [this, LevelStreaming, RoomFragment, PresetRoom] ()
 		{
 			ARoomActor* RoomActor = Cast<ARoomActor>(ULevelUtility::GetFirstActorOfClassFromStreamLevel(LevelStreaming, ARoomActor::StaticClass()));
-			UE_LOG(LogTemp, Error, TEXT("RoomActor %s"), *RoomActor->GetName());
 			if (!IsValid(RoomActor))
 			{
 				UE_LOG(LogTemp, Error, TEXT("PresetRoom does not exist"));
 				return;;
 			}
-		
-			RoomActor->SetRoomType(RoomFragment->GetRoomType());
+
+			for (const FGameplayTag& Layer : RoomFragment->GetLayers())
+			{
+				RoomActor->AddLayer(Layer);
+			}
 			RoomActor->SetOwner(GetOwner());
 			RoomFragment->SetSpawnedRoomActor(RoomActor);
-		
-			// ARoomActor* RoomActor = SpawnRoomActor(RoomFragment);
-			// RoomActor->SetActorLocation(FVector(PresetRoom.Key.X * RoomSize, - PresetRoom.Key.Y * RoomSize, 0.f));
-			// RoomActor->SetActorRotation(FRotator(0.f, 0.f, 0.f));
 			TMap<FName, FIntPoint> DestinationsOffsets = RoomActor->ConstructDestinationOffsets();
 		
 			const int32 CurrentRoomIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(PresetRoom.Key, Columns, Rows);
-			FDestinationAvailabilityResult Result = BuildDestinationAvailabilities(PresetRoom.Key, DestinationsOffsets);
+			FDestinationAvailabilityResult Result = BuildDestinationAvailabilities(PresetRoom.Key, DestinationsOffsets, ActiveLayer);
 			Result.RoomIndex = CurrentRoomIndex;
 			Result.DestinationYaw = 0;
 		
-			RoomActor->ConstructRoom(Result);
+			RoomActor->ConstructRoom(Result, RoomSize);
 			RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnPlayerEnterRoom);
 			UInventoryItem* NewRoom = SpawnedRoomList.AddEntry(PresetRoom.Value);
 			FRoomFragment* NewRoomFragment = NewRoom->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 			NewRoomFragment->SetYaw(0);
+			for (const FGameplayTag& Layer : RoomFragment->GetLayers())
+			{
+				NewRoomFragment->AddLayer(Layer);
+			}
 			NewRoomFragment->SetSpawnedRoomActor(RoomActor);
 			OnRoomAdded.Broadcast(NewRoom, CurrentRoomIndex);
 		});
-
-		// FTimerHandle TimerHandle;
-		// GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, RoomShowHandle] ()
-		// {
-		// 	if (RoomShowHandle.IsValid())
-		// 	{
-		// 		RoomShown.Remove(RoomShowHandle);
-		// 	}
-		// }, 1.f, false);
 	}
 }
 
@@ -158,13 +158,19 @@ void UDrawComponent::OnLevelShown()
 	RoomShown.RemoveAll(this);
 }
 
-FDestinationAvailabilityResult UDrawComponent::BuildDestinationAvailabilities(const FIntPoint& OffsetCoordinates, TMap<FName, FIntPoint> DestinationsOffsets) const
+void UDrawComponent::OnPlayerLayerUpdate(const FGameplayTag& Layer)
+{
+	ActiveLayer = Layer;
+}
+
+FDestinationAvailabilityResult UDrawComponent::BuildDestinationAvailabilities(const FIntPoint& OffsetCoordinates, TMap<FName, FIntPoint> DestinationsOffsets, const FGameplayTag& Layer) const
 {
 	FDestinationAvailabilityResult Result;
 	for (const TTuple<FName, FIntPoint>& DestinationsOffset : DestinationsOffsets)
 	{
 		FDestinationAvailability Availability;
 		Availability.Socket = DestinationsOffset.Key;
+		Availability.Layer = Layer;
 		Availability.DoorState = EDoorState::Closed;
 		FIntPoint NewCoordinates = OffsetCoordinates + DestinationsOffset.Value;
 		Availability.DestinationIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(NewCoordinates, Columns, Rows);
@@ -200,12 +206,16 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 		}
 		InventoryComponent->Server_ConsumeItemOfTypAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount());
 	}
+	
+	FRoomFragment* RoomFragment = RoomToSpawn->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
+	if (!RoomFragment) return;
 
 	const int32 RoomIndex = InteractingDoorComponent->GetRoomIndex();
 	const int32 DestinationIndex = InteractingDoorComponent->GetDestinationIndex();
 	const float RoomYaw = InteractingDoorComponent->GetRoomYaw();
+	const FGameplayTag Layer = InteractingDoorComponent->GetLayer();
 	const FIntPoint Coordinates = UWidgetUtiliies::GetPositionFromIndex(DestinationIndex, Columns);
-	FDestinationAvailabilityResult Result = DrawingBoard->HasRoom(RoomToSpawn->GetItemManifest(), RoomIndex, DestinationIndex, RoomYaw);
+	FDestinationAvailabilityResult Result = DrawingBoard->HasRoom(RoomToSpawn->GetItemManifestMutable(), RoomIndex, DestinationIndex, RoomYaw, RoomFragment->GetLayers(), Layer);
 	DetermineLockedDoors(Result);
 	
 	// UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());
@@ -228,11 +238,15 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	// 	// Create new item
 	// 	Server_AddNewItem(ItemComponent, Result.bStackable ? Result.TotalRoomToFill : 0, Result.Remainder);
 	// }
-	
-	FRoomFragment* RoomFragment = RoomToSpawn->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
-	if (!RoomFragment) return;
 
 	RoomFragment->SetYaw(RoomYaw);
+
+	// TODO:: This is only to use same room for all layers
+	if (RoomFragment->GetLayers().Num() == 1)
+	{
+		RoomFragment->ClearLayers();
+		RoomFragment->AddLayer(ActiveLayer);
+	}
 	
 	const FVector SpawnLocation = FVector(Coordinates.X * RoomSize,  - Coordinates.Y * RoomSize, 0.f);
 	const FRotator SpawnRotation = FRotator(0.f, RoomYaw, 0.f);
@@ -242,33 +256,20 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	if (!bSuccess) return;;
 	
 	LevelStreaming->OnLevelShown.AddDynamic(this, &ThisClass::OnLevelShown);
-	FDelegateHandle RoomShowHandle = RoomShown.AddWeakLambda(this, [this, LevelStreaming, Result, RoomToSpawn, &RoomShowHandle] ()
+	RoomShown.AddWeakLambda(this, [this, LevelStreaming, Result, RoomToSpawn] ()
 	{
 		ARoomActor* RoomActor = Cast<ARoomActor>(ULevelUtility::GetFirstActorOfClassFromStreamLevel(LevelStreaming, ARoomActor::StaticClass()));
-		UE_LOG(LogTemp, Error, TEXT("RoomActor %s"), *RoomActor->GetName());
 		if (!IsValid(RoomActor))
 		{
 			UE_LOG(LogTemp, Error, TEXT("RoomActor does not exist"));
 			return;
 		}
-	
-		// ARoomActor* RoomActor = SpawnRoomActor(RoomFragment);
-		// RoomActor->SetActorLocation(FVector(Coordinates.X * RoomSize,  - Coordinates.Y * RoomSize, 0.f));
-		// RoomActor->SetActorRotation(FRotator(0.f, RoomYaw, 0.f));
+		
 		RoomActor->ConstructDestinationOffsets();
-		RoomActor->ConstructRoom(Result);
+		RoomActor->ConstructRoom(Result, RoomSize);
 		RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnPlayerEnterRoom);
 		SpawnValuables(RoomToSpawn, RoomActor);
 	});
-
-	// FTimerHandle TimerHandle;
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, RoomShowHandle] ()
-	// {
-	// 	if (RoomShowHandle.IsValid())
-	// 	{
-	// 		RoomShown.Remove(RoomShowHandle);
-	// 	}
-	// }, 1.f, false);
 
 	InteractingDoorComponent->ToggleDoor(true);
 	
@@ -348,7 +349,10 @@ void UDrawComponent::DetermineLockedDoors(FDestinationAvailabilityResult& Result
 ARoomActor* UDrawComponent::SpawnRoomActor(FRoomFragment* RoomFragment) const
 {
 	ARoomActor* SpawnedRoomActor = RoomFragment->SpawnRoomActor(OwningController.Get());
-	SpawnedRoomActor->SetRoomType(RoomFragment->GetRoomType());
+	for (const FGameplayTag& Layer : RoomFragment->GetLayers())
+	{
+		SpawnedRoomActor->AddLayer(Layer);
+	}
 	SpawnedRoomActor->SetOwner(GetOwner());
 	RoomFragment->SetSpawnedRoomActor(SpawnedRoomActor);
 	return SpawnedRoomActor;
@@ -444,6 +448,7 @@ void UDrawComponent::DrawRooms()
 	DrawingBoard->ClearDrawingBoard();
 	const int32 DestinationIndex = InteractingDoorComponent->GetDestinationIndex();
 	const int32 DestinationYaw = InteractingDoorComponent->GetRoomYaw();
+	const FGameplayTag DestinationLayer = InteractingDoorComponent->GetLayer(); 
 	
 	for (int32 i = 0; i < NumberOfDrawnRooms; ++i)
 	{
@@ -456,7 +461,7 @@ void UDrawComponent::DrawRooms()
 		{
 			bRequirementMet = InventoryComponent->CheckItemOfTypAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount());
 		}
-		DrawingBoard->DrawRoom(Room, DestinationIndex,DestinationYaw, bRequirementMet);
+		DrawingBoard->DrawRoom(Room, DestinationIndex,DestinationYaw, DestinationLayer, bRequirementMet);
 	}
 	
 	DrawingBoard->PlayOpeningVisualEffects();

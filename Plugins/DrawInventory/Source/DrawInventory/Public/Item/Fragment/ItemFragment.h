@@ -1,10 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FragmentTags.h"
 #include "GameplayTagContainer.h"
 #include "StructUtils/InstancedStruct.h"
 #include "ItemFragment.generated.h"
 
+struct FSocketFragment;
 class UDrawComponent;
 class ARoomActor;
 class AEquipActor;
@@ -267,7 +269,7 @@ private:
 
 /*
  * Rooms
- */
+*/
 USTRUCT(BlueprintType)
 struct FRoomFragment : public FInventoryItemFragment
 {
@@ -279,9 +281,13 @@ public:
 	void OnSpawn(APlayerController* PC);
 	ARoomActor* SpawnRoomActor(const UObject* Outer) const;
 	ARoomActor* GetRoomActor() const { return RoomActor.Get(); }
-	FGameplayTag GetRoomType() const { return RoomType; }
+	TSet<FGameplayTag>  GetLayers() const { return Layers; }
+	void AddLayer(const FGameplayTag& NewLayer) { Layers.Add(NewLayer); }
+	void ClearLayers() { Layers.Empty(); }
 	void SetSpawnedRoomActor(ARoomActor* Room);
 	TMap<FIntPoint, FName> GetSockets() const { return Sockets; }
+	TArray<FSocketFragment> GetSocketFragments();
+	TArray<FSocketFragment> GetSocketFragmentsOfLayer(const FGameplayTag& Layer);
 	int32 GetYaw() const { return Yaw; }
 	void SetYaw(int32 NewYaw) { Yaw = NewYaw; }
 
@@ -293,11 +299,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TMap<FIntPoint, FName> Sockets;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(ExcludeBaseStruct))
+	TArray<TInstancedStruct<FSocketFragment>> SocketFragments;
 
 	int32 Yaw{ 0 };
 
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	FGameplayTag RoomType = FGameplayTag::EmptyTag;
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Layer"))
+	TSet<FGameplayTag> Layers;
 };
 
 USTRUCT(BlueprintType)

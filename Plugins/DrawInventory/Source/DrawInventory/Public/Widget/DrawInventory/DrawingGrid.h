@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Data/DestinationData.h"
 #include "Data/GridTypes.h"
@@ -27,7 +28,7 @@ class DRAWINVENTORY_API UDrawingGrid : public UUserWidget
 
 	public:
 	virtual void NativeOnInitialized() override;
-	FDestinationAvailabilityResult HasRoom(const FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 RoomYaw) const;
+	FDestinationAvailabilityResult HasRoom(FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 RoomYaw, FDestinationAvailabilityResult& Result) const;
 
 	UFUNCTION()
 	void AddRoom(UInventoryItem* Item, int32 Index);
@@ -75,6 +76,7 @@ private:
 	bool IsInGridBounds(const int32 StartIndex, const FIntPoint& Dimensions) const;
 	FIntPoint GetItemDimensions(const FItemManifest& ItemManifest) const;
 	bool IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates,  const FIntPoint& DestinationCoordinates, int32 Yaw) const;
+	bool MatchesLayer(const UInventoryItem* Item) const;
 
 	UFUNCTION()
 	void OnPlayerPositionUpdate(const FVector2D& Location, const float Angle);
@@ -82,7 +84,6 @@ private:
 	// bool IsUpperLeftSlot(const UInventoryGridSlot* GridSlot, const UInventoryGridSlot* SubGridSlot) const;
 	// bool DoesItemTypeMatch(const UInventoryItem* SubItem, const FGameplayTag& ItemType) const;
 	// bool HasRoomAtIndex(const UInventoryGridSlot* GridSlot, const FIntPoint& Dimensions, const TSet<int32>& CheckedIndices, TSet<int32>& OutTentativelyClaimed, const FGameplayTag& ItemType, int32 MaxStackSize);
-	// bool MatchesCategory(const UInventoryItem* Item) const;
 	// FSlotAvailabilityResult HasRoomForItem(const UInventoryItem* InventoryItem, const int32 StackAmountOverride = -1);
 	// FSlotAvailabilityResult HasRoomForItem(const FItemManifest& ItemManifest, int32 StackAmountOverride = -1);
 	// void AddItemToIndices(const FSlotAvailabilityResult& Result, UInventoryItem* NewItem);
@@ -99,11 +100,14 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	EGridCategory GridCategory;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Layer"))
+	FGameplayTag GridLayer = FGameplayTag::EmptyTag;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TMap<int32, TObjectPtr<USlottedRoom>> SlottedRooms;
 	
 	TWeakObjectPtr<USlottedRoom> HoverSlottedRoom;

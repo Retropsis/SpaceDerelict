@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "PlayerCharacterController.generated.h"
 
@@ -15,6 +16,7 @@ class UInputAction;
 class UInputMappingContext;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerPositionUpdated, const FVector2D&, Location, const float, Angle);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerLayerUpdated,  const FGameplayTag&, Layer);
 
 UCLASS()
 class DRAWINVENTORY_API APlayerCharacterController : public APlayerController
@@ -24,7 +26,7 @@ class DRAWINVENTORY_API APlayerCharacterController : public APlayerController
 public:
 	APlayerCharacterController();
 	virtual void Tick(float DeltaTime) override;
-	void SetTimerPlayerPositionUpdate() const;
+	void SetTimerPlayerPositionUpdate();
 	float GetAOPitch() const { return AO_Pitch; }
 	bool IsGloveRaised() const { return bGloveRaised; }
 
@@ -40,6 +42,9 @@ public:
 	FVector GetSavedPlayerLocation() const { return SavedPlayerLocation; }
 
 	FPlayerPositionUpdated OnPlayerPositionUpdated;
+
+	UPROPERTY(BlueprintAssignable)
+	FPlayerLayerUpdated OnPlayerLayerUpdated;
 
 protected:
 	virtual void BeginPlay() override;
@@ -89,4 +94,5 @@ private:
 	float AO_Pitch;
 	bool bGloveRaised;
 	FVector SavedPlayerLocation = FVector::ZeroVector;
+	FGameplayTag PreviousLayer = FGameplayTag::EmptyTag;
 };

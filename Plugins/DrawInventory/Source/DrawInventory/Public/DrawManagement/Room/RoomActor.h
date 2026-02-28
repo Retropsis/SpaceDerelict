@@ -21,10 +21,11 @@ class DRAWINVENTORY_API ARoomActor : public AActor
 public:
 	ARoomActor();
 	TMap<FName, FIntPoint>  ConstructDestinationOffsets();
-	void ConstructRoom(const FDestinationAvailabilityResult& Result);
+	void ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize);
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
 	void ConstructPuzzle() const;
-	void SetRoomType(const FGameplayTag& Type) { RoomType = Type; }
+	TSet<FGameplayTag>  GetLayer() const { return Layers; }
+	void AddLayer(const FGameplayTag& NewLayer) { Layers.Add(NewLayer); }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
 	UDoorComponent* GetDoorComponentBySocket(const FName& Socket);
 	TArray<FTransform> GetAvailableSpawnerTransforms() const;
@@ -49,5 +50,5 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	TObjectPtr<UBoxComponent> RoomBoundary;
 	
-	FGameplayTag RoomType = FGameplayTag::EmptyTag;
+	TSet<FGameplayTag> Layers;
 };

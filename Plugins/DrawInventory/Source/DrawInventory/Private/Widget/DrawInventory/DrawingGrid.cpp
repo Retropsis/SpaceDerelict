@@ -6,6 +6,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/Image.h"
 #include "DrawManagement/Component/DrawComponent.h"
+#include "DrawManagement/Room/SocketFragment.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Item/InventoryItem.h"
@@ -61,25 +62,22 @@ void UDrawingGrid::ConstructGrid()
 	}
 }
 
-FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manifest, const int32 RoomIndex, const int32 DestinationIndex, const int32 RoomYaw) const
+FDestinationAvailabilityResult UDrawingGrid::HasRoom(FItemManifest& Manifest, const int32 RoomIndex, const int32 DestinationIndex, const int32 RoomYaw, FDestinationAvailabilityResult& Result) const
 {
-	FDestinationAvailabilityResult Result;
-	Result.RoomIndex = DestinationIndex;
-	Result.DestinationYaw = RoomYaw;
-
-	const FRoomFragment* RoomFragment = Manifest.GetFragmentOfType<FRoomFragment>();
+	FRoomFragment* RoomFragment = Manifest.GetFragmentOfTypeMutable<FRoomFragment>();
 	if (!RoomFragment) return FDestinationAvailabilityResult();
 
-	for (TTuple<FIntPoint, FName>& Socket : RoomFragment->GetSockets())
+	for (const FSocketFragment& Socket : RoomFragment->GetSocketFragmentsOfLayer(GridLayer))
 	{
 		FDestinationAvailability Availability;
 		const FIntPoint RoomCoordinates = UWidgetUtiliies::GetPositionFromIndex(DestinationIndex, Columns);
-		const FIntPoint ShiftedOffset = UDrawingUtility::GetShiftedOffsetFromAngle(Socket.Key, RoomYaw);
+		const FIntPoint ShiftedOffset = UDrawingUtility::GetShiftedOffsetFromAngle(Socket.GetOffset(), RoomYaw);
 		const FIntPoint ShiftedCoordinates = RoomCoordinates + ShiftedOffset;
-		Availability.Socket = Socket.Value;
+		Availability.Socket = Socket.GetSocket();
+		Availability.Layer = Socket.GetLayer();
 		Availability.DestinationIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(ShiftedCoordinates, Columns, Rows);
 
-		if (RoomIndex == Availability.DestinationIndex) continue;
+		if (RoomIndex == Availability.DestinationIndex && Result.Layer.MatchesTagExact(GridLayer)) continue;
 
 		if (Availability.DestinationIndex < 0)
 		{
@@ -87,16 +85,13 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(const FItemManifest& Manife
 		}
 		else if (IsDestinationOccupied(Availability.DestinationIndex, RoomCoordinates, ShiftedCoordinates, RoomYaw))
 		{
-			if (SlottedRooms.Contains(Availability.DestinationIndex))
-			{
-				Availability.DoorState = EDoorState::Opened;
-				const FRoomFragment* DestinationRoomFragment = SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FRoomFragment>();
-				ARoomActor* ConnectedRoom = DestinationRoomFragment->GetRoomActor();
-				FName ConnectedDoorSocket = UDrawingUtility::FindConnectedDoorSocket(ShiftedOffset, DestinationRoomFragment->GetYaw());
-				UE_LOG(LogTemp, Error, TEXT("SocketName: %s"), *ConnectedDoorSocket.ToString());
+			Availability.DoorState = EDoorState::Opened;
+			const FRoomFragment* DestinationRoomFragment = SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+			ARoomActor* ConnectedRoom = DestinationRoomFragment->GetRoomActor();
+			FName ConnectedDoorSocket = UDrawingUtility::FindConnectedDoorSocket(ShiftedOffset, DestinationRoomFragment->GetYaw());
+			// UE_LOG(LogTemp, Error, TEXT("SocketName: %s"), *ConnectedDoorSocket.ToString());
 				
-				DrawComponent->Server_OpenConnectedDoor(ConnectedRoom, ConnectedDoorSocket);
-			}
+			DrawComponent->Server_OpenConnectedDoor(ConnectedRoom, ConnectedDoorSocket);
 			continue;
 		}
 		
@@ -130,7 +125,7 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 		UInventoryItem* FoundItem = SlottedRooms[Index]->GetInventoryItem();
 		if (IsValid(FoundItem))
 		{
-			const FRoomFragment* RoomFragment = FoundItem->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+			FRoomFragment* RoomFragment = FoundItem->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
 			UE_LOG(LogTemp, Warning, TEXT("Checking Destination Available with Yaw %d"), Yaw);
 			if (!RoomFragment)
 			{
@@ -138,11 +133,11 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 				return false;;
 			}
 
-			for (const TTuple<FIntPoint, FName>& Socket : RoomFragment->GetSockets())
+			for (const FSocketFragment& Socket : RoomFragment->GetSocketFragmentsOfLayer(GridLayer))
 			{
-				const FIntPoint ShiftedOffset = UDrawingUtility::GetShiftedOffsetFromAngle(Socket.Key, Yaw);
+				const FIntPoint ShiftedOffset = UDrawingUtility::GetShiftedOffsetFromAngle(Socket.GetOffset(), Yaw);
 				const FIntPoint ShiftedCoordinates = DestinationCoordinates + ShiftedOffset;
-				UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.Value.ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
+				UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.GetSocket().ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
 				if (ShiftedCoordinates == RoomCoordinates)
 				{
 					return true;
@@ -161,10 +156,17 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 	return false;
 }
 
+bool UDrawingGrid::MatchesLayer(const UInventoryItem* Item) const
+{
+	const FRoomFragment* RoomFragment = Item->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+	if (!RoomFragment) return false;
+	return RoomFragment->GetLayers().Contains(GridLayer);
+}
+
 void UDrawingGrid::AddRoom(UInventoryItem* Item, int32 Index)
 {
-	// if (!MatchesCategory(Item)) return;
-	//
+	if (!MatchesLayer(Item)) return;
+	
 	// FSlotAvailabilityResult Result = HasRoomForItem(Item);
 	// AddItemToIndices(Result, Item);
 	
@@ -174,11 +176,15 @@ void UDrawingGrid::AddRoom(UInventoryItem* Item, int32 Index)
 
 void UDrawingGrid::RemoveRoom(UInventoryItem* Item, int32 Index)
 {
+	if (!MatchesLayer(Item)) return;
+	
 	RemoveRoomFromGrid(Item, Index);
 }
 
 void UDrawingGrid::OnHover(UInventoryItem* Item, int32 Index)
 {
+	if (!MatchesLayer(Item)) return;
+	
 	const FGridFragment* GridFragment = GetFragment<FGridFragment>(Item, Fragment::Grid);
 	const FImageFragment* ImageFragment = GetFragment<FImageFragment>(Item, Fragment::Icon);
 	const FRoomFragment* RoomFragment = GetFragment<FRoomFragment>(Item, Fragment::Room);
@@ -192,6 +198,8 @@ void UDrawingGrid::OnHover(UInventoryItem* Item, int32 Index)
 
 void UDrawingGrid::OnUnhover(UInventoryItem* Item, int32 Index)
 {
+	if (!MatchesLayer(Item)) return;
+	
 	const FGridFragment* GridFragment = GetFragment<FGridFragment>(Item, Fragment::Grid);
 	if (!GridFragment) return;
 
