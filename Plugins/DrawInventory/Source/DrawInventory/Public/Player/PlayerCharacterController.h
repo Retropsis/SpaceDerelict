@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerCharacterController.generated.h"
 
+class APlayerCharacter;
 struct FInputActionValue;
 class UDrawComponent;
 class UDoorComponent;
@@ -29,6 +30,7 @@ public:
 	void SetTimerPlayerPositionUpdate();
 	float GetAOPitch() const { return AO_Pitch; }
 	bool IsGloveRaised() const { return bGloveRaised; }
+	virtual void RestartLevel() override;
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
@@ -48,6 +50,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	APlayerCharacter* GetPlayerCharacter();
+	virtual void OnPossess(APawn* aPawn) override;
 
 private:
 	virtual void SetupInputComponent() override;
@@ -56,11 +60,18 @@ private:
 	void TraceForItem();
 	void CalculateAOPitch();
 	void ToggleGlove(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void StartFiring();
+	void StopFiring();
+	void SwitchWeapon();
 
-public:
-	virtual void RestartLevel() override;
+	UFUNCTION(BlueprintCallable, Category="DrawInventory")
+	virtual void DoJumpStart();
 
-private:
+	UFUNCTION(BlueprintCallable, Category="DrawInventory")
+	virtual void DoJumpEnd();
+	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TArray<TObjectPtr<UInputMappingContext>> DefaultIMCs;
 	
@@ -72,6 +83,24 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> ToggleGloveAction;
+
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> JumpAction;
+
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> MouseLookAction;
+	
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> FireAction;
+	
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> SwitchWeaponAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
@@ -85,6 +114,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TEnumAsByte<ECollisionChannel> InteractionTraceChannel;
 
+	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
 	TWeakObjectPtr<AActor> ThisActor;
 	TWeakObjectPtr<AActor> LastActor;
 	TWeakObjectPtr<UActorComponent> ThisComponent;

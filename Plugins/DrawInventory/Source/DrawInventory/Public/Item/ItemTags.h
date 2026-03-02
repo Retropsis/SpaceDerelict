@@ -27,6 +27,11 @@ namespace Item
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shadowbane)
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Staff)
 		}
+
+		namespace Ammunition
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Bullet);
+		}
 		
 		namespace Cloaks
 		{

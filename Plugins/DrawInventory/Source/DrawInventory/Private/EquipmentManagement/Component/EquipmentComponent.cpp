@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "EquipmentManagement/Component/EquipmentComponent.h"
-
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "GameFramework/Character.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
@@ -43,7 +42,8 @@ void UEquipmentComponent::OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 {
 	if (ACharacter* OwningCharacter = Cast<ACharacter>(OwningPlayerController->GetPawn()); IsValid(OwningCharacter))
 	{
-		OwningSkeletalMesh = OwningCharacter->GetMesh();
+		USkeletalMeshComponent* FirstPersonMesh = Cast<USkeletalMeshComponent>(OwningCharacter->FindComponentByTag(USkeletalMeshComponent::StaticClass(), FName("FirstPerson")));
+		OwningSkeletalMesh = IsValid(FirstPersonMesh) ? FirstPersonMesh : OwningCharacter->GetMesh();
 	}
 	InitializeInventoryComponent();
 }
@@ -68,6 +68,7 @@ AEquipActor* UEquipmentComponent::SpawnEquippedActor(FEquipmentFragment* Equipme
 	AEquipActor* SpawnedEquipActor = EquipmentFragment->SpawnAttachedActor(AttachMesh);
 	SpawnedEquipActor->SetEquipmentType(EquipmentFragment->GetEquipmentType());
 	SpawnedEquipActor->SetOwner(GetOwner());
+	SpawnedEquipActor->InitializeEquipment();
 	EquipmentFragment->SetEquippedActor(SpawnedEquipActor);
 	return SpawnedEquipActor;
 }
@@ -88,6 +89,7 @@ void UEquipmentComponent::OnItemEquipped(UInventoryItem* EquippedItem)
 
 	if (!OwningSkeletalMesh.IsValid()) return;
 	AEquipActor* SpawnedEquipActor = SpawnEquippedActor(EquipmentFragment, ItemManifest, OwningSkeletalMesh.Get());
+	SpawnedEquipActor->OnEquip(OwningPlayerController->GetPawn());
 	
 	EquippedActors.Add(SpawnedEquipActor);
 }

@@ -16,6 +16,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacterController.h"
 #include "Widget/DrawInventory/DrawingBoard.h"
+#include "Widget/DrawInventory/DrawingPanel.h"
 #include "Widget/DrawInventory/Interaction/UnlockWidget.h"
 #include "Widget/Utiliies/WidgetUtiliies.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -200,7 +201,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 
 	if (const FRequirementFragment* RequirementFragment = RoomToSpawn->GetItemManifest().GetFragmentOfType<FRequirementFragment>())
 	{
-		if (!InventoryComponent->CheckItemOfTypAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount()))
+		if (!InventoryComponent->CheckItemOfTypeAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount()))
 		{
 			return;
 		}
@@ -366,6 +367,10 @@ void UDrawComponent::ConstructDrawingBoard()
 
 	DrawingBoard = CreateWidget<UDrawingBoard>(OwningController.Get(), DrawingBoardClass);
 	DrawingBoard->AddToViewport();
+	
+	DrawingPanel = CreateWidget<UDrawingPanel>(OwningController.Get(), DrawingPanelClass);
+	DrawingPanel->AddToViewport();
+	
 	CloseDrawingBoard();
 }
 
@@ -403,7 +408,7 @@ void UDrawComponent::OnPlayerEnterRoom(const FVector& Location)
 
 void UDrawComponent::OnOxygenConsume()
 {
-	if (InventoryComponent->CheckItemOfTypAndAmount(Item::Currency::Oxygen, 1))
+	if (InventoryComponent->CheckItemOfTypeAndAmount(Item::Currency::Oxygen, 1))
 	{
 		OnItemConsume(Item::Currency::Oxygen, 1);
 	}
@@ -430,7 +435,7 @@ void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)
 
 	if (InteractingDoorComponent->IsLocked())
 	{
-		if (InventoryComponent->CheckItemOfTypAndAmount(Item::Currency::Key, 1))
+		if (InventoryComponent->CheckItemOfTypeAndAmount(Item::Currency::Key, 1))
 		{
 			OpenUnlockWidget();
 		}
@@ -445,27 +450,47 @@ void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)
 void UDrawComponent::DrawRooms()
 {
 	RoomsToDraw.Empty();
-	DrawingBoard->ClearDrawingBoard();
+	DrawingPanel->ClearDrawingBoard();
 	const int32 DestinationIndex = InteractingDoorComponent->GetDestinationIndex();
 	const int32 DestinationYaw = InteractingDoorComponent->GetRoomYaw();
 	const FGameplayTag DestinationLayer = InteractingDoorComponent->GetLayer(); 
 	
 	for (int32 i = 0; i < NumberOfDrawnRooms; ++i)
 	{
-		const int32 Selection = FMath::RandRange(0, PooledRoomList.GetAllRooms().Num() - 1);
-		UInventoryItem* Room = PooledRoomList.GetAllRooms()[Selection];
+		UInventoryItem* Room;
+		bool bFoundRoom = false;
+		int32 Selection = -1;
+		while (!bFoundRoom)
+		{
+			Selection = FMath::RandRange(0, PooledRoomList.GetAllRooms().Num() - 1);
+			Room = PooledRoomList.GetAllRooms()[Selection];
+
+			const FRoomFragment* RoomFragment = Room->GetItemManifest().GetFragmentOfType<FRoomFragment>();
+			if (!RoomFragment) return;
+
+			if (!RoomFragment->GetLayers().Contains(ActiveLayer)) continue; 
+		
+			bFoundRoom = DrawingBoard->HasRoomAtIndex(DestinationIndex, RoomFragment->GetLayers());
+		}
+
+		if (Selection == -1)
+		{
+			UE_LOG(LogTemp, Error, TEXT("DrawRooms hasn't found a room"));
+			continue;
+		}
+		Room = PooledRoomList.GetAllRooms()[Selection];
 		RoomsToDraw.Add(Room);
 
 		bool bRequirementMet = false;
 		if (const FRequirementFragment* RequirementFragment = Room->GetItemManifest().GetFragmentOfType<FRequirementFragment>())
 		{
-			bRequirementMet = InventoryComponent->CheckItemOfTypAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount());
+			bRequirementMet = InventoryComponent->CheckItemOfTypeAndAmount(RequirementFragment->GetItemType(), RequirementFragment->GetAmount());
 		}
-		DrawingBoard->DrawRoom(Room, DestinationIndex,DestinationYaw, DestinationLayer, bRequirementMet);
+		DrawingPanel->DrawRoom(Room, DestinationIndex,DestinationYaw, DestinationLayer, bRequirementMet);
 	}
 	
 	DrawingBoard->PlayOpeningVisualEffects();
-	DrawingBoard->SetRedrawCount(NumberOfRedraws);
+	DrawingPanel->SetRedrawCount(NumberOfRedraws);
 }
 
 void UDrawComponent::ToggleDrawingBoard()
@@ -486,6 +511,7 @@ void UDrawComponent::OpenDrawingBoard()
 	if (!IsValid(DrawingBoard)) return;
 
 	DrawingBoard->SetVisibility(ESlateVisibility::Visible);
+	DrawingPanel->SetVisibility(ESlateVisibility::Visible);
 	bDrawingBoardOpen = true;
 
 	if (!OwningController.IsValid()) return;
@@ -501,6 +527,7 @@ void UDrawComponent::CloseDrawingBoard()
 	if (!IsValid(DrawingBoard)) return;
 	
 	DrawingBoard->SetVisibility(ESlateVisibility::Collapsed);
+	DrawingPanel->SetVisibility(ESlateVisibility::Collapsed);
 	bDrawingBoardOpen = false;
 
 	if (!OwningController.IsValid()) return;

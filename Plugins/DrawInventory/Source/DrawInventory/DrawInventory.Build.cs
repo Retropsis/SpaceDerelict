@@ -43,6 +43,7 @@ public class DrawInventory : ModuleRules
 				"SlateCore",
 				"UMG",
 				"InputCore",
+				"GeometryCollectionEngine"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

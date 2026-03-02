@@ -2,6 +2,7 @@
 
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "DrawManagement/Component/DrawComponent.h"
+#include "Item/Fragment/FragmentTags.h"
 
 UDrawComponent* UDrawingUtility::GetDrawComponent(const APlayerController* PlayerController)
 {
@@ -37,6 +38,7 @@ FIntPoint UDrawingUtility::GetShiftedOffsetFromAngle(const FIntPoint& Offset, in
 		if (Offset == FIntPoint(0, -1 )) return FIntPoint(0, 1);
 		if (Offset == FIntPoint(0, 1 )) return FIntPoint(0, -1);
 	case -90:
+	case 270:
 		if (Offset == FIntPoint(-1, 0 )) return FIntPoint(0, -1);
 		if (Offset == FIntPoint(1, 0 )) return FIntPoint(0, 1);
 		if (Offset == FIntPoint(0, -1 )) return FIntPoint(1, 0);
@@ -54,31 +56,113 @@ FName UDrawingUtility::GetSocketNameFromOffset(const FIntPoint& Offset)
 	return FName("None");
 }
 
-FName UDrawingUtility::FindConnectedDoorSocket(const FIntPoint& OriginOffset, const int32 Yaw)
+FName UDrawingUtility::FindConnectedDoorSocket(const FIntPoint& OriginOffset, const int32 Yaw, const FGameplayTag& Layer)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Layer is %s"), *Layer.ToString());
 	switch (Yaw)
 	{
 	case 0:
-		if (OriginOffset == FIntPoint(-1, 0 )) return FName("East");
-		if (OriginOffset == FIntPoint(1, 0 )) return FName("West");
-		if (OriginOffset == FIntPoint(0, -1 )) return FName("North");
-		if (OriginOffset == FIntPoint(0, 1 )) return FName("South");
+		if (OriginOffset == FIntPoint(-1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("East_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("East_Upper");
+			return FName("East");
+		}
+		if (OriginOffset == FIntPoint(1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("West_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("West_Upper");
+			return FName("West");
+		}
+		if (OriginOffset == FIntPoint(0, -1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("North_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("North_Upper");
+			return FName("North");
+		}
+		if (OriginOffset == FIntPoint(0, 1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("South_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("South_Upper");
+			return FName("South");
+		}
 	case 90: 
-		if (OriginOffset == FIntPoint(-1, 0 )) return FName("North");
-		if (OriginOffset == FIntPoint(1, 0 )) return FName("South");
-		if (OriginOffset == FIntPoint(0, -1 )) return FName("West");
-		if (OriginOffset == FIntPoint(0, 1 )) return FName("East");
+		if (OriginOffset == FIntPoint(-1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("North_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("North_Upper");
+			return FName("North");
+		}
+		if (OriginOffset == FIntPoint(1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("South_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("South_Upper");
+			return FName("South");
+		}
+		if (OriginOffset == FIntPoint(0, -1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("West_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("West_Upper");
+			return FName("West");
+		}
+		if (OriginOffset == FIntPoint(0, 1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("East_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("East_Upper");
+			return FName("East");
+		}
 	case -180: 
 	case 180:
-		if (OriginOffset == FIntPoint(-1, 0 )) return FName("West");
-		if (OriginOffset == FIntPoint(1, 0 )) return FName("East");
-		if (OriginOffset == FIntPoint(0, -1 )) return FName("South");
-		if (OriginOffset == FIntPoint(0, 1 )) return FName("North");
+		if (OriginOffset == FIntPoint(-1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("West_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("West_Upper");
+			return FName("West");
+		}
+		if (OriginOffset == FIntPoint(1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("East_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("East_Upper");
+			return FName("East");
+		}
+		if (OriginOffset == FIntPoint(0, -1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("South_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("South_Upper");
+			return FName("South");
+		}
+		if (OriginOffset == FIntPoint(0, 1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("North_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("North_Upper");
+			return FName("North");
+		}
 	case -90: 
-		if (OriginOffset == FIntPoint(-1, 0 )) return FName("South");
-		if (OriginOffset == FIntPoint(1, 0 )) return FName("North");
-		if (OriginOffset == FIntPoint(0, -1 )) return FName("East");
-		if (OriginOffset == FIntPoint(0, 1 )) return FName("West");
+	case 270: 
+		if (OriginOffset == FIntPoint(-1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("South_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("South_Upper");
+			return FName("South");
+		}
+		if (OriginOffset == FIntPoint(1, 0 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("North_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("North_Upper");
+			return FName("North");
+		}
+		if (OriginOffset == FIntPoint(0, -1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("East_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("East_Upper");
+			return FName("East");
+		}
+		if (OriginOffset == FIntPoint(0, 1 ))
+		{
+			if (Layer.MatchesTagExact(Layer::Lower)) return FName("West_Lower");
+			if (Layer.MatchesTagExact(Layer::Upper)) return FName("West_Upper");
+			return FName("West");
+		}
 		default: return FName("None");
 	}
 }

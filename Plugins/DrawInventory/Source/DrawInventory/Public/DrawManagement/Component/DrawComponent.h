@@ -10,6 +10,7 @@
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "DrawComponent.generated.h"
 
+class UDrawingPanel;
 struct FItemManifest;
 struct FRoomFragment;
 class UInventoryComponent;
@@ -132,6 +133,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UDrawingBoard> DrawingBoard;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<UDrawingPanel> DrawingPanelClass;
+	
+	UPROPERTY()
+	TObjectPtr<UDrawingPanel> DrawingPanel;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UUnlockWidget> UnlockWidgetClass;

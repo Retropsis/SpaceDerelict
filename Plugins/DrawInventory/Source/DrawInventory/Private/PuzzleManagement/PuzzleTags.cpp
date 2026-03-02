@@ -25,4 +25,9 @@ namespace Puzzle
 		UE_DEFINE_GAMEPLAY_TAG(Nine, "Puzzle.Numeric.9");
 		UE_DEFINE_GAMEPLAY_TAG(Enter, "Puzzle.Numeric.Enter");
 	}
+	namespace Breakable
+	{
+		UE_DEFINE_GAMEPLAY_TAG(True, "Puzzle.Breakable.True");
+		UE_DEFINE_GAMEPLAY_TAG(False, "Puzzle.Breakable.False");
+	}
 }

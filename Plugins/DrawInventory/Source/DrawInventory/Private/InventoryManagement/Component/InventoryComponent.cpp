@@ -78,7 +78,7 @@ void UInventoryComponent::Server_AddNewItem_Implementation(UItemComponent* ItemC
 {
 	UInventoryItem* NewItem = InventoryList.AddEntry(ItemComponent);
 	NewItem->SetTotalStackCount(StackCount);
-	OnHUDCounterItemStackChange.Broadcast(NewItem->GetItemManifest().GetItemType(), StackCount);
+	OnItemOfTypeStackChange.Broadcast(NewItem->GetItemManifest().GetItemType(), StackCount);
 
 	if (GetOwner()->GetNetMode() == NM_ListenServer || GetOwner()->GetNetMode() == NM_Standalone)
 	{
@@ -103,7 +103,7 @@ void UInventoryComponent::Server_AddStacksToItem_Implementation(UItemComponent* 
 	if (!IsValid(Item)) return;
 
 	Item->SetTotalStackCount(Item->GetTotalStackCount() + StackCount);
-	OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), Item->GetTotalStackCount());
+	OnItemOfTypeStackChange.Broadcast(Item->GetItemManifest().GetItemType(), Item->GetTotalStackCount());
 
 	if (Remainder == 0)
 	{
@@ -125,7 +125,7 @@ void UInventoryComponent::Server_DropItem_Implementation(UInventoryItem* Item, i
 	else
 	{
 		Item->SetTotalStackCount(NewStackCount);
-		OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
+		OnItemOfTypeStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
 	}
 	SpawnDroppedItem(Item, StackCount);
 }
@@ -157,7 +157,7 @@ void UInventoryComponent::Server_ConsumeItem_Implementation(UInventoryItem* Item
 	else
 	{
 		Item->SetTotalStackCount(NewStackCount);
-		OnHUDCounterItemStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
+		OnItemOfTypeStackChange.Broadcast(Item->GetItemManifest().GetItemType(), NewStackCount);
 	}
 
 	if (FConsumableFragment* ConsumableFragment = Item->GetItemManifestMutable().GetFragmentOfTypeMutable<FConsumableFragment>())
@@ -174,11 +174,12 @@ void UInventoryComponent::Server_ConsumeItemOfTypAndAmount_Implementation(const 
 	if (NewStackCount <= 0)
 	{
 		InventoryList.RemoveEntry(FoundItem);
+		OnItemOfTypeStackChange.Broadcast(FoundItem->GetItemManifest().GetItemType(), 0);
 	}
 	else
 	{
 		FoundItem->SetTotalStackCount(NewStackCount);
-		OnHUDCounterItemStackChange.Broadcast(FoundItem->GetItemManifest().GetItemType(), NewStackCount);
+		OnItemOfTypeStackChange.Broadcast(FoundItem->GetItemManifest().GetItemType(), NewStackCount);
 	}
 	
 	OnConsumeItemStackChange.Broadcast(ItemType, Amount);
@@ -189,12 +190,18 @@ void UInventoryComponent::Server_ConsumeItemOfTypAndAmount_Implementation(const 
 	}
 }
 
-bool UInventoryComponent::CheckItemOfTypAndAmount(const FGameplayTag& ItemType,  const int32 Amount)
+bool UInventoryComponent::CheckItemOfTypeAndAmount(const FGameplayTag& ItemType,  const int32 Amount)
 {
 	UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
 	bool bHasItemWithAmount = IsValid(FoundItem) && FoundItem->GetTotalStackCount() >= Amount;
 	if (!bHasItemWithAmount) NoItemOfTypeInInventory.Broadcast(ItemType.GetTagLeafName());
 	return bHasItemWithAmount;
+}
+
+int32 UInventoryComponent::GetItemOfTypeAmount(const FGameplayTag& ItemType)
+{
+	UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+	return IsValid(FoundItem) ? FoundItem->GetTotalStackCount() : -1;
 }
 
 void UInventoryComponent::Server_EquippedSlottedItemClicked_Implementation(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip)

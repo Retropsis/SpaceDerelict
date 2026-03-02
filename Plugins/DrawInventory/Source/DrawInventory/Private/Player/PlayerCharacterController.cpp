@@ -9,6 +9,7 @@
 #include "Item/ItemTags.h"
 #include "Item/Fragment/FragmentTags.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 #include "PuzzleManagement/Component/LockComponent.h"
 #include "PuzzleManagement/Piece/Component/DigitComponent.h"
 #include "Widget/HUD/HUDWidget.h"
@@ -53,6 +54,12 @@ void APlayerCharacterController::BeginPlay()
 	SetTimerPlayerPositionUpdate();
 }
 
+void APlayerCharacterController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	GetPlayerCharacter();
+}
+
 void APlayerCharacterController::SetTimerPlayerPositionUpdate()
 {
 	FTimerHandle PositionUpdateTimer;
@@ -82,6 +89,87 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleInventory);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleGlove);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ToggleGlove);
+	
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::DoJumpStart);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::DoJumpEnd);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
+	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &APlayerCharacterController::StartFiring);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopFiring);
+	EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::SwitchWeapon);
+}
+
+void APlayerCharacterController::Move(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (GetPlayerCharacter())
+	{
+		PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorRightVector(), MovementVector.X);
+		PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorForwardVector(), MovementVector.Y);
+	}
+}
+
+void APlayerCharacterController::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (GetPlayerCharacter())
+	{
+		PlayerCharacter->AddControllerYawInput(LookAxisVector.X);
+		PlayerCharacter->AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void APlayerCharacterController::DoJumpStart()
+{
+	if (GetPlayerCharacter()) PlayerCharacter->Jump();
+}
+
+void APlayerCharacterController::DoJumpEnd()
+{
+	if (GetPlayerCharacter()) PlayerCharacter->StopJumping();
+}
+
+void APlayerCharacterController::StartFiring()
+{
+	if (GetPlayerCharacter()) PlayerCharacter->StartFiring();
+}
+
+void APlayerCharacterController::StopFiring()
+{
+	if (GetPlayerCharacter()) PlayerCharacter->StopFiring();
+}
+
+void APlayerCharacterController::SwitchWeapon()
+{
+	// ensure we have at least two weapons two switch between
+	// if (OwnedWeapons.Num() > 1 && !IsDead())
+	// {
+	// 	// deactivate the old weapon
+	// 	CurrentWeapon->DeactivateWeapon();
+	//
+	// 	// find the index of the current weapon in the owned list
+	// 	int32 WeaponIndex = OwnedWeapons.Find(CurrentWeapon);
+	//
+	// 	// is this the last weapon?
+	// 	if (WeaponIndex == OwnedWeapons.Num() - 1)
+	// 	{
+	// 		// loop back to the beginning of the array
+	// 		WeaponIndex = 0;
+	// 	}
+	// 	else {
+	// 		// select the next weapon index
+	// 		++WeaponIndex;
+	// 	}
+	//
+	// 	// set the new weapon as current
+	// 	CurrentWeapon = OwnedWeapons[WeaponIndex];
+	//
+	// 	// activate the new weapon
+	// 	CurrentWeapon->ActivateWeapon();
+	// }
 }
 
 void APlayerCharacterController::PrimaryInteract()
@@ -105,7 +193,7 @@ void APlayerCharacterController::PrimaryInteract()
 	if (IsValid(LockComponent) || !DrawComponent.IsValid())
 	{
 		const FGameplayTag LockType = LockComponent->GetLockType();
-		if (InventoryComponent->CheckItemOfTypAndAmount(LockType, 1))
+		if (InventoryComponent->CheckItemOfTypeAndAmount(LockType, 1))
 		{
 			InventoryComponent->Server_ConsumeItemOfTypAndAmount(LockType, 1);
 			LockComponent->Unlock();
@@ -144,6 +232,7 @@ void APlayerCharacterController::CreateHUDWidget()
 
 void APlayerCharacterController::ToggleInventory()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ToggleInventory"));
 	if (DrawComponent.IsValid() && DrawComponent->IsDrawingBoardOpen()) return;
 	if (!InventoryComponent.IsValid() ) return;
 	InventoryComponent->ToggleInventoryMenu();
@@ -228,4 +317,13 @@ void APlayerCharacterController::TraceForItem()
 	{
 		
 	}
+}
+
+APlayerCharacter* APlayerCharacterController::GetPlayerCharacter()
+{
+	if (!PlayerCharacter.IsValid())
+	{
+		PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	}
+	return PlayerCharacter.Get();
 }

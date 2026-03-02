@@ -59,10 +59,10 @@ void USpatialInventory::EquippedGridSlotClicked(UEquippedGridSlot* EquippedGridS
 
 	InventoryComponent->Server_EquippedSlottedItemClicked(HoverItem->GetInventoryItem(), nullptr);
 
-	if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
-	{
-		InventoryComponent->OnItemEquipped.Broadcast(HoverItem->GetInventoryItem());
-	}
+	// if (GetOwningPlayer()->GetNetMode() != NM_DedicatedServer)
+	// {
+	// 	InventoryComponent->OnItemEquipped.Broadcast(HoverItem->GetInventoryItem());
+	// }
 		
 	// Clear the Hover Item
 	Grid_Items->ClearHoverItem();
@@ -162,7 +162,7 @@ bool USpatialInventory::CanEquipHoverItem(UEquippedGridSlot* EquippedGridSlot, c
 	UInventoryItem* HeldItem = HoverItem->GetInventoryItem();
 
 	return HasHoverItem() && IsValid(HeldItem) && !HoverItem->IsStackable() &&
-		HeldItem->GetItemManifest().GetItemCategory() == EGridCategory::Equippable &&
+		/*HeldItem->GetItemManifest().GetItemCategory() == EGridCategory::Equippable &&*/
 			HeldItem->GetItemManifest().GetItemType().MatchesTag(EquipmentType);
 }
 

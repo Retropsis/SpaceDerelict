@@ -1,17 +1,19 @@
 // Retropsis 2026
 
 #include "PuzzleManagement/Piece/RewardBox.h"
-#include "DrawManagement/Room/ItemSpawner.h"
 #include "PuzzleManagement/Component/LockComponent.h"
 
 void ARewardBox::SpawnReward()
 {
+	if (bHasSpawned) return;
+	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	if (IsValid(LootItemClass))
 	{
 		GetWorld()->SpawnActor<AActor>(LootItemClass, GetSpawnTransform(), SpawnParams);
 	}
+	bHasSpawned = true;
 }
 
 void ARewardBox::BeginPlay()

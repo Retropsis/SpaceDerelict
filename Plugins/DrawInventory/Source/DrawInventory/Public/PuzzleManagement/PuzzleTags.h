@@ -26,4 +26,10 @@ namespace Puzzle
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Nine);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enter);
 	}
+
+	namespace Breakable
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(True);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(False);
+	}
 }

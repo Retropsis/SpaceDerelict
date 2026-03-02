@@ -29,6 +29,7 @@ class DRAWINVENTORY_API UDrawingGrid : public UUserWidget
 	public:
 	virtual void NativeOnInitialized() override;
 	FDestinationAvailabilityResult HasRoom(FItemManifest& Manifest, int32 RoomIndex, int32 DestinationIndex, int32 RoomYaw, FDestinationAvailabilityResult& Result) const;
+	bool HasRoomAtIndex(int32 Index) const;
 
 	UFUNCTION()
 	void AddRoom(UInventoryItem* Item, int32 Index);

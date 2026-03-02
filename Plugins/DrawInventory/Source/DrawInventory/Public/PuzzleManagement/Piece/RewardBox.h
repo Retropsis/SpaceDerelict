@@ -24,4 +24,5 @@ protected:
 
 private:
 	TSubclassOf<AActor> LootItemClass;
+	bool bHasSpawned = false;
 };

@@ -26,7 +26,7 @@ public:
 
 	FEquippedGridSlotClicked EquippedGridSlotClicked;
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="GameItem.Equipment"))
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(Categories="Item.Equipment"))
 	FGameplayTag EquipmentType;
 
 	UPROPERTY(meta=(BindWidget))

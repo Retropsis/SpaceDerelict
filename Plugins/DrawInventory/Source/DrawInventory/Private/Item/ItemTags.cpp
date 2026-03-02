@@ -28,6 +28,12 @@ namespace Item
 			UE_DEFINE_GAMEPLAY_TAG(Staff, "Item.Equipment.Weapons.Staff")
 		}
 		
+		namespace Ammunition
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Bullet);
+			UE_DEFINE_GAMEPLAY_TAG(Bullet, "Item.Equipment.Ammunition.Bullet");
+		}
+		
 		namespace Cloaks
 		{
 			UE_DEFINE_GAMEPLAY_TAG(RedCloak, "Item.Equipment.Cloaks.RedCloak");

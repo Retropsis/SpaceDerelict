@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "PuzzleComponent.generated.h"
 
+class ABreakable;
 class ASafeBox;
 
 USTRUCT(BlueprintType)
@@ -45,6 +46,19 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FString Code{ "1234" };
+};
+
+USTRUCT(BlueprintType)
+struct FBreakablePattern
+{
+	GENERATED_BODY()
+
+public:
+	TMap<TSubclassOf<ABreakable>, FGameplayTag> GetBreakableClasses() const { return BreakableClasses; }
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle.Breakable"))
+	TMap<TSubclassOf<ABreakable>, FGameplayTag> BreakableClasses;
 };
 
 USTRUCT(BlueprintType)

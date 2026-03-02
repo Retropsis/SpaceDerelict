@@ -77,6 +77,8 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(FItemManifest& Manifest, co
 		Availability.Layer = Socket.GetLayer();
 		Availability.DestinationIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(ShiftedCoordinates, Columns, Rows);
 
+		UE_LOG(LogTemp, Warning, TEXT("Availability for Socket %s, ShiftedCoordinates: %s on %s"), *Availability.Socket.ToString(), *ShiftedCoordinates.ToString(), *GridLayer.ToString());
+
 		if (RoomIndex == Availability.DestinationIndex && Result.Layer.MatchesTagExact(GridLayer)) continue;
 
 		if (Availability.DestinationIndex < 0)
@@ -88,7 +90,7 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(FItemManifest& Manifest, co
 			Availability.DoorState = EDoorState::Opened;
 			const FRoomFragment* DestinationRoomFragment = SlottedRooms[Availability.DestinationIndex]->GetInventoryItem()->GetItemManifest().GetFragmentOfType<FRoomFragment>();
 			ARoomActor* ConnectedRoom = DestinationRoomFragment->GetRoomActor();
-			FName ConnectedDoorSocket = UDrawingUtility::FindConnectedDoorSocket(ShiftedOffset, DestinationRoomFragment->GetYaw());
+			FName ConnectedDoorSocket = UDrawingUtility::FindConnectedDoorSocket(ShiftedOffset, DestinationRoomFragment->GetYaw(), GridLayer);
 			// UE_LOG(LogTemp, Error, TEXT("SocketName: %s"), *ConnectedDoorSocket.ToString());
 				
 			DrawComponent->Server_OpenConnectedDoor(ConnectedRoom, ConnectedDoorSocket);
@@ -105,31 +107,36 @@ FDestinationAvailabilityResult UDrawingGrid::HasRoom(FItemManifest& Manifest, co
 			Availability.DoorState = EDoorState::Sealed;
 		}
 		
-		UE_LOG(LogTemp, Warning, TEXT("From room index %d to destination index %d, Yaw %d, ShiftedOffset %s, Socket %s"),
-			RoomIndex,
-			Availability.DestinationIndex,
-			RoomYaw,
-			*ShiftedOffset.ToString(),
-			*Availability.Socket.ToString());
+		// UE_LOG(LogTemp, Warning, TEXT("From room index %d to destination index %d, Yaw %d, Socket %s on Layer %s"),
+		// 	RoomIndex,
+		// 	Availability.DestinationIndex,
+		// 	RoomYaw,
+		// 	*Availability.Socket.ToString(),
+		// 	*GridLayer.ToString());
 		
 		Result.DestinationAvailabilities.Add(Availability);
 	}	
 	return Result;
 }
 
+bool UDrawingGrid::HasRoomAtIndex(int32 Index) const
+{
+	return !SlottedRooms.Contains(Index);
+}
+
 bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& RoomCoordinates, const FIntPoint& DestinationCoordinates, const int32 Yaw) const
 {	
-	UE_LOG(LogTemp, Warning, TEXT("Checking Destination for Room Index %d"), Index);
+	UE_LOG(LogTemp, Warning, TEXT("Checking Destination Occupied to Index %d and Yaw %d to Coords %s"), Index, Yaw, *DestinationCoordinates.ToString());
 	if (SlottedRooms.Contains(Index))
 	{
 		UInventoryItem* FoundItem = SlottedRooms[Index]->GetInventoryItem();
 		if (IsValid(FoundItem))
 		{
 			FRoomFragment* RoomFragment = FoundItem->GetItemManifestMutable().GetFragmentOfTypeMutable<FRoomFragment>();
-			UE_LOG(LogTemp, Warning, TEXT("Checking Destination Available with Yaw %d"), Yaw);
+			// UE_LOG(LogTemp, Warning, TEXT("Checking Destination Available with Yaw %d"), Yaw);
 			if (!RoomFragment)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid RoomFragment"));
+				// UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid RoomFragment"));
 				return false;;
 			}
 
@@ -137,7 +144,7 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 			{
 				const FIntPoint ShiftedOffset = UDrawingUtility::GetShiftedOffsetFromAngle(Socket.GetOffset(), Yaw);
 				const FIntPoint ShiftedCoordinates = DestinationCoordinates + ShiftedOffset;
-				UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.GetSocket().ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
+				// UE_LOG(LogTemp, Warning, TEXT("Checking Socket %s with ShiftedCoordinates %s from RoomCoordinates %s"), *Socket.GetSocket().ToString(), *ShiftedCoordinates.ToString(), *RoomCoordinates.ToString());
 				if (ShiftedCoordinates == RoomCoordinates)
 				{
 					return true;
@@ -146,12 +153,12 @@ bool UDrawingGrid::IsDestinationOccupied(const int32 Index, const FIntPoint& Roo
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid Item"));
+			// UE_LOG(LogTemp, Error, TEXT("Has NOT found a valid Item"));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Has NOT found SlottedRoom at Index %d"), Index);
+		// UE_LOG(LogTemp, Error, TEXT("Has NOT found SlottedRoom at Index %d"), Index);
 	}
 	return false;
 }

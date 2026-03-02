@@ -7,7 +7,7 @@
 #include "Puzzle_SafeBox.generated.h"
 
 class ASpawner;
-class UItemSpawner;
+class USpawnerComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DRAWINVENTORY_API UPuzzle_SafeBox : public UPuzzleComponent
@@ -29,5 +29,5 @@ private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FPuzzleReward> Rewards;
 	
-	TArray<UItemSpawner*> ItemSpawners;
+	TArray<USpawnerComponent*> ItemSpawners;
 };

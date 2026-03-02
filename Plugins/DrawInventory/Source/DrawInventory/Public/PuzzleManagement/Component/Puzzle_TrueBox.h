@@ -8,7 +8,7 @@
 
 class ASpawner;
 class ARewardBox;
-class UItemSpawner;
+class USpawnerComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class DRAWINVENTORY_API UPuzzle_TrueBox : public UPuzzleComponent
@@ -29,7 +29,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<ASpawner> SpawnerClass;
 
-	TArray<UItemSpawner*> ItemSpawners;
+	TArray<USpawnerComponent*> ItemSpawners;
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AActor> KeyItemClass;

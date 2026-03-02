@@ -1,7 +1,7 @@
 // Retropsis 2026
 
 #include "PuzzleManagement/Component/Puzzle_SafeBox.h"
-#include "DrawManagement/Room/ItemSpawner.h"
+#include "DrawManagement/Room/SpawnerComponent.h"
 #include "PuzzleManagement/PuzzleTags.h"
 #include "Item/ItemTags.h"
 #include "Item/Component/ItemComponent.h"
@@ -18,7 +18,7 @@ void UPuzzle_SafeBox::ConstructPuzzle()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	GetOwner()->GetComponents(UItemSpawner::StaticClass(), ItemSpawners);
+	GetOwner()->GetComponents(USpawnerComponent::StaticClass(), ItemSpawners);
 
 	const int32 PatternSelection = FMath::RandRange(0, SafeBoxPatterns.Num() - 1);
 	FSafeBoxPattern Pattern = SafeBoxPatterns[PatternSelection];
@@ -28,13 +28,13 @@ void UPuzzle_SafeBox::ConstructPuzzle()
 	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
 	TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
 	
-	TMap<FGameplayTag, UItemSpawner*> TaggedItemSpawners;
-	for (UItemSpawner* Spawner : ItemSpawners)
+	TMap<FGameplayTag, USpawnerComponent*> TaggedItemSpawners;
+	for (USpawnerComponent* Spawner : ItemSpawners)
 	{
 		TaggedItemSpawners.Add(Spawner->GetSpawnerTag(), Spawner);
 	}
 	
-	for (const TTuple<FGameplayTag, UItemSpawner*>& Spawner : TaggedItemSpawners)
+	for (const TTuple<FGameplayTag, USpawnerComponent*>& Spawner : TaggedItemSpawners)
 	{
 		if (Spawner.Key.MatchesTagExact(Item::Puzzle::Code) && IsValid(ChosenCodeItemClass))
 		{

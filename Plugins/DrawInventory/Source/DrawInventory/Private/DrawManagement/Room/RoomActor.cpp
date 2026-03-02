@@ -4,7 +4,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Data/DestinationData.h"
-#include "DrawManagement/Room/ItemSpawner.h"
+#include "DrawManagement/Room/SpawnerComponent.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -77,7 +77,6 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 		if (IsValid(StaticMeshComponent))
 		{
 			Door->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Availability.Socket);
-			UE_LOG(LogTemp, Warning, TEXT("Adding door for socket: %s"), *Availability.Socket.ToString())
 			Yaw = StaticMeshComponent->GetSocketTransform(Availability.Socket, RTS_Component).Rotator().Yaw;
 		}
 		
@@ -130,7 +129,7 @@ TArray<FTransform> ARoomActor::GetAvailableSpawnerTransforms() const
 {
 	TArray<FTransform> SpawnerTransforms;
 	TArray<UActorComponent*> Components;
-	GetComponents(UItemSpawner::StaticClass(), Components);
+	GetComponents(USpawnerComponent::StaticClass(), Components);
 	for (UActorComponent* Component : Components)
 	{
 		USceneComponent* SceneComponent = Cast<USceneComponent>(Component);

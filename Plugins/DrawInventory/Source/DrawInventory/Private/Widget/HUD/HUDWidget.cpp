@@ -17,7 +17,7 @@ void UHUDWidget::NativeOnInitialized()
 	{
 		InventoryComponent->NoRoomInInventory.AddDynamic(this, &ThisClass::OnNoRoom);
 		InventoryComponent->NoItemOfTypeInInventory.AddDynamic(this, &ThisClass::OnNoItemOfTypeAndAmount);
-		InventoryComponent->OnHUDCounterItemStackChange.AddDynamic(this, &ThisClass::UpdateHUDCounter);
+		InventoryComponent->OnItemOfTypeStackChange.AddDynamic(this, &ThisClass::UpdateHUDCounter);
 	}
 	InitializeHUDCounters();
 }

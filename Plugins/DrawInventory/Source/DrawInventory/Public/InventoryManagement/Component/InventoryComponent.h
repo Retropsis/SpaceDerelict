@@ -34,7 +34,8 @@ public:
 	void ToggleInventoryMenu();
 	UInventoryBase* GetInventoryMenu() const { return InventoryMenu; }
 	bool IsMenuOpen() const { return bInventoryMenuOpen; }
-	bool CheckItemOfTypAndAmount(const FGameplayTag& ItemType, const int32 Amount);
+	bool CheckItemOfTypeAndAmount(const FGameplayTag& ItemType, const int32 Amount);
+	int32 GetItemOfTypeAmount(const FGameplayTag& ItemType);
 
 	UFUNCTION(Server, Reliable)
 	void Server_AddNewItem(UItemComponent* ItemComponent, int32 StackCount, int32 Remainder);
@@ -70,7 +71,7 @@ public:
 	FInventoryMenuToggled OnInventoryMenuToggled;
 	FNoItemOfTypeInInventory NoItemOfTypeInInventory;
 	FItemStackChange OnConsumeItemStackChange;
-	FItemStackChange OnHUDCounterItemStackChange;
+	FItemStackChange OnItemOfTypeStackChange;
 	FToggleHUD OnToggleHUD;
 
 protected:

@@ -25,7 +25,7 @@ public:
 	void OnNewCountVisualEffects();
 
 private:
-	UPROPERTY(EditAnywhere, Category ="DrawInventory", meta=(Categories="Item.Currency"))
+	UPROPERTY(EditAnywhere, Category ="DrawInventory", meta=(Categories="Item"))
 	FGameplayTag ItemType;
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")

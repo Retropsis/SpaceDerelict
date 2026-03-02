@@ -17,7 +17,10 @@ public:
 	FGameplayTag GetEquipmentType() const { return EquipmentType; }
 	void SetEquipmentType(FGameplayTag Type) { EquipmentType = Type; }
 
+	virtual void InitializeEquipment() {}
+	virtual void OnEquip(APawn* Pawn) {}
+
 private:
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	FGameplayTag EquipmentType;
 };
