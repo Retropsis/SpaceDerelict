@@ -20,6 +20,7 @@ namespace Fragment
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Room);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Requirement);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Valuable);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Puzzle);
 
 	namespace AttributeModifier
 	{

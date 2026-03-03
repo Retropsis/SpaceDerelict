@@ -349,6 +349,19 @@ private:
 	TArray<TSubclassOf<AActor>> ValuableItems;
 };
 
+USTRUCT(BlueprintType)
+struct FPuzzleFragment : public FItemFragment
+{
+	GENERATED_BODY()
+	
+public:
+	UTexture2D* GetPuzzleIcon() const { return PuzzleIcon; };
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	UTexture2D* PuzzleIcon = nullptr;
+};
+
 /*
  * Rules
  */

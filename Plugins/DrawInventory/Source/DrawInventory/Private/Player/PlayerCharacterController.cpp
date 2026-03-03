@@ -89,6 +89,7 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleInventory);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleGlove);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ToggleGlove);
+	EnhancedInputComponent->BindAction(HolsterAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleWeapon);
 	
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::DoJumpStart);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::DoJumpEnd);
@@ -140,6 +141,15 @@ void APlayerCharacterController::StartFiring()
 void APlayerCharacterController::StopFiring()
 {
 	if (GetPlayerCharacter()) PlayerCharacter->StopFiring();
+}
+
+void APlayerCharacterController::ToggleWeapon()
+{
+	if (GetPlayerCharacter())
+	{
+		PlayerCharacter->ToggleWeapon();
+		HUDWidget->UpdateHolsterWidget(PlayerCharacter->IsAimDownSight(), true);
+	}
 }
 
 void APlayerCharacterController::SwitchWeapon()

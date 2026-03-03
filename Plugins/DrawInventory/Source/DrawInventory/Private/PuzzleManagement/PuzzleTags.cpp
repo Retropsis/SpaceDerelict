@@ -29,5 +29,6 @@ namespace Puzzle
 	{
 		UE_DEFINE_GAMEPLAY_TAG(True, "Puzzle.Breakable.True");
 		UE_DEFINE_GAMEPLAY_TAG(False, "Puzzle.Breakable.False");
+		UE_DEFINE_GAMEPLAY_TAG(Pattern, "Puzzle.Breakable.Pattern");
 	}
 }

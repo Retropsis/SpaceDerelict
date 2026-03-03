@@ -28,6 +28,7 @@ public:
 	virtual FVector GetWeaponTargetLocation() = 0;
 	virtual void OnSemiWeaponRefire() = 0;
 	virtual void AddWeapon(AWeapon* Weapon) = 0;
+	virtual void HolsterWeapon(AWeapon* Weapon) = 0;
 	virtual void OnWeaponActivated(AWeapon* Weapon) = 0;
 	virtual void OnWeaponDeactivated(AWeapon* Weapon) = 0;
 };

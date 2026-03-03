@@ -56,6 +56,24 @@ void UDrawnRoomSlot::SetRequirement(UTexture2D* Icon, const int32 Amount, bool b
 	Text_Requirement->SetColorAndOpacity(bRequirementMet ? RequirementMetColor : RequirementNotMatchedColor);
 }
 
+void UDrawnRoomSlot::SetPuzzleIcon(UTexture2D* Icon) const
+{
+	HorizontalBox_Valuable->SetVisibility(ESlateVisibility::Visible);
+	
+	UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+	Image->SetBrushResourceObject(Icon);
+	FSlateBrush Brush;
+	Brush.DrawAs = ESlateBrushDrawType::Image;
+	HorizontalBox_Valuable->AddChildToHorizontalBox(Image);
+		
+	UHorizontalBoxSlot* ImageSlot = UWidgetLayoutLibrary::SlotAsHorizontalBoxSlot(Image);
+	FSlateChildSize Size;
+	Size.SizeRule = ESlateSizeRule::Automatic;
+	ImageSlot->SetHorizontalAlignment(HAlign_Center);
+	ImageSlot->SetSize(Size);
+	ImageSlot->SetPadding(FMargin(5.f, 0.f, 5.f, 0.f));
+}
+
 void UDrawnRoomSlot::SetValuable(const TMap<UTexture2D*, int32>& Valuables) const
 {
 	HorizontalBox_Valuable->SetVisibility(ESlateVisibility::Visible);

@@ -13,6 +13,8 @@ class AEquipActor;
 class UInventoryItem;
 class UInventoryComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipStatusChange, const FGameplayTag&, EquipmentType);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class DRAWINVENTORY_API UEquipmentComponent : public UActorComponent
 {
@@ -22,6 +24,9 @@ public:
 	void SetOwningSkeletalMesh(USkeletalMeshComponent* OwningMesh) { OwningSkeletalMesh = OwningMesh; }
 	void SetIsProxy(bool bProxy) { bIsProxy = bProxy; }
 	void InitializeOwner(APlayerController* PlayerController);
+
+	FOnEquipStatusChange OnEquipped;
+	FOnEquipStatusChange OnUnequipped;
 
 protected:
 	virtual void BeginPlay() override;

@@ -2,6 +2,7 @@
 
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Data/GridTypes.h"
+#include "EquipmentManagement/Component/EquipmentComponent.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "Widget/Inventory/InventoryBase/InventoryBase.h"
 
@@ -11,6 +12,14 @@ UInventoryComponent* UInventoryUtility::GetInventoryComponent(const APlayerContr
 
 	UInventoryComponent* InventoryComponent = PlayerController->FindComponentByClass<UInventoryComponent>();
 	return InventoryComponent;
+}
+
+UEquipmentComponent* UInventoryUtility::GetEquipmentComponent(const APlayerController* PlayerController)
+{
+	if (!IsValid(PlayerController)) return nullptr;
+
+	UEquipmentComponent* EquipmentComponent = PlayerController->FindComponentByClass<UEquipmentComponent>();
+	return EquipmentComponent;
 }
 
 EGridCategory UInventoryUtility::GetItemCategoryFromItemComponent(const UItemComponent* ItemComponent)

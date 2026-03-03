@@ -57,6 +57,14 @@ void AWeapon::OnEquip(APawn* Pawn)
 	}
 }
 
+void AWeapon::OnUnequip(APawn* Pawn)
+{
+	if (IWeaponInterface* WeaponHolder = Cast<IWeaponInterface>(Pawn))
+	{
+		WeaponHolder->HolsterWeapon(this);
+	}
+}
+
 void AWeapon::ActivateWeapon()
 {
 	SetActorHiddenInGame(false);
@@ -65,6 +73,7 @@ void AWeapon::ActivateWeapon()
 
 void AWeapon::DeactivateWeapon()
 {
+	StopFiring();
 	SetActorHiddenInGame(true);
 	WeaponOwner->OnWeaponDeactivated(this);
 }

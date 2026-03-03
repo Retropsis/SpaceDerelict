@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UHolsterWidget;
 struct FGameplayTag;
 class UHUDCounter;
 class UHorizontalBox;
@@ -27,11 +28,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "DrawInventory")
 	void HidePickupMessage();
 
+	void InitializeHolsterWidget();
 	void InitializeHUDCounters();
 	void ToggleHUD(bool bShow);
 
 	UFUNCTION()
 	void UpdateHUDCounter(const FGameplayTag& ItemType, int32 NewCount);
+
+	UFUNCTION()
+	void UpdateHolsterWidget(bool bEquipped, bool bVisible);
+	
+	UFUNCTION()
+	void OnGunEquipped(const FGameplayTag& EquipmentType);
+	
+	UFUNCTION()
+	void OnGunUnequipped(const FGameplayTag& EquipmentType);
 
 private:	
 	UPROPERTY(meta = (BindWidget))
@@ -39,6 +50,9 @@ private:
 
 	UPROPERTY()
 	TMap<FGameplayTag, UHUDCounter*> HUDCounters;
+
+	UPROPERTY()
+	TObjectPtr<UHolsterWidget> HolsterWidget;
 
 	UFUNCTION()
 	void OnNoRoom();

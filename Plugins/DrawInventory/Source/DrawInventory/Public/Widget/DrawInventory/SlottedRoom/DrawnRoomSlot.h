@@ -28,6 +28,7 @@ public:
 	void SetRoomIcon(const FSlateBrush& Brush) const;
 	void SetRoomName(const FText& Name) const;
 	void SetRequirement(UTexture2D* Icon, int32 Amount, bool bRequirementMet) const;
+	void SetPuzzleIcon(UTexture2D* Icon) const;
 	void SetValuable(const TMap<UTexture2D* , int32>& Valuables) const;
 	TWeakObjectPtr<UInventoryItem> GetInventoryItem() const { return InventoryItem; }
 	void SetInventoryItem(UInventoryItem* Item);

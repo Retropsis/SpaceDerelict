@@ -8,6 +8,7 @@
 #include "Widget/Utiliies/WidgetUtiliies.h"
 #include "InventoryUtility.generated.h"
 
+class UEquipmentComponent;
 class UInventoryBase;
 class UHoverItem;
 class UInventoryComponent;
@@ -22,6 +23,9 @@ class DRAWINVENTORY_API UInventoryUtility : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static UInventoryComponent* GetInventoryComponent(const APlayerController* PlayerController);
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static UEquipmentComponent* GetEquipmentComponent(const APlayerController* PlayerController);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	static EGridCategory GetItemCategoryFromItemComponent(const UItemComponent* ItemComponent);

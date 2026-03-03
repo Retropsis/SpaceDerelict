@@ -19,6 +19,7 @@ namespace Fragment
 	UE_DEFINE_GAMEPLAY_TAG(Room, "Fragment.Room");
 	UE_DEFINE_GAMEPLAY_TAG(Requirement, "Fragment.Requirement");
 	UE_DEFINE_GAMEPLAY_TAG(Valuable, "Fragment.Valuable");
+	UE_DEFINE_GAMEPLAY_TAG(Puzzle, "Fragment.Puzzle");
 
 	namespace AttributeModifier
 	{

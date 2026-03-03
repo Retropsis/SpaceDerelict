@@ -24,6 +24,7 @@ public:
 	USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	const TSubclassOf<UAnimInstance>& GetFirstPersonAnimInstanceClass() const { return FirstPersonAnimInstanceClass; }
 	virtual void OnEquip(APawn* Pawn) override;
+	virtual void OnUnequip(APawn* Pawn) override;
 	virtual void InitializeEquipment() override;
 
 	UFUNCTION()

@@ -65,6 +65,7 @@ private:
 	void StartFiring();
 	void StopFiring();
 	void SwitchWeapon();
+	void ToggleWeapon();
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
 	virtual void DoJumpStart();
@@ -77,6 +78,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> PrimaryInteractAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TObjectPtr<UInputAction>HolsterAction;
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> ToggleInventoryAction;

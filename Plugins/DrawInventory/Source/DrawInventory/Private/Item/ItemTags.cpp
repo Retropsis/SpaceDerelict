@@ -19,6 +19,7 @@ namespace Item
 	{
 		namespace Weapons
 		{
+			UE_DEFINE_GAMEPLAY_TAG(Gun, "Item.Equipment.Weapons.Gun");
 			UE_DEFINE_GAMEPLAY_TAG(Axe, "Item.Equipment.Weapons.Axe");
 			UE_DEFINE_GAMEPLAY_TAG(Sword, "Item.Equipment.Weapons.Sword");
 			UE_DEFINE_GAMEPLAY_TAG(Knife, "Item.Equipment.Weapons.Knife")

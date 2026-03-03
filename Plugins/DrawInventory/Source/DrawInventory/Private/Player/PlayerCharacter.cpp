@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Equipment/Weapon/Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCharacterController.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -84,6 +85,19 @@ void APlayerCharacter::AddWeapon(AWeapon* Weapon)
 
 			CurrentWeapon = Weapon;
 			CurrentWeapon->ActivateWeapon();
+			bAimDownSight = true;
+		}
+	}
+}
+
+void APlayerCharacter::HolsterWeapon(AWeapon* Weapon)
+{
+	if (IsValid(Weapon))
+	{
+		if (CurrentWeapon.IsValid())
+		{
+			CurrentWeapon->DeactivateWeapon();
+			bAimDownSight = false;
 		}
 	}
 }
@@ -97,6 +111,11 @@ void APlayerCharacter::OnWeaponActivated(AWeapon* Weapon)
 	// GetFirstPersonMesh()->SetAnimInstanceClass(Weapon->GetFirstPersonAnimInstanceClass());
 	// GetMesh()->SetAnimInstanceClass(Weapon->GetThirdPersonAnimInstanceClass());
 	GetMesh()->SetAnimInstanceClass(Weapon->GetFirstPersonAnimInstanceClass());
+}
+
+void APlayerCharacter::OnWeaponDeactivated(AWeapon* Weapon)
+{
+	GetMesh()->SetAnimInstanceClass(UnarmedAnimInstanceClass);
 }
 
 void APlayerCharacter::StartFiring() const
@@ -119,9 +138,20 @@ void APlayerCharacter::SwitchWeapon()
 {
 }
 
-void APlayerCharacter::OnWeaponDeactivated(AWeapon* Weapon)
+void APlayerCharacter::ToggleWeapon()
 {
-	//
+	if (CurrentWeapon.IsValid())
+	{
+		if (bAimDownSight)
+		{
+			CurrentWeapon->DeactivateWeapon();
+		}
+		else
+		{
+			CurrentWeapon->ActivateWeapon();
+		}
+		bAimDownSight = !bAimDownSight;
+	}
 }
 
 void APlayerCharacter::OnSemiWeaponRefire()

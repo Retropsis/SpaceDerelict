@@ -55,10 +55,14 @@ struct FBreakablePattern
 
 public:
 	TMap<TSubclassOf<ABreakable>, FGameplayTag> GetBreakableClasses() const { return BreakableClasses; }
+	TSubclassOf<AActor> GetPatternClass() const { return PatternClass; }
 	
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle.Breakable"))
 	TMap<TSubclassOf<ABreakable>, FGameplayTag> BreakableClasses;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle.Breakable"))
+	TSubclassOf<AActor> PatternClass;
 };
 
 USTRUCT(BlueprintType)

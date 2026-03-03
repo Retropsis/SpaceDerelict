@@ -24,13 +24,19 @@ public:
 	virtual FVector GetWeaponTargetLocation() override;
 	virtual void OnSemiWeaponRefire() override;
 	virtual void AddWeapon(AWeapon* Weapon) override;
+	virtual void HolsterWeapon(AWeapon* Weapon) override;
 	virtual void OnWeaponActivated(AWeapon* Weapon) override;
 	virtual void OnWeaponDeactivated(AWeapon* Weapon) override;
 	//~ WeaponInterface
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Test();
 	
 	void StartFiring() const;
 	void StopFiring() const;
 	void SwitchWeapon();
+	void ToggleWeapon();
+	bool IsAimDownSight() const { return bAimDownSight; }
 	
 	// USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 	UFUNCTION(BlueprintCallable)
@@ -52,9 +58,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FirstPersonCameraComponent;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<UAnimInstance> UnarmedAnimInstanceClass;
 
 	TWeakObjectPtr<APlayerCharacterController> PlayerCharacterController;
 	TWeakObjectPtr<AWeapon> CurrentWeapon;
+	bool bAimDownSight{false};
 };
 
 

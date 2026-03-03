@@ -16,14 +16,16 @@ ABreakable::ABreakable()
 	GeometryCollection->SetupAttachment(GetRootComponent());
 	GeometryCollection->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GeometryCollection->SetGenerateOverlapEvents(true);
-	GeometryCollection->SetVisibility(true);
+	GeometryCollection->SetSimulatePhysics(false);
+	GeometryCollection->SetVisibility(false);
 }
 
 void ABreakable::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	Mesh->DestroyComponent();
 	GeometryCollection->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	// GeometryCollection->SetVisibility(true);
+	GeometryCollection->SetSimulatePhysics(true);
+	GeometryCollection->SetVisibility(true);
 	SpawnReward();
 }
 

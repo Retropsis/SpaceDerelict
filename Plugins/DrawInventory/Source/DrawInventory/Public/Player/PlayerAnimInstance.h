@@ -22,9 +22,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsGloveRaised() const { return bGloveRaised; }
+	
+	UFUNCTION(BlueprintCallable)
+	void SetControlRigAlpha(float Alpha) { ControlRigAlpha = FMath::Clamp(Alpha, 0.f, 1.f); }
+	
+	UFUNCTION(BlueprintCallable)
+	float GetControlRigAlpha() const { return ControlRigAlpha; }
 
 private:
 	TWeakObjectPtr<APlayerCharacterController> PlayerController;
 	float Pitch;
 	bool bGloveRaised;
+	float ControlRigAlpha{1.f};
 };

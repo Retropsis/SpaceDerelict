@@ -61,6 +61,10 @@ void UDrawingPanel::DrawRoom(UInventoryItem* Room, int32 Index, int32 Yaw, const
 	{
 		DrawnRoomSlot->SetValuable(ValuableFragment->GetValuables());
 	}
+	if (const FPuzzleFragment* PuzzleFragment = Room->GetItemManifest().GetFragmentOfType<FPuzzleFragment>())
+	{
+		DrawnRoomSlot->SetPuzzleIcon(PuzzleFragment->GetPuzzleIcon());
+	}
 	DrawnRoomSlot->OnDrawVisualEffects();
 	DrawnRoomSlots.Add(DrawnRoomSlot);
 }

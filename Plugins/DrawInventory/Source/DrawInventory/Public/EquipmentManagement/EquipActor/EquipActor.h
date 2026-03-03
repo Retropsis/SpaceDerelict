@@ -19,6 +19,7 @@ public:
 
 	virtual void InitializeEquipment() {}
 	virtual void OnEquip(APawn* Pawn) {}
+	virtual void OnUnequip(APawn* Pawn) {}
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

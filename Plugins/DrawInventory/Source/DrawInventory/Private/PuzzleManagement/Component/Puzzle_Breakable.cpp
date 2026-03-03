@@ -26,7 +26,14 @@ void UPuzzle_Breakable::ConstructPuzzle()
 	
 	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
 	TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
-
+	
+	USpawnerComponent* SpawnerComponent = *Spawners.FindByPredicate([] (const USpawnerComponent* Spawner) { return Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Breakable::Pattern); });
+	if (IsValid(SpawnerComponent))
+	{
+		GetOwner()->GetWorld()->SpawnActor<AActor>(Pattern.GetPatternClass(), SpawnerComponent->GetComponentTransform(), SpawnParams);
+		Spawners.Remove(SpawnerComponent);
+	}
+	
 	int32 SpawnerIndex = 0;
 	for (const TTuple<TSubclassOf<ABreakable>, FGameplayTag>& TaggedBreakable : Breakables)
 	{

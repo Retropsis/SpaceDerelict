@@ -90,6 +90,7 @@ void UEquipmentComponent::OnItemEquipped(UInventoryItem* EquippedItem)
 	if (!OwningSkeletalMesh.IsValid()) return;
 	AEquipActor* SpawnedEquipActor = SpawnEquippedActor(EquipmentFragment, ItemManifest, OwningSkeletalMesh.Get());
 	SpawnedEquipActor->OnEquip(OwningPlayerController->GetPawn());
+	OnEquipped.Broadcast(EquippedItem->GetItemManifest().GetItemType());
 	
 	EquippedActors.Add(SpawnedEquipActor);
 }
@@ -109,6 +110,7 @@ void UEquipmentComponent::OnItemUnequipped(UInventoryItem* UnequippedItem)
 	}
 	
 	RemoveEquippedActor(EquipmentFragment->GetEquipmentType());
+	OnUnequipped.Broadcast(UnequippedItem->GetItemManifest().GetItemType());
 }
 
 AEquipActor* UEquipmentComponent::FindEquippedActor(const FGameplayTag& Type)
@@ -125,6 +127,8 @@ void UEquipmentComponent::RemoveEquippedActor(const FGameplayTag& Type)
 	if (AEquipActor* EquippedActor = FindEquippedActor(Type); IsValid(EquippedActor))
 	{
 		EquippedActors.Remove(EquippedActor);
+		EquippedActor->OnUnequip(OwningPlayerController->GetPawn());
 		EquippedActor->Destroy();
+		
 	}
 }
