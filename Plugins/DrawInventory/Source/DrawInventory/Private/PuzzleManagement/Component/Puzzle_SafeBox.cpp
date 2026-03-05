@@ -13,7 +13,7 @@ UPuzzle_SafeBox::UPuzzle_SafeBox()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPuzzle_SafeBox::ConstructPuzzle()
+void UPuzzle_SafeBox::ConstructPuzzle(const FIntPoint& Coordinates)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

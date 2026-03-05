@@ -16,7 +16,7 @@ class DRAWINVENTORY_API UPuzzle_SafeBox : public UPuzzleComponent
 
 public:
 	UPuzzle_SafeBox();
-	virtual void ConstructPuzzle() override;
+	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
 	virtual void ConstructSpawners() override;
 
 private:

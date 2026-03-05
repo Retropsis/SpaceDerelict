@@ -136,6 +136,7 @@ void UDrawComponent::BuildPresetRooms()
 			const int32 CurrentRoomIndex = UWidgetUtiliies::GetIndexFromPositionNoWrap(PresetRoom.Key, Columns, Rows);
 			FDestinationAvailabilityResult Result = BuildDestinationAvailabilities(PresetRoom.Key, DestinationsOffsets, ActiveLayer);
 			Result.RoomIndex = CurrentRoomIndex;
+			Result.RoomCoordinates = PresetRoom.Key;
 			Result.DestinationYaw = 0;
 		
 			RoomActor->ConstructRoom(Result, RoomSize);
@@ -217,6 +218,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	const FGameplayTag Layer = InteractingDoorComponent->GetLayer();
 	const FIntPoint Coordinates = UWidgetUtiliies::GetPositionFromIndex(DestinationIndex, Columns);
 	FDestinationAvailabilityResult Result = DrawingBoard->HasRoom(RoomToSpawn->GetItemManifestMutable(), RoomIndex, DestinationIndex, RoomYaw, RoomFragment->GetLayers(), Layer);
+	Result.RoomCoordinates = Coordinates;
 	DetermineLockedDoors(Result);
 	
 	// UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemComponent->GetItemManifest().GetItemType());

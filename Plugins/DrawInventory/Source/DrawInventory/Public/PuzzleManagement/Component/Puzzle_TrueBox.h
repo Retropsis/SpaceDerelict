@@ -23,7 +23,7 @@ public:
 	virtual void ConstructSpawners() override;
 #endif
 	
-	virtual void ConstructPuzzle() override;
+	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

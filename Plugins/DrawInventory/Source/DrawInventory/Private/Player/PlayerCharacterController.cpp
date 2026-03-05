@@ -203,6 +203,11 @@ void APlayerCharacterController::PrimaryInteract()
 	if (IsValid(LockComponent) || !DrawComponent.IsValid())
 	{
 		const FGameplayTag LockType = LockComponent->GetLockType();
+		if (!LockType.IsValid())
+		{
+			LockComponent->Unlock();
+			return;
+		}
 		if (InventoryComponent->CheckItemOfTypeAndAmount(LockType, 1))
 		{
 			InventoryComponent->Server_ConsumeItemOfTypAndAmount(LockType, 1);

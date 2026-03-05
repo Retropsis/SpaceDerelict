@@ -19,6 +19,9 @@ public:
 	
 	void SetLootItemClass(const TSubclassOf<AActor>& Class) { LootItemClass = Class; }
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetResourceObject(UObject* Object);
+
 protected:
 	virtual void BeginPlay() override;
 

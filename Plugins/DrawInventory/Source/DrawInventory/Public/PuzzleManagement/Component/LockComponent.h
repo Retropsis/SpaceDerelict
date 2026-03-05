@@ -16,8 +16,8 @@ class DRAWINVENTORY_API ULockComponent : public UInteractionComponent
 
 public:
 	ULockComponent();
-
 	void Unlock();
+	
 	FGameplayTag GetLockType() const { return LockType; }
 
 	UPROPERTY(BlueprintAssignable, Category="DrawInventory")

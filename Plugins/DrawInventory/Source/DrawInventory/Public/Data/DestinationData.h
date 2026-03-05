@@ -37,6 +37,7 @@ struct FDestinationAvailabilityResult
 	// TWeakObjectPtr<UInventoryItem> Item;
 
 	int32 RoomIndex{INDEX_NONE};
+	FIntPoint RoomCoordinates{INDEX_NONE};
 	int32 DestinationYaw{ INDEX_NONE };
 	FGameplayTag Layer = FGameplayTag::EmptyTag;
 	TArray<FDestinationAvailability> DestinationAvailabilities;

@@ -23,7 +23,7 @@ public:
 	TMap<FName, FIntPoint>  ConstructDestinationOffsets();
 	void ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize);
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
-	void ConstructPuzzle() const;
+	void ConstructPuzzle(const FIntPoint& Coordinates) const;
 	TSet<FGameplayTag>  GetLayer() const { return Layers; }
 	void AddLayer(const FGameplayTag& NewLayer) { Layers.Add(NewLayer); }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }

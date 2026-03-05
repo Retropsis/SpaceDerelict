@@ -17,7 +17,7 @@ class DRAWINVENTORY_API UPuzzle_Breakable : public UPuzzleComponent
 
 public:
 	UPuzzle_Breakable();
-	virtual void ConstructPuzzle() override;
+	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
 
 private:	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")

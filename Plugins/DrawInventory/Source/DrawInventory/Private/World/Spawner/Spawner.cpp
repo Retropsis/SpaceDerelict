@@ -17,6 +17,7 @@ ASpawner::ASpawner()
 	BoxVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoxVisualizer->SetCollisionResponseToAllChannels(ECR_Ignore);
 	BoxVisualizer->SetGenerateOverlapEvents(false);
+	BoxVisualizer->SetHiddenInGame(true);
 }
 
 FTransform ASpawner::GetSpawnTransform() const

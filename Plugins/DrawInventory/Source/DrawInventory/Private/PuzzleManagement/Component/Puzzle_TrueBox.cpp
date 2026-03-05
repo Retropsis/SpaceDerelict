@@ -12,7 +12,7 @@ UPuzzle_TrueBox::UPuzzle_TrueBox()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPuzzle_TrueBox::ConstructPuzzle()
+void UPuzzle_TrueBox::ConstructPuzzle(const FIntPoint& Coordinates)
 {
 	GetOwner()->GetComponents(USpawnerComponent::StaticClass(), ItemSpawners);
 

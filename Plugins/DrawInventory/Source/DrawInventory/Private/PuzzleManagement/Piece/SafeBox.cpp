@@ -1,9 +1,7 @@
 // Retropsis 2026
 
 #include "PuzzleManagement/Piece/SafeBox.h"
-
 #include "Components/WidgetComponent.h"
-#include "DrawManagement/Room/SpawnerComponent.h"
 #include "PuzzleManagement/Piece/Component/DigitComponent.h"
 #include "PuzzleManagement/PuzzleTags.h"
 #include "Widget/Puzzle/DigitWidget.h"

@@ -33,4 +33,8 @@ namespace Puzzle
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(False);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pattern);
 	}
+	namespace Hieroglyphic
+	{
+		
+	}
 }

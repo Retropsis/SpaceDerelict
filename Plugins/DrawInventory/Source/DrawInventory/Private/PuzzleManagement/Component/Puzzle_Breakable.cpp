@@ -12,7 +12,7 @@ UPuzzle_Breakable::UPuzzle_Breakable()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPuzzle_Breakable::ConstructPuzzle()
+void UPuzzle_Breakable::ConstructPuzzle(const FIntPoint& Coordinates)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

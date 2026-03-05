@@ -53,7 +53,7 @@ TMap<FName, FIntPoint>  ARoomActor::ConstructDestinationOffsets()
 void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize)
 {
 	ConstructDoors(Result);
-	ConstructPuzzle();
+	ConstructPuzzle(Result.RoomCoordinates);
 	RoomBoundary->SetBoxExtent(FVector( RoomSize/ 2.f, RoomSize/ 2.f, 20000.f ));
 	RoomBoundary->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnRoomBoundaryBeginOverlap);
 }
@@ -109,12 +109,12 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 	}
 }
 
-void ARoomActor::ConstructPuzzle() const
+void ARoomActor::ConstructPuzzle(const FIntPoint& Coordinates) const
 {
 	UPuzzleComponent* PuzzleComponent = FindComponentByClass<UPuzzleComponent>();
 	if (IsValid(PuzzleComponent))
 	{
-		PuzzleComponent->ConstructPuzzle();
+		PuzzleComponent->ConstructPuzzle(Coordinates);
 	}
 }
 
