@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
-#include "HolsterWidget.generated.h"
+#include "ActiveEquipmentWidget.generated.h"
 
 class UImage;
 class UTextBlock;
@@ -13,30 +13,33 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class DRAWINVENTORY_API UHolsterWidget : public UUserWidget
+class DRAWINVENTORY_API UActiveEquipmentWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativePreConstruct() override;
-	void SetIcon(bool bEquipped) const;
+	void SetIcon(bool bActivated) const;
 	FGameplayTag GetEquipmentType() const {return EquipmentType; }
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnHolsterVisualEffects();
+	void OnEquipVisualEffects();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAimDownSightVisualEffects();
 
 private:
 	UPROPERTY(EditAnywhere, Category ="DrawInventory", meta=(Categories="Item"))
 	FGameplayTag EquipmentType;
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
-	TObjectPtr<UTexture2D> Icon_Equipped;
+	FSlateBrush Brush_Activated;
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
-	TObjectPtr<UTexture2D> Icon_Unequipped;
+	FSlateBrush Brush_Deactivated;
 	
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UImage> Image_Holster;
+	TObjectPtr<UImage> Image_Equipment;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Text_Key;

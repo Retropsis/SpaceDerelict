@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "WeaponInterface.generated.h"
 
+class AActiveEquipActor;
 class AWeapon;
 
 // This class does not need to be modified.
@@ -24,11 +25,11 @@ class DRAWINVENTORY_API IWeaponInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void AttachWeaponMeshes(AWeapon* Weapon) = 0;
-	virtual FVector GetWeaponTargetLocation() = 0;
+	virtual void AttachEquipmentMeshes(AActiveEquipActor* ActiveEquipment) = 0;
+	virtual FVector GetActiveTargetLocation() = 0;
 	virtual void OnSemiWeaponRefire() = 0;
-	virtual void AddWeapon(AWeapon* Weapon) = 0;
-	virtual void HolsterWeapon(AWeapon* Weapon) = 0;
-	virtual void OnWeaponActivated(AWeapon* Weapon) = 0;
-	virtual void OnWeaponDeactivated(AWeapon* Weapon) = 0;
+	virtual void AddActiveEquipment(AActiveEquipActor* ActiveEquipment) = 0;
+	virtual void HolsterActiveEquipment(AActiveEquipActor* ActiveEquipment) = 0;
+	virtual void OnActiveEquipmentActivated(AActiveEquipActor* ActiveEquipment) = 0;
+	virtual void OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEquipment) = 0;
 };

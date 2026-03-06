@@ -8,7 +8,7 @@
 #include "InventoryManagement/Utilities/InventoryUtility.h"
 #include "Item/ItemTags.h"
 #include "Widget/DrawInventory/HUD/HUDCounter.h"
-#include "Widget/HUD/HolsterWidget.h"
+#include "Widget/HUD/ActiveEquipmentWidget.h"
 #include "Widget/HUD/InfoMessage.h"
 
 
@@ -26,10 +26,10 @@ void UHUDWidget::NativeOnInitialized()
 	UEquipmentComponent* EquipmentComponent = UInventoryUtility::GetEquipmentComponent(GetOwningPlayer());
 	if (IsValid(EquipmentComponent))
 	{
-		EquipmentComponent->OnEquipped.AddDynamic(this, &ThisClass::OnGunEquipped);
+		EquipmentComponent->OnEquipped.AddDynamic(this, &ThisClass::OnActiveEquipped);
 	}
 	InitializeHUDCounters();
-	InitializeHolsterWidget();
+	InitializeActiveEquipmentWidget();
 }
 
 void UHUDWidget::InitializeHUDCounters()
@@ -43,13 +43,13 @@ void UHUDWidget::InitializeHUDCounters()
 	});
 }
 
-void UHUDWidget::InitializeHolsterWidget()
+void UHUDWidget::InitializeActiveEquipmentWidget()
 {
 	WidgetTree->ForEachWidget([this] (UWidget* Widget)
 	{
-		if (UHolsterWidget* FoundWidget = Cast<UHolsterWidget>(Widget); IsValid(FoundWidget))
+		if (UActiveEquipmentWidget* FoundWidget = Cast<UActiveEquipmentWidget>(Widget); IsValid(FoundWidget))
 		{
-			HolsterWidget = FoundWidget;
+			ActiveEquipmentWidgets.Add(FoundWidget);
 		}
 	});
 }
@@ -67,29 +67,22 @@ void UHUDWidget::UpdateHUDCounter(const FGameplayTag& ItemType, int32 NewCount)
 	}
 }
 
-void UHUDWidget::UpdateHolsterWidget(bool bEquipped, bool bVisible)
+void UHUDWidget::UpdateActiveEquipmentWidget(const FGameplayTag& EquipmentType, bool bNewlyEquipped)
 {
-	if (IsValid(HolsterWidget))
+	for (TObjectPtr<UActiveEquipmentWidget> Widget : ActiveEquipmentWidgets)
 	{
-		HolsterWidget->SetVisibility(bVisible ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-		HolsterWidget->SetIcon(bEquipped);
+		if (IsValid(Widget))
+		{
+			bool bMatchesTagExact = Widget->GetEquipmentType().MatchesTagExact(EquipmentType);
+			if (bNewlyEquipped && bMatchesTagExact) Widget->SetVisibility(ESlateVisibility::HitTestInvisible);
+			Widget->SetIcon(bMatchesTagExact);
+		}
 	}
 }
 
-void UHUDWidget::OnGunEquipped(const FGameplayTag& EquipmentType)
+void UHUDWidget::OnActiveEquipped(const FGameplayTag& EquipmentType)
 {
-	if (EquipmentType.MatchesTagExact(Item::Equipment::Weapons::Gun))
-	{
-		UpdateHolsterWidget(true, true);
-	}
-}
-
-void UHUDWidget::OnGunUnequipped(const FGameplayTag& EquipmentType)
-{
-	if (EquipmentType.MatchesTagExact(Item::Equipment::Weapons::Gun))
-	{
-		UpdateHolsterWidget(false, false);
-	}
+	UpdateActiveEquipmentWidget(EquipmentType, true);
 }
 
 void UHUDWidget::OnNoRoom()

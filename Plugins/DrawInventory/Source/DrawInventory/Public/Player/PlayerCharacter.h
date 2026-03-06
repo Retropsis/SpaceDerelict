@@ -21,22 +21,19 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	
 	//~ WeaponInterface
-	virtual void AttachWeaponMeshes(AWeapon* Weapon) override;
-	virtual FVector GetWeaponTargetLocation() override;
+	virtual void AttachEquipmentMeshes(AActiveEquipActor* ActiveEquipment) override;
+	virtual FVector GetActiveTargetLocation() override;
 	virtual void OnSemiWeaponRefire() override;
-	virtual void AddWeapon(AWeapon* Weapon) override;
-	virtual void HolsterWeapon(AWeapon* Weapon) override;
-	virtual void OnWeaponActivated(AWeapon* Weapon) override;
-	virtual void OnWeaponDeactivated(AWeapon* Weapon) override;
+	virtual void AddActiveEquipment(AActiveEquipActor* ActiveEquipment) override;
+	virtual void HolsterActiveEquipment(AActiveEquipActor* ActiveEquipment) override;
+	virtual void OnActiveEquipmentActivated(AActiveEquipActor* ActiveEquipment) override;
+	virtual void OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEquipment) override;
 	//~ WeaponInterface
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Test();
 	
-	void StartFiring() const;
-	void StopFiring() const;
-	void SwitchWeapon();
-	void ToggleWeapon(const FGameplayTag& EquipmentType);
+	void StartActive() const;
+	void StopActive() const;
+	void SwitchActive();
+	void ToggleActive(const FGameplayTag& EquipmentType);
 	
 	// USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 	UFUNCTION(BlueprintCallable)
@@ -48,7 +45,7 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere, Category ="PlayerCharacter")
-	FName WeaponSocket = FName("HandGrip_R");
+	FName ActiveSocket = FName("HandGrip_R");
 	
 	UPROPERTY(EditAnywhere, Category ="PlayerCharacter", meta = (ClampMin = 0, ClampMax = 100000, Units = "cm"))
 	float MaxAimDistance = 10000.0f;
@@ -63,8 +60,8 @@ private:
 	TSubclassOf<UAnimInstance> UnarmedAnimInstanceClass;
 
 	TWeakObjectPtr<APlayerCharacterController> PlayerCharacterController;
-	TWeakObjectPtr<AWeapon> CurrentWeapon;
-	TMap<FGameplayTag, AWeapon*> OwnedWeapons;
+	TWeakObjectPtr<AActiveEquipActor> CurrentActive;
+	TMap<FGameplayTag, AActiveEquipActor*> OwnedActives;
 };
 
 

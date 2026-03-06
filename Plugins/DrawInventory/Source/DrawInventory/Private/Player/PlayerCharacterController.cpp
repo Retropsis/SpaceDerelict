@@ -137,27 +137,29 @@ void APlayerCharacterController::DoJumpEnd()
 
 void APlayerCharacterController::StartFiring()
 {
-	if (GetPlayerCharacter()) PlayerCharacter->StartFiring();
+	if (GetPlayerCharacter()) PlayerCharacter->StartActive();
 }
 
 void APlayerCharacterController::StopFiring()
 {
-	if (GetPlayerCharacter()) PlayerCharacter->StopFiring();
+	if (GetPlayerCharacter()) PlayerCharacter->StopActive();
 }
 
 void APlayerCharacterController::ToggleWeapon(int32 Index)
 {
 	if (GetPlayerCharacter())
 	{
+		FGameplayTag EquipmentType = FGameplayTag::EmptyTag;
 		switch (Index)
 		{
-			case 1: PlayerCharacter->ToggleWeapon(Item::Equipment::Weapons::Gun);
+			case 1: EquipmentType = Item::Equipment::Weapons::Gun;
 			break;
-			case 2: PlayerCharacter->ToggleWeapon(Item::Equipment::Weapons::Scanner);
+			case 2: EquipmentType= Item::Equipment::Weapons::Scanner;
 			break;
 		default: ;
 		}
-		HUDWidget->UpdateHolsterWidget(IsAimDownSight(), true);
+		PlayerCharacter->ToggleActive(EquipmentType);
+		HUDWidget->UpdateActiveEquipmentWidget(EquipmentType, false);
 	}
 }
 

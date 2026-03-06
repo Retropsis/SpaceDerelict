@@ -46,15 +46,15 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	PlayerCharacterController = Cast<APlayerCharacterController>(NewController);
 }
 
-void APlayerCharacter::AttachWeaponMeshes(AWeapon* Weapon)
+void APlayerCharacter::AttachEquipmentMeshes(AActiveEquipActor* ActiveEquipment)
 {
 	const FAttachmentTransformRules AttachmentRule(EAttachmentRule::SnapToTarget, false);
-	Weapon->AttachToActor(this, AttachmentRule);
-	Weapon->GetWeaponMesh()->AttachToComponent(GetMesh(), AttachmentRule, WeaponSocket);
+	ActiveEquipment->AttachToActor(this, AttachmentRule);
+	ActiveEquipment->GetEquipmentMesh()->AttachToComponent(GetMesh(), AttachmentRule, ActiveSocket);
 	// Weapon->GetWeaponMesh()->AttachToComponent(GetFirstPersonMesh(), AttachmentRule, WeaponSocket);
 }
 
-FVector APlayerCharacter::GetWeaponTargetLocation()
+FVector APlayerCharacter::GetActiveTargetLocation()
 {
 	FHitResult OutHit;
 
@@ -68,40 +68,40 @@ FVector APlayerCharacter::GetWeaponTargetLocation()
 	return OutHit.bBlockingHit ? OutHit.ImpactPoint : OutHit.TraceEnd;
 }
 
-void APlayerCharacter::AddWeapon(AWeapon* Weapon)
+void APlayerCharacter::AddActiveEquipment(AActiveEquipActor* ActiveEquipment)
 {
 	// AWeapon* OwnedWeapon = FindWeaponOfType(WeaponClass);
 
 	if (true /*!OwnedWeapon*/)
 	{
-		if (IsValid(Weapon))
+		if (IsValid(ActiveEquipment))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Adding Weapon of Type: %s"), *Weapon->GetEquipmentType().ToString());
-			OwnedWeapons.Add(Weapon->GetEquipmentType(), Weapon);
+			UE_LOG(LogTemp, Warning, TEXT("Adding Weapon of Type: %s"), *ActiveEquipment->GetEquipmentType().ToString());
+			OwnedActives.Add(ActiveEquipment->GetEquipmentType(), ActiveEquipment);
 
-			if (CurrentWeapon.IsValid())
+			if (CurrentActive.IsValid())
 			{
-				CurrentWeapon->DeactivateWeapon();
+				CurrentActive->DeactivateEquipment();
 			}
 
-			CurrentWeapon = Weapon;
-			CurrentWeapon->ActivateWeapon();
+			CurrentActive = ActiveEquipment;
+			CurrentActive->ActivateEquipment();
 		}
 	}
 }
 
-void APlayerCharacter::HolsterWeapon(AWeapon* Weapon)
+void APlayerCharacter::HolsterActiveEquipment(AActiveEquipActor* ActiveEquipment)
 {
-	if (IsValid(Weapon))
+	if (IsValid(ActiveEquipment))
 	{
-		if (CurrentWeapon.IsValid())
+		if (CurrentActive.IsValid())
 		{
-			CurrentWeapon->DeactivateWeapon();
+			CurrentActive->DeactivateEquipment();
 		}
 	}
 }
 
-void APlayerCharacter::OnWeaponActivated(AWeapon* Weapon)
+void APlayerCharacter::OnActiveEquipmentActivated(AActiveEquipActor* ActiveEquipment)
 {
 	// update the bullet counter
 	// OnBulletCountUpdated.Broadcast(Weapon->GetMagazineSize(), Weapon->GetBulletCount());
@@ -109,45 +109,45 @@ void APlayerCharacter::OnWeaponActivated(AWeapon* Weapon)
 	// set the character mesh AnimInstances
 	// GetFirstPersonMesh()->SetAnimInstanceClass(Weapon->GetFirstPersonAnimInstanceClass());
 	// GetMesh()->SetAnimInstanceClass(Weapon->GetThirdPersonAnimInstanceClass());
-	GetMesh()->SetAnimInstanceClass(Weapon->GetFirstPersonAnimInstanceClass());
+	GetMesh()->SetAnimInstanceClass(ActiveEquipment->GetFirstPersonAnimInstanceClass());
 }
 
-void APlayerCharacter::OnWeaponDeactivated(AWeapon* Weapon)
+void APlayerCharacter::OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEquipment)
 {
 	GetMesh()->SetAnimInstanceClass(UnarmedAnimInstanceClass);
 }
 
-void APlayerCharacter::StartFiring() const
+void APlayerCharacter::StartActive() const
 {
-	if (CurrentWeapon.IsValid())
+	if (CurrentActive.IsValid())
 	{
-		CurrentWeapon->StartFiring();
+		CurrentActive->StartActive();
 	}
 }
 
-void APlayerCharacter::StopFiring() const
+void APlayerCharacter::StopActive() const
 {
-	if (CurrentWeapon.IsValid())
+	if (CurrentActive.IsValid())
 	{
-		CurrentWeapon->StopFiring();
+		CurrentActive->StopActive();
 	}
 }
 
-void APlayerCharacter::SwitchWeapon()
+void APlayerCharacter::SwitchActive()
 {
 }
 
-void APlayerCharacter::ToggleWeapon(const FGameplayTag& EquipmentType)
+void APlayerCharacter::ToggleActive(const FGameplayTag& EquipmentType)
 {
-	if (!OwnedWeapons.Contains(EquipmentType)) return;
+	if (!OwnedActives.Contains(EquipmentType)) return;
 	
-	if (CurrentWeapon.IsValid())
+	if (CurrentActive.IsValid())
 	{
-		CurrentWeapon->DeactivateWeapon();
+		CurrentActive->DeactivateEquipment();
 
-		CurrentWeapon = OwnedWeapons[EquipmentType];
+		CurrentActive = OwnedActives[EquipmentType];
 		
-		CurrentWeapon->ActivateWeapon();
+		CurrentActive->ActivateEquipment();
 	}
 }
 

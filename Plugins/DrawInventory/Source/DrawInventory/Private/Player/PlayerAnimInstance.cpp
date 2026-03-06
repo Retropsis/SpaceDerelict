@@ -31,4 +31,5 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	Pitch = PlayerController->GetAOPitch();
 	bGloveRaised = PlayerController->IsGloveRaised();
+	bAimDownSight = PlayerController->IsAimDownSight();
 }

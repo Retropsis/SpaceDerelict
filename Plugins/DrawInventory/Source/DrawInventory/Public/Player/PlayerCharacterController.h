@@ -30,6 +30,7 @@ public:
 	void SetTimerPlayerPositionUpdate();
 	float GetAOPitch() const { return AO_Pitch; }
 	bool IsGloveRaised() const { return bGloveRaised; }
+	bool IsAimDownSight() const { return bAimDownSight; }
 	virtual void RestartLevel() override;
 
 	UFUNCTION(BlueprintCallable)
@@ -67,7 +68,6 @@ private:
 	void StopFiring();
 	void SwitchWeapon();
 	void ToggleWeapon(int32 Index);
-	bool IsAimDownSight() const { return bAimDownSight; }
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
 	virtual void DoJumpStart();

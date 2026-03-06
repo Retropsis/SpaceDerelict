@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Equipment/ActiveEquipActor.h"
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "Weapon.generated.h"
 
@@ -11,36 +12,23 @@ class AProjectile;
 class IWeaponInterface;
 
 UCLASS()
-class DRAWINVENTORY_API AWeapon : public AEquipActor
+class DRAWINVENTORY_API AWeapon : public AActiveEquipActor
 {
 	GENERATED_BODY()
 
 public:
-	AWeapon();
-	void StartFiring();
-	void StopFiring();
-	void ActivateWeapon();
-	void DeactivateWeapon();
-	USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
-	const TSubclassOf<UAnimInstance>& GetFirstPersonAnimInstanceClass() const { return FirstPersonAnimInstanceClass; }
-	virtual void OnEquip(APawn* Pawn) override;
-	virtual void OnUnequip(APawn* Pawn) override;
 	virtual void InitializeEquipment() override;
-
+	virtual void StartActive() override;
+	virtual void StopActive() override;
+	
 	UFUNCTION()
 	void OnBulletCountChange(const FGameplayTag& ItemType, int32 Amount);
 
-private:
+private:	
 	virtual void Fire();
 	virtual void FireProjectile(const FVector& TargetLocation);
 	void FireCooldownExpired();
 	FTransform CalculateProjectileSpawnTransform(const FVector& TargetLocation) const;
-	
-	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
-	USkeletalMeshComponent* WeaponMesh;
-	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<UAnimInstance> FirstPersonAnimInstanceClass;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AProjectile> ProjectileClass;
@@ -71,10 +59,6 @@ private:
 	bool bIsFiring = false;
 	float TimeOfLastShot = 0.0f;
 	FTimerHandle RefireTimer;
-	IWeaponInterface* WeaponOwner = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<APawn> PawnOwner;
 
 	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
 };

@@ -8,20 +8,6 @@
 #include "Item/ItemTags.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AWeapon::AWeapon()
-{
-	PrimaryActorTick.bCanEverTick = false;
-	
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
-	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RootComponent);
-
-	WeaponMesh->SetCollisionProfileName(FName("NoCollision"));
-	WeaponMesh->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
-	// WeaponMesh->bOnlyOwnerSee = true;
-}
-
 void AWeapon::InitializeEquipment()
 {
 	// GetOwner()->OnDestroyed.AddDynamic(this, &AWeapon::OnOwnerDestroyed);
@@ -33,7 +19,7 @@ void AWeapon::InitializeEquipment()
 		
 		if (APawn* OwnerPawn = Cast<APawn>(OwnerController->GetPawn()))
 		{
-			WeaponOwner = Cast<IWeaponInterface>(OwnerPawn);
+			EquipmentOwner = Cast<IWeaponInterface>(OwnerPawn);
 			PawnOwner = Cast<APawn>(OwnerPawn);
 			// CurrentBullets = MagazineSize;
 			// WeaponOwner->AttachWeaponMeshes(this);
@@ -49,36 +35,7 @@ void AWeapon::OnBulletCountChange(const FGameplayTag& ItemType, int32 Amount)
 	}
 }
 
-void AWeapon::OnEquip(APawn* Pawn)
-{
-	if (IWeaponInterface* WeaponHolder = Cast<IWeaponInterface>(Pawn))
-	{
-		WeaponHolder->AddWeapon(this);
-	}
-}
-
-void AWeapon::OnUnequip(APawn* Pawn)
-{
-	if (IWeaponInterface* WeaponHolder = Cast<IWeaponInterface>(Pawn))
-	{
-		WeaponHolder->HolsterWeapon(this);
-	}
-}
-
-void AWeapon::ActivateWeapon()
-{
-	SetActorHiddenInGame(false);
-	WeaponOwner->OnWeaponActivated(this);
-}
-
-void AWeapon::DeactivateWeapon()
-{
-	StopFiring();
-	SetActorHiddenInGame(true);
-	WeaponOwner->OnWeaponDeactivated(this);
-}
-
-void AWeapon::StartFiring()
+void AWeapon::StartActive()
 {
 	if (CurrentBullets <= 0) return;
 	
@@ -98,7 +55,7 @@ void AWeapon::StartFiring()
 	}
 }
 
-void AWeapon::StopFiring()
+void AWeapon::StopActive()
 {
 	bIsFiring = false;
 	GetWorld()->GetTimerManager().ClearTimer(RefireTimer);
@@ -111,7 +68,7 @@ void AWeapon::Fire()
 		return;
 	}
 	
-	FireProjectile(WeaponOwner->GetWeaponTargetLocation());
+	FireProjectile(EquipmentOwner->GetActiveTargetLocation());
 	TimeOfLastShot = GetWorld()->GetTimeSeconds();
 
 	// MakeNoise(ShotLoudness, PawnOwner, PawnOwner->GetActorLocation(), ShotNoiseRange, ShotNoiseTag);
@@ -164,12 +121,12 @@ void AWeapon::FireProjectile(const FVector& TargetLocation)
 
 void AWeapon::FireCooldownExpired()
 {
-	WeaponOwner->OnSemiWeaponRefire();
+	EquipmentOwner->OnSemiWeaponRefire();
 }
 
 FTransform AWeapon::CalculateProjectileSpawnTransform(const FVector& TargetLocation) const
 {
-	const FVector MuzzleLoc = WeaponMesh->GetSocketLocation(MuzzleSocketName);
+	const FVector MuzzleLoc = EquipmentMesh->GetSocketLocation(MuzzleSocketName);
 	const FVector SpawnLoc = MuzzleLoc + ((TargetLocation - MuzzleLoc).GetSafeNormal() * MuzzleOffset);
 	const FRotator AimRot = UKismetMathLibrary::FindLookAtRotation(SpawnLoc, TargetLocation + (UKismetMathLibrary::RandomUnitVector() * AimVariance));
 	return FTransform(AimRot, SpawnLoc, FVector::OneVector);

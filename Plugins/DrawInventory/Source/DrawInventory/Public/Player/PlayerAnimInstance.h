@@ -28,10 +28,14 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	float GetControlRigAlpha() const { return ControlRigAlpha; }
+	
+	UFUNCTION(BlueprintCallable)
+	bool ShouldControlArms() const { return bAimDownSight; }
 
 private:
 	TWeakObjectPtr<APlayerCharacterController> PlayerController;
 	float Pitch;
 	bool bGloveRaised;
 	float ControlRigAlpha{1.f};
+	bool bAimDownSight{false};
 };
