@@ -54,6 +54,7 @@ void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result, flo
 {
 	ConstructDoors(Result);
 	ConstructPuzzle(Result.RoomCoordinates);
+	ConstructDisplay(Result.RoomCoordinates);
 	RoomBoundary->SetBoxExtent(FVector( RoomSize/ 2.f, RoomSize/ 2.f, 20000.f ));
 	RoomBoundary->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnRoomBoundaryBeginOverlap);
 }
@@ -115,6 +116,30 @@ void ARoomActor::ConstructPuzzle(const FIntPoint& Coordinates) const
 	if (IsValid(PuzzleComponent))
 	{
 		PuzzleComponent->ConstructPuzzle(Coordinates);
+	}
+}
+
+void ARoomActor::ConstructDisplay(const FIntPoint& Coordinates)
+{
+	TArray<UStaticMeshComponent*> StaticMeshes;
+	GetComponents(UStaticMeshComponent::StaticClass(), StaticMeshes);
+	for (UStaticMeshComponent* StaticMesh : StaticMeshes)
+	{
+		if (StaticMesh->ComponentHasTag(FName("Room")))
+		{
+			for (const FName& SlotName : StaticMesh->GetMaterialSlotNames())
+			{
+				if (SlotName.IsEqual(FName("Display_X")) && Numerics.IsValidIndex(Coordinates.X))
+				{
+					StaticMesh->SetMaterialByName(FName("Display_X"), Numerics[Coordinates.X]);
+				}
+				if (SlotName.IsEqual(FName("Display_Y")) && Numerics.IsValidIndex(Coordinates.Y))
+				{
+					StaticMesh->SetMaterialByName(FName("Display_Y"), Numerics[Coordinates.Y]);
+				}
+			}
+			return;
+		}
 	}
 }
 

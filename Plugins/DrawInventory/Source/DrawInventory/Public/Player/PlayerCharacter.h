@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Equipment/Weapon/WeaponInterface.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
@@ -35,8 +36,7 @@ public:
 	void StartFiring() const;
 	void StopFiring() const;
 	void SwitchWeapon();
-	void ToggleWeapon();
-	bool IsAimDownSight() const { return bAimDownSight; }
+	void ToggleWeapon(const FGameplayTag& EquipmentType);
 	
 	// USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 	UFUNCTION(BlueprintCallable)
@@ -64,7 +64,7 @@ private:
 
 	TWeakObjectPtr<APlayerCharacterController> PlayerCharacterController;
 	TWeakObjectPtr<AWeapon> CurrentWeapon;
-	bool bAimDownSight{false};
+	TMap<FGameplayTag, AWeapon*> OwnedWeapons;
 };
 
 

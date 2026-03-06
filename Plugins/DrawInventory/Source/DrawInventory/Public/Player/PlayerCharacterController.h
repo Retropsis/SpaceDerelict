@@ -7,8 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerCharacterController.generated.h"
 
-class APlayerCharacter;
 struct FInputActionValue;
+class APlayerCharacter;
 class UDrawComponent;
 class UDoorComponent;
 class UInventoryComponent;
@@ -56,6 +56,7 @@ protected:
 private:
 	virtual void SetupInputComponent() override;
 	void PrimaryInteract();
+	void SecondaryInteract(bool bADS);
 	void CreateHUDWidget();
 	void TraceForItem();
 	void CalculateAOPitch();
@@ -65,7 +66,8 @@ private:
 	void StartFiring();
 	void StopFiring();
 	void SwitchWeapon();
-	void ToggleWeapon();
+	void ToggleWeapon(int32 Index);
+	bool IsAimDownSight() const { return bAimDownSight; }
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
 	virtual void DoJumpStart();
@@ -79,8 +81,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> PrimaryInteractAction;
 	
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> SecondaryInteractAction;
+	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
-	TObjectPtr<UInputAction>HolsterAction;
+	TObjectPtr<UInputAction>EquipmentAction_1;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TObjectPtr<UInputAction>EquipmentAction_2;
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> ToggleInventoryAction;
@@ -99,9 +107,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
 	TObjectPtr<UInputAction> MouseLookAction;
-	
-	UPROPERTY(EditAnywhere, Category ="DrawInventory")
-	TObjectPtr<UInputAction> FireAction;
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
 	TObjectPtr<UInputAction> SwitchWeaponAction;
@@ -129,4 +134,5 @@ private:
 	bool bGloveRaised;
 	FVector SavedPlayerLocation = FVector::ZeroVector;
 	FGameplayTag PreviousLayer = FGameplayTag::EmptyTag;
+	bool bAimDownSight{false};
 };

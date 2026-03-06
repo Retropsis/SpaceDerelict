@@ -20,6 +20,7 @@ namespace Item
 		namespace Weapons
 		{
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Gun);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Scanner);
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Axe);
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Sword);
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Knife)
@@ -27,6 +28,10 @@ namespace Item
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(NightsEdge)
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shadowbane)
 			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Staff)
+		}
+
+		namespace Tool
+		{
 		}
 
 		namespace Ammunition

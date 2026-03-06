@@ -20,6 +20,7 @@ namespace Item
 		namespace Weapons
 		{
 			UE_DEFINE_GAMEPLAY_TAG(Gun, "Item.Equipment.Weapons.Gun");
+			UE_DEFINE_GAMEPLAY_TAG(Scanner, "Item.Equipment.Weapons.Scanner");
 			UE_DEFINE_GAMEPLAY_TAG(Axe, "Item.Equipment.Weapons.Axe");
 			UE_DEFINE_GAMEPLAY_TAG(Sword, "Item.Equipment.Weapons.Sword");
 			UE_DEFINE_GAMEPLAY_TAG(Knife, "Item.Equipment.Weapons.Knife")
@@ -27,6 +28,10 @@ namespace Item
 			UE_DEFINE_GAMEPLAY_TAG(NightsEdge, "Item.Equipment.Weapons.NightsEdge")
 			UE_DEFINE_GAMEPLAY_TAG(Shadowbane, "Item.Equipment.Weapons.Shadowbane")
 			UE_DEFINE_GAMEPLAY_TAG(Staff, "Item.Equipment.Weapons.Staff")
+		}
+
+		namespace Tool
+		{
 		}
 		
 		namespace Ammunition

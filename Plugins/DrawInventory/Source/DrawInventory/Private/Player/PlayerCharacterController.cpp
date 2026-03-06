@@ -86,18 +86,20 @@ void APlayerCharacterController::SetupInputComponent()
 	
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::PrimaryInteract);
+	EnhancedInputComponent->BindAction(PrimaryInteractAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopFiring);
+	EnhancedInputComponent->BindAction(SecondaryInteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::SecondaryInteract, true);
+	EnhancedInputComponent->BindAction(SecondaryInteractAction, ETriggerEvent::Completed, this, &APlayerCharacterController::SecondaryInteract, false);
 	EnhancedInputComponent->BindAction(ToggleInventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleInventory);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleGlove);
 	EnhancedInputComponent->BindAction(ToggleGloveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ToggleGlove);
-	EnhancedInputComponent->BindAction(HolsterAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleWeapon);
+	EnhancedInputComponent->BindAction(EquipmentAction_1, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleWeapon, 1);
+	EnhancedInputComponent->BindAction(EquipmentAction_2, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleWeapon, 2);
 	
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::DoJumpStart);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::DoJumpEnd);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &APlayerCharacterController::StartFiring);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopFiring);
 	EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::SwitchWeapon);
 }
 
@@ -143,12 +145,19 @@ void APlayerCharacterController::StopFiring()
 	if (GetPlayerCharacter()) PlayerCharacter->StopFiring();
 }
 
-void APlayerCharacterController::ToggleWeapon()
+void APlayerCharacterController::ToggleWeapon(int32 Index)
 {
 	if (GetPlayerCharacter())
 	{
-		PlayerCharacter->ToggleWeapon();
-		HUDWidget->UpdateHolsterWidget(PlayerCharacter->IsAimDownSight(), true);
+		switch (Index)
+		{
+			case 1: PlayerCharacter->ToggleWeapon(Item::Equipment::Weapons::Gun);
+			break;
+			case 2: PlayerCharacter->ToggleWeapon(Item::Equipment::Weapons::Scanner);
+			break;
+		default: ;
+		}
+		HUDWidget->UpdateHolsterWidget(IsAimDownSight(), true);
 	}
 }
 
@@ -184,6 +193,12 @@ void APlayerCharacterController::SwitchWeapon()
 
 void APlayerCharacterController::PrimaryInteract()
 {
+	if (bAimDownSight)
+	{
+		StartFiring();
+		return;
+	}
+	
 	if (!ThisActor.IsValid()) return;
 	
 	UItemComponent* ItemComponent = ThisActor->FindComponentByClass<UItemComponent>();
@@ -233,6 +248,11 @@ void APlayerCharacterController::PrimaryInteract()
 	DrawComponent->TryDrawing(DoorComponent);
 }
 
+void APlayerCharacterController::SecondaryInteract(bool bADS)
+{
+	bAimDownSight = bADS;
+}
+
 void APlayerCharacterController::CreateHUDWidget()
 {
 	if (!IsLocalController()) return;
@@ -247,7 +267,6 @@ void APlayerCharacterController::CreateHUDWidget()
 
 void APlayerCharacterController::ToggleInventory()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ToggleInventory"));
 	if (DrawComponent.IsValid() && DrawComponent->IsDrawingBoardOpen()) return;
 	if (!InventoryComponent.IsValid() ) return;
 	InventoryComponent->ToggleInventoryMenu();

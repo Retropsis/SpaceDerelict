@@ -24,6 +24,7 @@ public:
 	void ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize);
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
 	void ConstructPuzzle(const FIntPoint& Coordinates) const;
+	void ConstructDisplay(const FIntPoint& Coordinates);
 	TSet<FGameplayTag>  GetLayer() const { return Layers; }
 	void AddLayer(const FGameplayTag& NewLayer) { Layers.Add(NewLayer); }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
@@ -41,6 +42,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<AActor> DoorClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TArray<UMaterialInterface*> Numerics;
 
 	TMap<FName, FIntPoint> DestinationOffsets;
 

@@ -19,7 +19,7 @@ AWeapon::AWeapon()
 
 	WeaponMesh->SetCollisionProfileName(FName("NoCollision"));
 	WeaponMesh->SetFirstPersonPrimitiveType(EFirstPersonPrimitiveType::FirstPerson);
-	WeaponMesh->bOnlyOwnerSee = true;
+	// WeaponMesh->bOnlyOwnerSee = true;
 }
 
 void AWeapon::InitializeEquipment()

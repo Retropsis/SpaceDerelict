@@ -76,7 +76,8 @@ void APlayerCharacter::AddWeapon(AWeapon* Weapon)
 	{
 		if (IsValid(Weapon))
 		{
-			// OwnedWeapons.Add(AddedWeapon);
+			UE_LOG(LogTemp, Warning, TEXT("Adding Weapon of Type: %s"), *Weapon->GetEquipmentType().ToString());
+			OwnedWeapons.Add(Weapon->GetEquipmentType(), Weapon);
 
 			if (CurrentWeapon.IsValid())
 			{
@@ -85,7 +86,6 @@ void APlayerCharacter::AddWeapon(AWeapon* Weapon)
 
 			CurrentWeapon = Weapon;
 			CurrentWeapon->ActivateWeapon();
-			bAimDownSight = true;
 		}
 	}
 }
@@ -97,7 +97,6 @@ void APlayerCharacter::HolsterWeapon(AWeapon* Weapon)
 		if (CurrentWeapon.IsValid())
 		{
 			CurrentWeapon->DeactivateWeapon();
-			bAimDownSight = false;
 		}
 	}
 }
@@ -138,19 +137,17 @@ void APlayerCharacter::SwitchWeapon()
 {
 }
 
-void APlayerCharacter::ToggleWeapon()
+void APlayerCharacter::ToggleWeapon(const FGameplayTag& EquipmentType)
 {
+	if (!OwnedWeapons.Contains(EquipmentType)) return;
+	
 	if (CurrentWeapon.IsValid())
 	{
-		if (bAimDownSight)
-		{
-			CurrentWeapon->DeactivateWeapon();
-		}
-		else
-		{
-			CurrentWeapon->ActivateWeapon();
-		}
-		bAimDownSight = !bAimDownSight;
+		CurrentWeapon->DeactivateWeapon();
+
+		CurrentWeapon = OwnedWeapons[EquipmentType];
+		
+		CurrentWeapon->ActivateWeapon();
 	}
 }
 
