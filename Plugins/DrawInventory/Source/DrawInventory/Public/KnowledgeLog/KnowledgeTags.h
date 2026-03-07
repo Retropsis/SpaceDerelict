@@ -1,0 +1,32 @@
+#pragma once
+
+#include "NativeGameplayTags.h"
+
+namespace Knowledge
+{
+	namespace Fragment
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Image);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Text);
+	}
+	namespace Category
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Symbol);
+	}
+	namespace Symbol
+	{
+		namespace Numeric
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Zero);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(One);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Two);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Three);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Four);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Five);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Six);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Seven);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Eight);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Nine);
+		}
+	}
+}

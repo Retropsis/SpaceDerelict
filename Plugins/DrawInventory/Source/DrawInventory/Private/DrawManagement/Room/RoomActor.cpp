@@ -4,10 +4,14 @@
 
 #include "Components/BoxComponent.h"
 #include "Data/DestinationData.h"
+#include "Data/KnowledgeData.h"
 #include "DrawManagement/Room/SpawnerComponent.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
+#include "Game/DerelictGameMode.h"
 #include "GameFramework/Character.h"
+#include "Interaction/KnowledgeComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "KnowledgeLog/KnowledgeTags.h"
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -123,6 +127,12 @@ void ARoomActor::ConstructDisplay(const FIntPoint& Coordinates)
 {
 	TArray<UStaticMeshComponent*> StaticMeshes;
 	GetComponents(UStaticMeshComponent::StaticClass(), StaticMeshes);
+	
+	TArray<UKnowledgeComponent*> KnowledgeComponents;
+	GetComponents(UKnowledgeComponent::StaticClass(), KnowledgeComponents);
+
+	ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
+	
 	for (UStaticMeshComponent* StaticMesh : StaticMeshes)
 	{
 		if (StaticMesh->ComponentHasTag(FName("Room")))
@@ -132,14 +142,43 @@ void ARoomActor::ConstructDisplay(const FIntPoint& Coordinates)
 				if (SlotName.IsEqual(FName("Display_X")) && Numerics.IsValidIndex(Coordinates.X))
 				{
 					StaticMesh->SetMaterialByName(FName("Display_X"), Numerics[Coordinates.X]);
+					if (KnowledgeComponents.IsValidIndex(0)) ConstructKnowledgeComponent(Coordinates.X, KnowledgeComponents[0], DerelictGameMode);
 				}
 				if (SlotName.IsEqual(FName("Display_Y")) && Numerics.IsValidIndex(Coordinates.Y))
 				{
 					StaticMesh->SetMaterialByName(FName("Display_Y"), Numerics[Coordinates.Y]);
+					if (KnowledgeComponents.IsValidIndex(1)) ConstructKnowledgeComponent(Coordinates.Y, KnowledgeComponents[1], DerelictGameMode);
 				}
 			}
 			return;
 		}
+	}
+}
+
+void ARoomActor::ConstructKnowledgeComponent(const int32 Integer, UKnowledgeComponent* KnowledgeComponent, const ADerelictGameMode* DerelictGameMode)
+{
+	if (IsValid(DerelictGameMode) && IsValid(DerelictGameMode->GetKnowledgeData()))
+	{
+		FSymbolData SymbolData = DerelictGameMode->GetKnowledgeData()->GetNumericSymbolDataByInt(Integer);
+		
+		// UKnowledgeComponent* KnowledgeComponent = nullptr;
+		// for (UKnowledgeComponent* Component : KnowledgeComponents)
+		// {
+		// 	if (IsValid(Component) && Component->GetKnowledgeTag().MatchesTagExact(SymbolData.KnowledgeTag))
+		// 	{
+		// 		KnowledgeComponent = Component;
+		// 		break;
+		// 	}
+		// }
+		if (!IsValid(KnowledgeComponent)) return;
+						
+		FKnowledgeImage* KnowledgeImage = KnowledgeComponent->GetFragmentOfTypeMutable<FKnowledgeImage>();
+		FKnowledgeText* KnowledgeText = KnowledgeComponent->GetFragmentOfTypeMutable<FKnowledgeText>();
+		if (!KnowledgeImage || !KnowledgeText) return;
+						
+		KnowledgeImage->SetImage(SymbolData.Texture);
+		KnowledgeText->SetText(SymbolData.Text);
+		KnowledgeComponent->SetKnowledgeTag(SymbolData.KnowledgeTag);
 	}
 }
 

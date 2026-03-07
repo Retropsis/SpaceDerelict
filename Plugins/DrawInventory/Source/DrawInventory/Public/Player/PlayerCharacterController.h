@@ -32,6 +32,7 @@ public:
 	bool IsGloveRaised() const { return bGloveRaised; }
 	bool IsAimDownSight() const { return bAimDownSight; }
 	virtual void RestartLevel() override;
+	UHUDWidget* GetHUDWidget() const { return HUDWidget; }
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
@@ -66,7 +67,7 @@ private:
 	void Look(const FInputActionValue& Value);
 	void StartFiring();
 	void StopFiring();
-	void SwitchWeapon();
+	void ToggleKnowledgeLog();
 	void ToggleWeapon(int32 Index);
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
@@ -109,7 +110,7 @@ private:
 	TObjectPtr<UInputAction> MouseLookAction;
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
-	TObjectPtr<UInputAction> SwitchWeaponAction;
+	TObjectPtr<UInputAction> KnowledgeAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;

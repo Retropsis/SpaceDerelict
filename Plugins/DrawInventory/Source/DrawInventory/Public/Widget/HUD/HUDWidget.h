@@ -7,6 +7,9 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UKnowledgeComponent;
+class UKnowledgeLog;
+class URadialProgressBar;
 class UActiveEquipmentWidget;
 struct FGameplayTag;
 class UHUDCounter;
@@ -21,6 +24,10 @@ class DRAWINVENTORY_API UHUDWidget : public UUserWidget
 
 public:
 	virtual void NativeOnInitialized() override;
+	void InitializeKnowledgeLog();
+	void CloseKnowledgeLog();
+	void OpenKnowledgeLog();
+	void ToggleKnowledgeLog();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "DrawInventory")
 	void ShowPickupMessage(const FString& Message);
@@ -44,15 +51,29 @@ public:
 	UFUNCTION()
 	void OnActiveUnequipped(const FGameplayTag& EquipmentType) {}
 
+	UFUNCTION()
+	void OnScanProgress(float Percentage);
+	
+	UFUNCTION()
+	void OnScanComplete(const UKnowledgeComponent* KnowledgeComponent);
+
 private:	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UInfoMessage> InfoMessage;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<URadialProgressBar> RadialProgressBar;
 
 	UPROPERTY()
 	TMap<FGameplayTag, UHUDCounter*> HUDCounters;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UActiveEquipmentWidget>> ActiveEquipmentWidgets;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UKnowledgeLog> KnowledgeLog;
+
+	bool bKnowledgeLogOpen{false};
 
 	UFUNCTION()
 	void OnNoRoom();

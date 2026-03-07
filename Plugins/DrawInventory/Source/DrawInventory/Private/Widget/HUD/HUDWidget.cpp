@@ -10,6 +10,8 @@
 #include "Widget/DrawInventory/HUD/HUDCounter.h"
 #include "Widget/HUD/ActiveEquipmentWidget.h"
 #include "Widget/HUD/InfoMessage.h"
+#include "Widget/HUD/RadialProgressBar.h"
+#include "Widget/Knowledge/KnowledgeLog.h"
 
 
 void UHUDWidget::NativeOnInitialized()
@@ -30,6 +32,58 @@ void UHUDWidget::NativeOnInitialized()
 	}
 	InitializeHUDCounters();
 	InitializeActiveEquipmentWidget();
+}
+
+void UHUDWidget::InitializeKnowledgeLog()
+{
+	WidgetTree->ForEachWidget([this] (UWidget* Widget)
+	{
+		if (UKnowledgeLog* KnowledgeLogWidget = Cast<UKnowledgeLog>(Widget); IsValid(KnowledgeLogWidget))
+		{
+			KnowledgeLog = KnowledgeLogWidget;
+			KnowledgeLog->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	});
+}
+
+void UHUDWidget::ToggleKnowledgeLog()
+{
+	if (bKnowledgeLogOpen)
+	{
+		CloseKnowledgeLog();
+	}
+	else
+	{
+		OpenKnowledgeLog();
+	}
+}
+
+void UHUDWidget::CloseKnowledgeLog()
+{
+	if (!IsValid(KnowledgeLog)) return;
+
+	KnowledgeLog->SetVisibility(ESlateVisibility::Collapsed);
+	bKnowledgeLogOpen = false;
+
+	if (!IsValid(GetOwningPlayer())) return;
+
+	FInputModeGameOnly InputMode;
+	GetOwningPlayer()->SetInputMode(InputMode);
+	GetOwningPlayer()->SetShowMouseCursor(false);
+}
+
+void UHUDWidget::OpenKnowledgeLog()
+{
+	if (!IsValid(KnowledgeLog)) return;
+
+	KnowledgeLog->SetVisibility(ESlateVisibility::Visible);
+	bKnowledgeLogOpen = true;
+
+	if (!IsValid(GetOwningPlayer())) return;
+
+	FInputModeGameAndUI InputMode;
+	GetOwningPlayer()->SetInputMode(InputMode);
+	GetOwningPlayer()->SetShowMouseCursor(true);
 }
 
 void UHUDWidget::InitializeHUDCounters()
@@ -83,6 +137,26 @@ void UHUDWidget::UpdateActiveEquipmentWidget(const FGameplayTag& EquipmentType, 
 void UHUDWidget::OnActiveEquipped(const FGameplayTag& EquipmentType)
 {
 	UpdateActiveEquipmentWidget(EquipmentType, true);
+}
+
+void UHUDWidget::OnScanProgress(float Percentage)
+{
+	if (IsValid(RadialProgressBar))
+	{
+		RadialProgressBar->SetPercentage(Percentage);
+	}
+}
+
+void UHUDWidget::OnScanComplete(const UKnowledgeComponent* KnowledgeComponent)
+{
+	if (IsValid(KnowledgeLog))
+	{
+		KnowledgeLog->OnKnowledgeReceived(KnowledgeComponent);
+	}
+	if (IsValid(RadialProgressBar))
+	{
+		RadialProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UHUDWidget::OnNoRoom()

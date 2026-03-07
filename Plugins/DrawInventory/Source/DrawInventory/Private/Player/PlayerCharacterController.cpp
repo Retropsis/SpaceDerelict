@@ -100,7 +100,7 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
-	EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::SwitchWeapon);
+	EnhancedInputComponent->BindAction(KnowledgeAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleKnowledgeLog);
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
@@ -163,34 +163,9 @@ void APlayerCharacterController::ToggleWeapon(int32 Index)
 	}
 }
 
-void APlayerCharacterController::SwitchWeapon()
+void APlayerCharacterController::ToggleKnowledgeLog()
 {
-	// ensure we have at least two weapons two switch between
-	// if (OwnedWeapons.Num() > 1 && !IsDead())
-	// {
-	// 	// deactivate the old weapon
-	// 	CurrentWeapon->DeactivateWeapon();
-	//
-	// 	// find the index of the current weapon in the owned list
-	// 	int32 WeaponIndex = OwnedWeapons.Find(CurrentWeapon);
-	//
-	// 	// is this the last weapon?
-	// 	if (WeaponIndex == OwnedWeapons.Num() - 1)
-	// 	{
-	// 		// loop back to the beginning of the array
-	// 		WeaponIndex = 0;
-	// 	}
-	// 	else {
-	// 		// select the next weapon index
-	// 		++WeaponIndex;
-	// 	}
-	//
-	// 	// set the new weapon as current
-	// 	CurrentWeapon = OwnedWeapons[WeaponIndex];
-	//
-	// 	// activate the new weapon
-	// 	CurrentWeapon->ActivateWeapon();
-	// }
+	HUDWidget->ToggleKnowledgeLog();
 }
 
 void APlayerCharacterController::PrimaryInteract()
@@ -303,14 +278,6 @@ void APlayerCharacterController::CalculateAOPitch()
 
 void APlayerCharacterController::ToggleGlove(const FInputActionValue& Value)
 {
-	if (Value.Get<bool>()) 
-	{
-		GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::Red, "Glove Raised");
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, .1f, FColor::Red, "Glove Off");
-	}
 	bGloveRaised = Value.Get<bool>();
 }
 
