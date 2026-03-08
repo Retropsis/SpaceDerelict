@@ -441,12 +441,15 @@ void UDrawComponent::TryDrawing(UDoorComponent* DoorComponent)
 		{
 			OpenUnlockWidget();
 		}
+		return;
 	}
-	else
+	if (InteractingDoorComponent->IsMetaLocked())
 	{
-		ToggleDrawingBoard();
-        DrawRooms();
+		return;
 	}
+	
+	ToggleDrawingBoard();
+	DrawRooms();
 }
 
 void UDrawComponent::DrawRooms()

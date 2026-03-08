@@ -98,6 +98,7 @@ struct FHieroglyphicCombinationPattern
 public:
 	TArray<FGameplayTag> GetHieroglyphics() const { return Hieroglyphics; }
 	TArray<FGameplayTag> GetHieroglyphicCombination() const { return HieroglyphicCombination; }
+	TObjectPtr<UStaticMesh> GetAdditionalMesh() const { return AdditionalMesh; }
 	
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
@@ -105,6 +106,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FGameplayTag> HieroglyphicCombination;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TObjectPtr<UStaticMesh> AdditionalMesh = nullptr;
 };
 
 USTRUCT(BlueprintType)

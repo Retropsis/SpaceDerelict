@@ -16,9 +16,10 @@ public:
 	UDoorComponent();
 	void ToggleDoor(bool bOpen);
 	bool IsLocked() const { return DoorState == EDoorState::Locked; }
-	void Unlock();
+	bool IsMetaLocked() const { return DoorState == EDoorState::MetaLocked; }
 	void SwitchDoorState(const EDoorState NewState);
 	void SetDoorState(const EDoorState NewState) { DoorState = NewState; }
+	EDoorState GetDoorState() const { return DoorState; }
 	bool IsSealed() const { return DoorState == EDoorState::Sealed; }
 	void SetRoomIndex(int32 Index) { RoomIndex = Index; }
 	int32 GetRoomIndex() const { return RoomIndex; }
@@ -27,8 +28,12 @@ public:
 	void SetRoomYaw(int32 NewYaw) { Yaw = NewYaw; }
 	float GetRoomYaw() const { return Yaw; }
 	void SetInteractionMessageToLocked();
+	void SetInteractionMessageToMetaLocked();
 	FGameplayTag GetLayer() const { return Layer; }
 	void SetLayer(FGameplayTag NewLayer) { Layer = NewLayer; }
+	
+	UFUNCTION()
+	void Unlock();
 
 private:
 	EDoorState DoorState;

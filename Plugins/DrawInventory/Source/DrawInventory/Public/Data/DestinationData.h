@@ -10,6 +10,7 @@ enum class EDoorState : uint8
 	Closed,
 	Locked,
 	Sealed,
+	MetaLocked,
 	None
 };
 

@@ -21,4 +21,7 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchDoorState(EDoorState DoorState);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateDoorVisuals(UObject* NewVisual);
 };

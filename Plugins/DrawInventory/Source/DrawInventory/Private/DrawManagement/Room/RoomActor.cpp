@@ -93,6 +93,7 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 		// }
 
 		Door->SwitchDoorState(Availability.DoorState);
+		Doors.Add(Door);
 
 		if (Availability.DoorState == EDoorState::Sealed) continue;
 

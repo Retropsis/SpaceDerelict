@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "RoomActor.generated.h"
 
+class ADoor;
 class ADerelictGameMode;
 class UKnowledgeComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerEnter, const FVector&, Location);
@@ -32,6 +33,7 @@ public:
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
 	UDoorComponent* GetDoorComponentBySocket(const FName& Socket);
 	TArray<FTransform> GetAvailableSpawnerTransforms() const;
+	TArray<TWeakObjectPtr<ADoor>> GetDoors() const { return Doors; }
 	void ConstructKnowledgeComponent(int32 Integer, UKnowledgeComponent* KnowledgeComponent, const ADerelictGameMode* DerelictGameMode);
 	
 	FOnPlayerEnter OnPlayerEnter;
@@ -58,4 +60,5 @@ private:
 	TObjectPtr<UBoxComponent> RoomBoundary;
 	
 	TSet<FGameplayTag> Layers;
+	TArray<TWeakObjectPtr<ADoor>> Doors;
 };

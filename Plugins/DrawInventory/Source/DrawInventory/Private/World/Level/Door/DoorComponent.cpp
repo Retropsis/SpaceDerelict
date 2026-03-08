@@ -45,3 +45,8 @@ void UDoorComponent::SetInteractionMessageToLocked()
 	InteractionMessage = FString("E - Unlock Door");
 }
 
+void UDoorComponent::SetInteractionMessageToMetaLocked()
+{
+	InteractionMessage = FString("1234");
+}
+
