@@ -16,12 +16,14 @@ void UPuzzle_Delivery::ConstructPuzzle(const FIntPoint& Coordinates)
 
 	const int32 PatternSelection = FMath::RandRange(0, DeliveryPatterns.Num() - 1);
 	FDeliveryPattern Pattern = DeliveryPatterns[PatternSelection];
-
-	if (!Pattern.GetRewardToCoordinates().Contains(Coordinates)) return;
 	
-	FPuzzleReward* Reward = Pattern.GetRewardToCoordinates().Find(Coordinates);
-	TSubclassOf<AActor> ItemToSpawn = Reward->GetLootItemClass();
-
+	TSubclassOf<AActor> ItemToSpawn = nullptr;
+	if (Pattern.GetRewardToCoordinates().Contains(Coordinates))
+	{
+		const FPuzzleReward* Reward = Pattern.GetRewardToCoordinates().Find(Coordinates);
+		ItemToSpawn = Reward->GetLootItemClass();
+	}
+	
 	for (const TObjectPtr<AActor>& Actor : GetOwner()->GetLevel()->Actors)
 	{
 		if (ARewardBox* RewardBox = Cast<ARewardBox>(Actor))

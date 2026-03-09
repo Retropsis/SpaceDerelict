@@ -20,6 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemEquipStatusChanged,  UInventory
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryMenuToggled,  bool, bOpen);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemStackChange, const FGameplayTag&, ItemType, int32, Amount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleHUD, bool, bShow);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipItemOfType, const FGameplayTag&, ItemType);
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
@@ -58,6 +59,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_EquippedSlottedItemClicked(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip);
 	
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItemOfType(const FGameplayTag& ItemType);
+	
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category="Inventory")
 	void TryAddItem(UItemComponent* ItemComponent);
 	
@@ -73,6 +77,7 @@ public:
 	FItemStackChange OnConsumeItemStackChange;
 	FItemStackChange OnItemOfTypeStackChange;
 	FToggleHUD OnToggleHUD;
+	FOnEquipItemOfType OnEquipItemOfType;
 
 protected:
 	virtual void BeginPlay() override;

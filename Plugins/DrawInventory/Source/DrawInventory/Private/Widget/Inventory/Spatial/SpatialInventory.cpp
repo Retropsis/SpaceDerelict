@@ -100,6 +100,25 @@ void USpatialInventory::EquippedSlottedItemClicked(UEquippedSlottedItem* Equippe
 	BroadcastSlotClickedDelegates(ItemToEquip, ItemToUnequip);
 }
 
+void USpatialInventory::OnEquipItemOfType(UInventoryItem* Item)
+{
+	for (TObjectPtr<UEquippedGridSlot>& GridSlot : EquippedGridSlots)
+	{
+		if (GridSlot->EquipmentType.MatchesTagExact(Item->GetItemManifest().GetItemType()))
+		{
+			const float TileSize = UInventoryUtility::GetInventoryWidget(GetOwningPlayer())->GetTileSize();
+			UEquippedSlottedItem* EquippedSlottedItem = GridSlot->OnItemEquipped(Item, GridSlot->EquipmentType, TileSize);
+			EquippedSlottedItem->OnEquippedSlottedItemClicked.AddDynamic(this, &ThisClass::EquippedSlottedItemClicked);
+			GridSlot->SetOccupiedTexture();
+			
+			UInventoryComponent* InventoryComponent = UInventoryUtility::GetInventoryComponent(GetOwningPlayer());
+			check(IsValid(InventoryComponent));
+			InventoryComponent->Server_EquippedSlottedItemClicked(Item, nullptr);
+			return;
+		}
+	}
+}
+
 void USpatialInventory::BroadcastSlotClickedDelegates(UInventoryItem* ItemToEquip, UInventoryItem* ItemToUnequip) const
 {
 	UInventoryComponent* InventoryComponent = UInventoryUtility::GetInventoryComponent(GetOwningPlayer());

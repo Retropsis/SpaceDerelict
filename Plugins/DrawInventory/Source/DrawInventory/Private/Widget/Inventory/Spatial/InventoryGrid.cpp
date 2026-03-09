@@ -26,6 +26,7 @@ void UInventoryGrid::NativeOnInitialized()
 	InventoryComponent->OnStackChange.AddDynamic(this, &ThisClass::AddStacks);
 	InventoryComponent->OnInventoryMenuToggled.AddDynamic(this, &ThisClass::OnInventoryMenuToggled);
 	InventoryComponent->OnConsumeItemStackChange.AddDynamic(this, &ThisClass::OnItemStackChange);
+	InventoryComponent->OnEquipItemOfType.AddDynamic(this, &ThisClass::OnEquipItemOfType);
 }
 
 void UInventoryGrid::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -480,6 +481,18 @@ void UInventoryGrid::OnItemStackChange(const FGameplayTag& ItemType, int32 Amoun
 	if (NewStackCount <= 0)
 	{
 		RemoveItemFromGrid(FoundItem, FoundSlot->Get()->GetTileIndex());
+	}
+}
+
+void UInventoryGrid::OnEquipItemOfType(const FGameplayTag& ItemType)
+{
+	for (TTuple<int32, TObjectPtr<USlottedItem>>& SlottedItem : SlottedItems)
+	{
+		if (SlottedItem.Value->GetInventoryItem()->GetItemManifest().GetItemType().MatchesTagExact(ItemType))
+		{
+			RemoveItemFromGrid(SlottedItem.Value->GetInventoryItem(), SlottedItem.Value->GetGridIndex());
+			return;
+		}
 	}
 }
 

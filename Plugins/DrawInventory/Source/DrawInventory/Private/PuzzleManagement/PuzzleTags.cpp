@@ -31,4 +31,30 @@ namespace Puzzle
 		UE_DEFINE_GAMEPLAY_TAG(False, "Puzzle.Breakable.False");
 		UE_DEFINE_GAMEPLAY_TAG(Pattern, "Puzzle.Breakable.Pattern");
 	}
+
+	namespace Hieroglyphic
+	{
+		UE_DEFINE_GAMEPLAY_TAG(Apostrophe_1, "Puzzle.Hieroglyphic.Apostrophe1");
+		UE_DEFINE_GAMEPLAY_TAG(Apostrophe_2, "Puzzle.Hieroglyphic.Apostrophe2");
+		UE_DEFINE_GAMEPLAY_TAG(B, "Puzzle.Hieroglyphic.B");
+		UE_DEFINE_GAMEPLAY_TAG(D, "Puzzle.Hieroglyphic.D");
+		UE_DEFINE_GAMEPLAY_TAG(G, "Puzzle.Hieroglyphic.G");
+		UE_DEFINE_GAMEPLAY_TAG(H, "Puzzle.Hieroglyphic.H");
+		UE_DEFINE_GAMEPLAY_TAG(HLong, "Puzzle.Hieroglyphic.HLong");
+		UE_DEFINE_GAMEPLAY_TAG(K, "Puzzle.Hieroglyphic.K");
+		UE_DEFINE_GAMEPLAY_TAG(L, "Puzzle.Hieroglyphic.L");
+		UE_DEFINE_GAMEPLAY_TAG(M, "Puzzle.Hieroglyphic.M");
+		UE_DEFINE_GAMEPLAY_TAG(N, "Puzzle.Hieroglyphic.N");
+		UE_DEFINE_GAMEPLAY_TAG(P, "Puzzle.Hieroglyphic.P");
+		UE_DEFINE_GAMEPLAY_TAG(Q, "Puzzle.Hieroglyphic.Q");
+		UE_DEFINE_GAMEPLAY_TAG(R, "Puzzle.Hieroglyphic.R");
+		UE_DEFINE_GAMEPLAY_TAG(S, "Puzzle.Hieroglyphic.S");
+		UE_DEFINE_GAMEPLAY_TAG(SShort, "Puzzle.Hieroglyphic.SShort");
+		UE_DEFINE_GAMEPLAY_TAG(SLong, "Puzzle.Hieroglyphic.SLong");
+		UE_DEFINE_GAMEPLAY_TAG(T, "Puzzle.Hieroglyphic.T");
+		UE_DEFINE_GAMEPLAY_TAG(TLong, "Puzzle.Hieroglyphic.TLong");
+		UE_DEFINE_GAMEPLAY_TAG(W, "Puzzle.Hieroglyphic.W");
+		UE_DEFINE_GAMEPLAY_TAG(Y, "Puzzle.Hieroglyphic.Y");
+		UE_DEFINE_GAMEPLAY_TAG(Z, "Puzzle.Hieroglyphic.Z");
+	}
 }

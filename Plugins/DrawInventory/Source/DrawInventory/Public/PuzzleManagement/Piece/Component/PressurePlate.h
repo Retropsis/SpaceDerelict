@@ -39,7 +39,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	float PressurePlateTime{2.f};
 
-	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle.Hieroglyphic"))
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle"))
 	FGameplayTag Symbol = FGameplayTag::EmptyTag;
 
 	UPROPERTY(VisibleAnywhere)

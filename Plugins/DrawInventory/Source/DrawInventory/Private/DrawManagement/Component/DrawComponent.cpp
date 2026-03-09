@@ -96,6 +96,7 @@ void UDrawComponent::GiveItemsFromRoomData()
 		if (IsValid(ItemComponent))
 		{
 			InventoryComponent->TryAddItem(ItemComponent);
+			InventoryComponent->Server_EquipItemOfType(ItemComponent->GetItemManifest().GetItemType());
 			ItemComponent->PickedUp();
 		}
 	}

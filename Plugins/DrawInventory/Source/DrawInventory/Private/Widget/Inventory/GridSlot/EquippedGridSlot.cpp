@@ -91,9 +91,11 @@ UEquippedSlottedItem* UEquippedGridSlot::OnItemEquipped(UInventoryItem* Item, co
 	FGeometry Geometry = Overlay_Root->GetCachedGeometry();
 	FVector2f OverlayPosition = Geometry.Position;
 	auto OverlaySize = Geometry.GetLocalSize();
-	const float LeftPadding = OverlaySize.X / 2.f - DrawSize.X / 2.f;
-	const float TopPadding = OverlaySize.Y / 2.f - DrawSize.Y / 2.f;
-
+	// const float LeftPadding = OverlaySize.X / 2.f - DrawSize.X / 2.f;
+	// const float TopPadding = OverlaySize.Y / 2.f - DrawSize.Y / 2.f;
+	const float LeftPadding = 10.f;
+	const float TopPadding = 10.f;
+	
 	UOverlaySlot* OverlaySlot = UWidgetLayoutLibrary::SlotAsOverlaySlot(EquippedSlottedItem);
 	OverlaySlot->SetPadding(FMargin(LeftPadding, TopPadding));
 	

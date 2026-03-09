@@ -40,6 +40,13 @@ void UInventoryComponent::ConstructInventory()
 	CloseInventoryMenu();
 }
 
+void UInventoryComponent::Server_EquipItemOfType_Implementation(const FGameplayTag& ItemType)
+{
+	UInventoryItem* FoundItem = InventoryList.FindFirstItemByType(ItemType);
+	OnEquipItemOfType.Broadcast(ItemType);
+	InventoryMenu->OnEquipItemOfType(FoundItem);
+}
+
 void UInventoryComponent::TryAddItem(UItemComponent* ItemComponent)
 {
 	FSlotAvailabilityResult Result = InventoryMenu->HasRoomForItem(ItemComponent);

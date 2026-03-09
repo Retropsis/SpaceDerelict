@@ -24,4 +24,6 @@ public:
 	virtual bool HasHoverItem() const { return false; }
 	virtual UHoverItem* GetHoverItem() const { return nullptr; }
 	virtual float GetTileSize() const { return 0.0f; }
+
+	virtual void OnEquipItemOfType(UInventoryItem* Item) {}
 };

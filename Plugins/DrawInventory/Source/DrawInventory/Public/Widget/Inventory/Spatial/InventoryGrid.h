@@ -63,6 +63,9 @@ public:
 
 	UFUNCTION()
 	void OnItemStackChange(const FGameplayTag& ItemType, int32 Amount);
+
+	UFUNCTION()
+	void OnEquipItemOfType(const FGameplayTag& ItemType);
 	
 	FSlotAvailabilityResult HasRoomForItem(const UItemComponent* ItemComponent);
 	EGridCategory GetItemCategory() const { return ItemCategory; }

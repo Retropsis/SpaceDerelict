@@ -34,6 +34,7 @@ public:
 	virtual bool HasHoverItem() const override;
 	virtual UHoverItem* GetHoverItem() const override;
 	virtual float GetTileSize() const override;
+	virtual void OnEquipItemOfType(UInventoryItem* Item) override;
 
 private:
 	UPROPERTY(meta=(BindWidget))
