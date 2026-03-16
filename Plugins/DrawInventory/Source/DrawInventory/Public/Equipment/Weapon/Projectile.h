@@ -17,7 +17,10 @@ class DRAWINVENTORY_API AProjectile : public AActor
 public:
 	AProjectile();
 	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-
+	
+	UPROPERTY(BlueprintReadOnly, Category="DrawInventory")
+	UProjectileMovementComponent* ProjectileMovement;
+	
 protected:
 	virtual void BeginPlay() override;
 	
@@ -34,9 +37,6 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	USphereComponent* CollisionComponent;
-
-	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
-	UProjectileMovementComponent* ProjectileMovement;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	bool bDamageOwner = false;

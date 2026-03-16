@@ -3,6 +3,7 @@
 #include "Equipment/Tool/KnowledgeScanner.h"
 #include "Equipment/Weapon/WeaponInterface.h"
 #include "CableComponent.h"
+#include "Equipment/Weapon/Projectile.h"
 #include "Interaction/KnowledgeComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -54,6 +55,12 @@ void AKnowledgeScanner::StopActive()
 	ScanTimer.Invalidate();
 	OnScanProgress.Broadcast(-1.f);
 	LinkComponent->bAttachEnd = true;
+
+	// if (Projectile.IsValid())
+	// {
+	// 	Projectile->Destroy();
+	// 	Projectile.Reset();
+	// }
 }
 
 void AKnowledgeScanner::BeginPlay()
@@ -95,12 +102,21 @@ void AKnowledgeScanner::FireScanLink(const FVector& TargetLocation)
 {
 	KnowledgeComponent.Reset();
 	LinkComponent->SetVisibility(true);
-	FTransform TargetTransform = CalculateTargetTransform(TargetLocation);
+	FTransform ProjectileTransform = CalculateTargetTransform(TargetLocation);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
+	SpawnParams.Owner = GetOwner();
+	SpawnParams.Instigator = PawnOwner;
+	
+	Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileTransform, SpawnParams);
+	LinkComponent->SetAttachEndTo(Projectile.Get(), FName("RootComponent"));
 
 	FHitResult Hit;
 	const FVector Start = EquipmentMesh->GetSocketLocation(MuzzleSocketName);
 	const FVector End = Start + ((TargetLocation - Start).GetSafeNormal() * 5000.f);
-	UKismetSystemLibrary::DrawDebugSphere(this, End, 15.f, 12, FLinearColor::Green, 5.f);;
+	// UKismetSystemLibrary::DrawDebugSphere(this, End, 15.f, 12, FLinearColor::Green, 5.f);
 	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
 
 	if (Hit.bBlockingHit && IsValid(Hit.GetComponent()))
@@ -109,8 +125,8 @@ void AKnowledgeScanner::FireScanLink(const FVector& TargetLocation)
 		if (KnowledgeComponent.IsValid())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Scanning Component %s"), *KnowledgeComponent->GetName());
-			LinkComponent->SetAttachEndToComponent(Hit.GetComponent());
-			LinkComponent->EndLocation = FVector(Hit.ImpactPoint - Hit.GetComponent()->GetComponentLocation());
+			// LinkComponent->SetAttachEndToComponent(Hit.GetComponent());
+			// LinkComponent->EndLocation = FVector(Hit.ImpactPoint - Hit.GetComponent()->GetComponentLocation());
 		}
 		else
 		{
@@ -130,9 +146,9 @@ void AKnowledgeScanner::ScanComplete()
 
 void AKnowledgeScanner::ScanLinkFailed()
 {
-	LinkComponent->SetAttachEndToComponent(EquipmentMesh, MuzzleSocketName);
-	LinkComponent->EndLocation = FVector(5000.f, 0.f, 0.f);
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, LinkComponent->EndLocation.ToString());
+	// LinkComponent->SetAttachEndToComponent(EquipmentMesh, MuzzleSocketName);
+	// LinkComponent->EndLocation = FVector(5000.f, 0.f, 0.f);
+	// GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, LinkComponent->EndLocation.ToString());
 	if (DeferredDetachmentTime > 0.0f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(DeferredUnlinkTimer, this, &AKnowledgeScanner::OnDeferredUnlink, DeferredUnlinkTime, false);
@@ -146,12 +162,12 @@ void AKnowledgeScanner::ScanLinkFailed()
 
 void AKnowledgeScanner::OnDeferredDetachment()
 {
-	StopActive();
+	// StopActive();
 }
 
 void AKnowledgeScanner::OnDeferredUnlink()
 {
-	LinkComponent->bAttachEnd = false;
+	// LinkComponent->bAttachEnd = false;
 }
 
 FTransform AKnowledgeScanner::CalculateTargetTransform(const FVector& TargetLocation) const

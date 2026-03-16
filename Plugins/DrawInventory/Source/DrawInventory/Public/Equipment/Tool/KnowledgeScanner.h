@@ -6,6 +6,7 @@
 #include "Equipment/ActiveEquipActor.h"
 #include "KnowledgeScanner.generated.h"
 
+class AProjectile;
 class UKnowledgeComponent;
 class UCableComponent;
 
@@ -52,6 +53,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	UCableComponent* LinkComponent;
 	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<AProjectile> ProjectileClass;
+	
 	UPROPERTY(EditAnywhere, Category="DrawInventory", meta = (ClampMin = 0, ClampMax = 5, Units = "s"))
 	float ScanRate = 0.5f;
 	
@@ -80,4 +84,5 @@ private:
 	FTimerHandle DeferredDetachmentTimer;
 	FTimerHandle DeferredUnlinkTimer;
 	TWeakObjectPtr<UKnowledgeComponent> KnowledgeComponent;
+	TWeakObjectPtr<AProjectile> Projectile;
 };
