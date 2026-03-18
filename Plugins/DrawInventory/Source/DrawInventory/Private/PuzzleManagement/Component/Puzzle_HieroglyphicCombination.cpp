@@ -3,6 +3,8 @@
 #include "PuzzleManagement/Component/Puzzle_HieroglyphicCombination.h"
 
 #include "DrawManagement/Room/RoomActor.h"
+#include "Game/DerelictGameMode.h"
+#include "PuzzleManagement/PuzzleTags.h"
 #include "PuzzleManagement/Piece/Component/PressurePlate.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
@@ -17,7 +19,25 @@ void UPuzzle_HieroglyphicCombination::ConstructPuzzle(const FIntPoint& Coordinat
 {
 	const int32 Selection = FMath::RandRange(0, HieroglyphicCombinationPatterns.Num() - 1);
 	const FHieroglyphicCombinationPattern ChosenPattern = HieroglyphicCombinationPatterns[Selection];
-	DesiredCombination = ChosenPattern.GetHieroglyphicCombination();
+
+	
+	
+	if (ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (DerelictGameMode->IsPuzzleDataValid(Puzzle::Hieroglyphics))
+		{
+			const FTagCombinationData* Data = DerelictGameMode->GetPuzzleDataOfType<FTagCombinationData>(Puzzle::Hieroglyphics);
+			DesiredCombination = Data->GetTagCombination();
+		}
+		else
+		{
+			FTagCombinationData Data;
+			Data.SetTag(Puzzle::Hieroglyphics);
+			Data.SetTagCombination(ChosenPattern.GetHieroglyphicCombination());
+			DerelictGameMode->AddPuzzleData(TInstancedStruct<FPuzzleData>::Make(Data));
+			DesiredCombination = ChosenPattern.GetHieroglyphicCombination();
+		}
+	}
 	
 	for (const TObjectPtr<AActor>& Actor : GetOwner()->GetLevel()->Actors)
 	{

@@ -3,6 +3,8 @@
 
 namespace Puzzle
 {
+	UE_DEFINE_GAMEPLAY_TAG(Hieroglyphics, "Puzzle.Hieroglyphics");
+	
 	namespace Box
 	{
 		UE_DEFINE_GAMEPLAY_TAG(True, "Puzzle.Box.True");

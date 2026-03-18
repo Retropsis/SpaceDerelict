@@ -3,7 +3,9 @@
 #include "NativeGameplayTags.h"
 
 namespace Puzzle
-{
+{	
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Hieroglyphics);
+	
 	namespace Box
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(True);
