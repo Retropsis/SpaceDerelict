@@ -7,6 +7,7 @@
 #include "Puzzle_Delivery.generated.h"
 
 
+struct FDeliveryPattern;
 class USpawnerComponent;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), BlueprintType)

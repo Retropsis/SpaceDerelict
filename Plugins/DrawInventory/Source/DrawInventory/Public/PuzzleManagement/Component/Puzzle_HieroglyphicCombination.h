@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_HieroglyphicCombination.generated.h"
 
+struct FHieroglyphicCombinationPattern;
 class APressurePlate;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCombinationComplete);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), BlueprintType)

@@ -30,6 +30,9 @@ public:
 
 	template<typename T> requires std::derived_from<T, FItemFragment>
 	const T* GetFragmentOfTypeWithTag(const FGameplayTag& Tag) const;
+	
+	template<typename T> requires std::derived_from<T, FItemFragment>
+	T* GetFragmentOfTypeWithTagMutable(const FGameplayTag& Tag);
 
 	template<typename T> requires std::derived_from<T, FItemFragment>
 	const T* GetFragmentOfType() const;
@@ -65,6 +68,20 @@ const T* FItemManifest::GetFragmentOfTypeWithTag(const FGameplayTag& Tag) const
 	for (const TInstancedStruct<FItemFragment>& Fragment : Fragments)
 	{
 		if (const T* FragmentPtr = Fragment.GetPtr<T>())
+		{
+			if (!FragmentPtr->GetFragmentTag().MatchesTagExact(Tag)) continue;
+			return FragmentPtr;
+		}
+	}
+	return nullptr;
+}
+
+template <typename T> requires std::derived_from<T, FItemFragment>
+T* FItemManifest::GetFragmentOfTypeWithTagMutable(const FGameplayTag& Tag)
+{
+	for (TInstancedStruct<FItemFragment>& Fragment : Fragments)
+	{
+		if (T* FragmentPtr = Fragment.GetMutablePtr<T>())
 		{
 			if (!FragmentPtr->GetFragmentTag().MatchesTagExact(Tag)) continue;
 			return FragmentPtr;

@@ -3,8 +3,14 @@
 
 namespace Puzzle
 {
-	UE_DEFINE_GAMEPLAY_TAG(Hieroglyphics, "Puzzle.Hieroglyphics");
-	
+	namespace Pattern
+	{
+		UE_DEFINE_GAMEPLAY_TAG(TrueBox, "Puzzle.Pattern.TrueBox");
+		UE_DEFINE_GAMEPLAY_TAG(SafeBox, "Puzzle.Pattern.SafeBox");
+		UE_DEFINE_GAMEPLAY_TAG(Delivery, "Puzzle.Pattern.Delivery");
+		UE_DEFINE_GAMEPLAY_TAG(Hieroglyphics, "Puzzle.Pattern.Hieroglyphics");
+		UE_DEFINE_GAMEPLAY_TAG(Breakable, "Puzzle.Pattern.Breakable");
+	}
 	namespace Box
 	{
 		UE_DEFINE_GAMEPLAY_TAG(True, "Puzzle.Box.True");

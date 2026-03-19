@@ -4,6 +4,8 @@
 #include "DrawManagement/Room/SpawnerComponent.h"
 #include "Interaction/InteractionComponent.h"
 #include "Item/ItemTags.h"
+#include "Data/PuzzleData.h"
+#include "Game/DerelictGameMode.h"
 #include "PuzzleManagement/PuzzleTags.h"
 #include "PuzzleManagement/Piece/RewardBox.h"
 
@@ -18,13 +20,15 @@ void UPuzzle_TrueBox::ConstructPuzzle(const FIntPoint& Coordinates)
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	const ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
+	check(DerelictGameMode);
 
-	const int32 PatternSelection = FMath::RandRange(0, TrueBoxPatterns.Num() - 1);
-	FTrueBoxPattern Pattern = TrueBoxPatterns[PatternSelection];
-	FGameplayTag TrueBoxTag = Pattern.GetTrueBoxTag();
+	const FTrueBoxPattern* Pattern = DerelictGameMode->GetPuzzleDataOfTypeWithTag<FTrueBoxPattern>(Puzzle::Pattern::TrueBox);
+	const FGameplayTag TrueBoxTag = Pattern->GetTrueBoxTag();
 	
 	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
-	TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
+	const TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
 	
 	TMap<FGameplayTag, USpawnerComponent*> TaggedItemSpawners;
 	for (USpawnerComponent* Spawner : ItemSpawners)
@@ -50,9 +54,9 @@ void UPuzzle_TrueBox::ConstructPuzzle(const FIntPoint& Coordinates)
 			TrueBox->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 		
 			UInteractionComponent* InteractionComponent = TrueBox->FindComponentByClass<UInteractionComponent>();
-			if (IsValid(InteractionComponent) && Pattern.GetHintMessages().Contains(Spawner.Key))
+			if (IsValid(InteractionComponent) && Pattern->GetHintMessages().Contains(Spawner.Key))
 			{
-				InteractionComponent->SetInteractionMessage(Pattern.GetHintMessages()[Spawner.Key]);
+				InteractionComponent->SetInteractionMessage(Pattern->GetHintMessages()[Spawner.Key]);
 			}
 	
 			if (Spawner.Key.MatchesTagExact(TrueBoxTag) && IsValid(ChosenRewardClass))

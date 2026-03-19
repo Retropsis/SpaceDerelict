@@ -6,6 +6,8 @@
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_SafeBox.generated.h"
 
+struct FSafeBoxPattern;
+struct FPuzzleReward;
 class ASpawner;
 class USpawnerComponent;
 

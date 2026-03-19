@@ -328,7 +328,7 @@ void UDrawComponent::Server_OpenConnectedDoor_Implementation(ARoomActor* RoomAct
 
 void UDrawComponent::Server_Redraw_Implementation()
 {
-	NumberOfRedraws = FMath::Min(0, --NumberOfRedraws);
+	NumberOfRedraws = FMath::Max(0, --NumberOfRedraws);
 	DrawRooms();
 }
 

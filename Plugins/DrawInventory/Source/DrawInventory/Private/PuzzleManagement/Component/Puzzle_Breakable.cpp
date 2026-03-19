@@ -3,8 +3,10 @@
 #include "PuzzleManagement/Component/Puzzle_Breakable.h"
 #include "Algo/RandomShuffle.h"
 #include "DrawManagement/Room/SpawnerComponent.h"
+#include "Game/DerelictGameMode.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "PuzzleManagement/PuzzleTags.h"
+#include "Data/PuzzleData.h"
 #include "World/Actor/Breakable.h"
 
 UPuzzle_Breakable::UPuzzle_Breakable()
@@ -19,18 +21,20 @@ void UPuzzle_Breakable::ConstructPuzzle(const FIntPoint& Coordinates)
 	
 	GetOwner()->GetComponents(USpawnerComponent::StaticClass(), Spawners);
 	Algo::RandomShuffle(Spawners);
+	
+	const ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
+	check(DerelictGameMode);
 
-	const int32 PatternSelection = FMath::RandRange(0, BreakablePatterns.Num() - 1);
-	FBreakablePattern Pattern = BreakablePatterns[PatternSelection];
-	TMap<TSubclassOf<ABreakable>, FGameplayTag> Breakables = Pattern.GetBreakableClasses();
+	const FBreakablePattern* Pattern = DerelictGameMode->GetPuzzleDataOfTypeWithTag<FBreakablePattern>(Puzzle::Pattern::Breakable);
+	TMap<TSubclassOf<ABreakable>, FGameplayTag> Breakables = Pattern->GetBreakableClasses();
 	
 	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
-	TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
+	const TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
 	
-	USpawnerComponent* SpawnerComponent = *Spawners.FindByPredicate([] (const USpawnerComponent* Spawner) { return Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Breakable::Pattern); });
+	USpawnerComponent* SpawnerComponent = *Spawners.FindByPredicate([] (const USpawnerComponent* Spawner) { return Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Pattern::Breakable); });
 	if (IsValid(SpawnerComponent))
 	{
-		GetOwner()->GetWorld()->SpawnActor<AActor>(Pattern.GetPatternClass(), SpawnerComponent->GetComponentTransform(), SpawnParams);
+		GetOwner()->GetWorld()->SpawnActor<AActor>(Pattern->GetPatternClass(), SpawnerComponent->GetComponentTransform(), SpawnParams);
 		Spawners.Remove(SpawnerComponent);
 	}
 	

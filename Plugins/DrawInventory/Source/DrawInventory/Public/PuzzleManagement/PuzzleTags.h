@@ -3,9 +3,15 @@
 #include "NativeGameplayTags.h"
 
 namespace Puzzle
-{	
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Hieroglyphics);
-	
+{
+	namespace Pattern
+	{
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(TrueBox);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(SafeBox);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Delivery);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Hieroglyphics);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Breakable);
+	}
 	namespace Box
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(True);
@@ -33,7 +39,6 @@ namespace Puzzle
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(True);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(False);
-		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Pattern);
 	}
 	namespace Hieroglyphic
 	{

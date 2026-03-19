@@ -7,6 +7,8 @@
 #include "Puzzle_Breakable.generated.h"
 
 
+struct FPuzzleReward;
+struct FBreakablePattern;
 class USpawnerComponent;
 class ABreakable;
 

@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_TrueBox.generated.h"
 
+struct FPuzzleReward;
+struct FTrueBoxPattern;
 class ASpawner;
 class ARewardBox;
 class USpawnerComponent;

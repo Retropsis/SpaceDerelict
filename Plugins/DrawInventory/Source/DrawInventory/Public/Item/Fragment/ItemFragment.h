@@ -98,6 +98,33 @@ private:
 };
 
 USTRUCT(BlueprintType)
+struct FPuzzleTagFragment : public FItemFragment
+{
+	GENERATED_BODY()
+
+public:
+	FGameplayTag GetPuzzleTag() const { return PuzzleTag; }
+	void SetPuzzleTag(FGameplayTag Tag) { PuzzleTag = Tag; }
+
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle"))
+	FGameplayTag PuzzleTag = FGameplayTag::EmptyTag;
+};
+
+USTRUCT(BlueprintType)
+struct FPuzzleFragment : public FItemFragment
+{
+	GENERATED_BODY()
+
+public:
+	UTexture2D* GetPuzzleIcon() const { return PuzzleIcon; };
+
+private:	
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	UTexture2D* PuzzleIcon = nullptr;
+};
+
+USTRUCT(BlueprintType)
 struct FLabeledNumberFragment : public FInventoryItemFragment
 {
 	GENERATED_BODY()
@@ -349,18 +376,18 @@ private:
 	TArray<TSubclassOf<AActor>> ValuableItems;
 };
 
-USTRUCT(BlueprintType)
-struct FPuzzleFragment : public FItemFragment
-{
-	GENERATED_BODY()
-	
-public:
-	UTexture2D* GetPuzzleIcon() const { return PuzzleIcon; };
-	
-private:
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	UTexture2D* PuzzleIcon = nullptr;
-};
+// USTRUCT(BlueprintType)
+// struct FPuzzleFragment : public FItemFragment
+// {
+// 	GENERATED_BODY()
+// 	
+// public:
+// 	UTexture2D* GetPuzzleIcon() const { return PuzzleIcon; };
+// 	
+// private:
+// 	UPROPERTY(EditAnywhere, Category="DrawInventory")
+// 	UTexture2D* PuzzleIcon = nullptr;
+// };
 
 /*
  * Rules
