@@ -139,6 +139,14 @@ void UHUDWidget::OnActiveEquipped(const FGameplayTag& EquipmentType)
 	UpdateActiveEquipmentWidget(EquipmentType, true);
 }
 
+void UHUDWidget::OnScanStarted()
+{
+	if (IsValid(RadialProgressBar))
+	{
+		RadialProgressBar->OnStartVisualEffect();
+	}
+}
+
 void UHUDWidget::OnScanProgress(float Percentage)
 {
 	if (IsValid(RadialProgressBar))
@@ -155,7 +163,12 @@ void UHUDWidget::OnScanComplete(const UKnowledgeComponent* KnowledgeComponent)
 	}
 	if (IsValid(RadialProgressBar))
 	{
-		RadialProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		RadialProgressBar->OnCompletedVisualEffect();
+		FTimerHandle CollapseTimer;
+		GetWorld()->GetTimerManager().SetTimer(CollapseTimer, [this] ()
+		{ 
+			RadialProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		}, .2f, false);
 	}
 }
 

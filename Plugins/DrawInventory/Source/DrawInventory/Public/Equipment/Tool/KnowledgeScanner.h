@@ -10,6 +10,7 @@ class AProjectile;
 class UKnowledgeComponent;
 class UCableComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScanStarted);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScanProgress, float, Percentage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScanComplete, const UKnowledgeComponent*, KnowledgeComponent);
 
@@ -32,6 +33,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ScanComplete();
+	
+	UPROPERTY(BlueprintCallable)
+	FOnScanStarted OnScanStarted;
 
 	UPROPERTY(BlueprintCallable)
 	FOnScanProgress OnScanProgress;

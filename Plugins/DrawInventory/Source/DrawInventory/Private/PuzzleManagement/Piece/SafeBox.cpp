@@ -20,58 +20,36 @@ ASafeBox::ASafeBox()
 	
 	CREATE_AND_SETUP_DIGIT(Digit_1);
 	Digit_1->SetDigitCode(Puzzle::Numeric::One);
-	UWidgetComponent* DigitComp_1 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_1"));
-	DigitComp_1->SetupAttachment(Digit_1);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_2);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Two);
-	UWidgetComponent* DigitComp_2 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_2"));
-	DigitComp_2->SetupAttachment(Digit_2);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_3);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Three);
-	UWidgetComponent* DigitComp_3 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_3"));
-	DigitComp_3->SetupAttachment(Digit_3);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_4);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Four);
-	UWidgetComponent* DigitComp_4 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_4"));
-	DigitComp_4->SetupAttachment(Digit_4);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_5);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Five);
-	UWidgetComponent* DigitComp_5 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_5"));
-	DigitComp_5->SetupAttachment(Digit_5);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_6);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Six);
-	UWidgetComponent* DigitComp_6 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_6"));
-	DigitComp_6->SetupAttachment(Digit_6);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_7);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Seven);
-	UWidgetComponent* DigitComp_7 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_7"));
-	DigitComp_7->SetupAttachment(Digit_7);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_8);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Eight);
-	UWidgetComponent* DigitComp_8 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_8"));
-	DigitComp_8->SetupAttachment(Digit_8);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_9);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Nine);
-	UWidgetComponent* DigitComp_9 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_9"));
-	DigitComp_9->SetupAttachment(Digit_9);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_0);
 	Digit_1->SetDigitCode(Puzzle::Numeric::Zero);
-	UWidgetComponent* DigitComp_0 = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_0"));
-	DigitComp_0->SetupAttachment(Digit_0);
 	
 	CREATE_AND_SETUP_DIGIT(Digit_Enter);
 	Digit_Enter->SetDigitCode(Puzzle::Numeric::Enter);
-	UWidgetComponent* DigitComp_Enter = ConstructDigitWidgetComponent(FName("DigitWidgetComponent_Enter"));
-	DigitComp_Enter->SetupAttachment(Digit_Enter);
 
 	for (const TObjectPtr<UDigitComponent> Digit : Digits)
 	{

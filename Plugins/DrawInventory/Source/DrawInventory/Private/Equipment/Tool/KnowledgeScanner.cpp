@@ -25,6 +25,7 @@ void AKnowledgeScanner::InitializeEquipment()
 	{
 		if (UHUDWidget* HUDWidget = OwnerController->GetHUDWidget())
 		{
+			OnScanStarted.AddDynamic(HUDWidget, &UHUDWidget::OnScanStarted);
 			OnScanProgress.AddDynamic(HUDWidget, &UHUDWidget::OnScanProgress);
 			OnScanComplete.AddDynamic(HUDWidget, &UHUDWidget::OnScanComplete);
 		}
@@ -34,6 +35,12 @@ void AKnowledgeScanner::InitializeEquipment()
 			PawnOwner = Cast<APawn>(OwnerPawn);
 		}
 	}
+}
+
+void AKnowledgeScanner::BeginPlay()
+{
+	Super::BeginPlay();
+	LinkComponent->SetRelativeLocation(EquipmentMesh->GetSocketLocation(MuzzleSocketName));
 }
 
 void AKnowledgeScanner::StartActive()
@@ -55,18 +62,6 @@ void AKnowledgeScanner::StopActive()
 	ScanTimer.Invalidate();
 	OnScanProgress.Broadcast(-1.f);
 	LinkComponent->bAttachEnd = true;
-
-	// if (Projectile.IsValid())
-	// {
-	// 	Projectile->Destroy();
-	// 	Projectile.Reset();
-	// }
-}
-
-void AKnowledgeScanner::BeginPlay()
-{
-	Super::BeginPlay();
-	LinkComponent->SetRelativeLocation(EquipmentMesh->GetSocketLocation(MuzzleSocketName));
 }
 
 void AKnowledgeScanner::Scan()
@@ -78,22 +73,6 @@ void AKnowledgeScanner::Scan()
 	
 	FireScanLink(EquipmentOwner->GetActiveTargetLocation());
 	TimeOfLastScan = GetWorld()->GetTimeSeconds();
-
-	StartScanProgress(TimeToComplete);
-
-	GetWorld()->GetTimerManager().SetTimer(ScanTimer, [this] ()
-	{
-		if (DeferredDetachmentTime > 0.0f)
-		{
-			// GetWorld()->GetTimerManager().SetTimer(DeferredUnlinkTimer, this, &AKnowledgeScanner::OnDeferredUnlink, DeferredUnlinkTime, false);
-			OnDeferredUnlink();
-			GetWorld()->GetTimerManager().SetTimer(DeferredDetachmentTimer, this, &AKnowledgeScanner::OnDeferredDetachment, DeferredDetachmentTime, false);
-		}
-		else
-		{
-			StopActive();
-		}
-	}, TimeToComplete, false);
 
 	// MakeNoise(ShotLoudness, PawnOwner, PawnOwner->GetActorLocation(), ShotNoiseRange, ShotNoiseTag);
 }
@@ -124,9 +103,9 @@ void AKnowledgeScanner::FireScanLink(const FVector& TargetLocation)
 		KnowledgeComponent = Cast<UKnowledgeComponent>(Hit.GetComponent());
 		if (KnowledgeComponent.IsValid())
 		{
+			StartScanProgress(TimeToComplete);
+			OnScanStarted.Broadcast();
 			UE_LOG(LogTemp, Warning, TEXT("Scanning Component %s"), *KnowledgeComponent->GetName());
-			// LinkComponent->SetAttachEndToComponent(Hit.GetComponent());
-			// LinkComponent->EndLocation = FVector(Hit.ImpactPoint - Hit.GetComponent()->GetComponentLocation());
 		}
 		else
 		{
@@ -142,6 +121,17 @@ void AKnowledgeScanner::FireScanLink(const FVector& TargetLocation)
 void AKnowledgeScanner::ScanComplete()
 {
 	OnScanComplete.Broadcast(KnowledgeComponent.Get());
+
+	if (DeferredDetachmentTime > 0.0f)
+	{
+		OnDeferredUnlink();
+		// GetWorld()->GetTimerManager().SetTimer(DeferredUnlinkTimer, this, &AKnowledgeScanner::OnDeferredUnlink, DeferredUnlinkTime, false);
+		GetWorld()->GetTimerManager().SetTimer(DeferredDetachmentTimer, this, &AKnowledgeScanner::OnDeferredDetachment, DeferredDetachmentTime, false);
+	}
+	else
+	{
+		StopActive();
+	}
 }
 
 void AKnowledgeScanner::ScanLinkFailed()

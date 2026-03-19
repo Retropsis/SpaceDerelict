@@ -50,6 +50,9 @@ public:
 	
 	UFUNCTION()
 	void OnActiveUnequipped(const FGameplayTag& EquipmentType) {}
+	
+	UFUNCTION()
+	void OnScanStarted();
 
 	UFUNCTION()
 	void OnScanProgress(float Percentage);

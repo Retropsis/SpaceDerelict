@@ -20,6 +20,12 @@ public:
 	void ConstructDynamicMaterial();
 	void SetPercentage(float Percentage);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStartVisualEffect();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCompletedVisualEffect();
+
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TObjectPtr<UMaterialInterface> RadialMaterial;
