@@ -127,9 +127,34 @@ void UHUDWidget::UpdateActiveEquipmentWidget(const FGameplayTag& EquipmentType, 
 	{
 		if (IsValid(Widget))
 		{
-			bool bMatchesTagExact = Widget->GetEquipmentType().MatchesTagExact(EquipmentType);
-			if (bNewlyEquipped && bMatchesTagExact) Widget->SetVisibility(ESlateVisibility::HitTestInvisible);
-			Widget->SetIcon(bMatchesTagExact);
+			if (Widget->GetEquipmentType().MatchesTagExact(EquipmentType))
+			{
+				if (bNewlyEquipped)
+				{
+					Widget->SetVisibility(ESlateVisibility::HitTestInvisible);
+				}
+				Widget->OnEquipVisualEffects();
+				Widget->SetIcon(true);
+			}
+			else
+			{
+				Widget->SetIcon(false);
+				Widget->OnAimDownSightVisualEffects(false);
+			}
+		}
+	}
+}
+
+void UHUDWidget::UpdateActiveEquipmentADS(const FGameplayTag& EquipmentType, bool bAimDownSight)
+{
+	for (TObjectPtr<UActiveEquipmentWidget> Widget : ActiveEquipmentWidgets)
+	{
+		if (IsValid(Widget))
+		{
+			if (Widget->GetEquipmentType().MatchesTagExact(EquipmentType))
+			{
+				Widget->OnAimDownSightVisualEffects(bAimDownSight);
+			}
 		}
 	}
 }

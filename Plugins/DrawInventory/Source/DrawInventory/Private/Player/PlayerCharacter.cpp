@@ -117,6 +117,15 @@ void APlayerCharacter::OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEqu
 	GetMesh()->SetAnimInstanceClass(UnarmedAnimInstanceClass);
 }
 
+FGameplayTag APlayerCharacter::GetActiveEquipmentTag()
+{
+	if (CurrentActive.IsValid())
+	{
+		return CurrentActive->GetEquipmentType();
+	}
+	return  FGameplayTag::EmptyTag;
+}
+
 void APlayerCharacter::StartActive() const
 {
 	if (CurrentActive.IsValid())

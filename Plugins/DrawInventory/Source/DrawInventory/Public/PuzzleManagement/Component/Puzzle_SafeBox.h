@@ -26,9 +26,6 @@ private:
 	TSubclassOf<ASpawner> SpawnerClass;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FSafeBoxPattern> SafeBoxPatterns;
-	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FPuzzleReward> Rewards;
 	
 	TArray<USpawnerComponent*> ItemSpawners;

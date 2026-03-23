@@ -41,8 +41,5 @@ private:
 	TMap<FGameplayTag, TSubclassOf<ARewardBox>> BoxClasses;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FTrueBoxPattern> TrueBoxPatterns;
-	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FPuzzleReward> Rewards;
 };

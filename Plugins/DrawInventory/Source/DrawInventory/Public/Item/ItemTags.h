@@ -14,6 +14,7 @@ namespace Item
 	{
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(BoxKey);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Code);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combination);
 	}
 	namespace Equipment
 	{

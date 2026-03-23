@@ -17,6 +17,8 @@ class DRAWINVENTORY_API AProjectile : public AActor
 public:
 	AProjectile();
 	virtual void NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
+	void SetNewState();
 	
 	UPROPERTY(BlueprintReadOnly, Category="DrawInventory")
 	UProjectileMovementComponent* ProjectileMovement;

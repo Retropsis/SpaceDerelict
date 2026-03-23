@@ -21,10 +21,7 @@ public:
 	UPuzzle_Breakable();
 	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
 
-private:	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FBreakablePattern> BreakablePatterns;
-	
+private:		
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TArray<FPuzzleReward> Rewards;
 	

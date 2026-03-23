@@ -57,11 +57,10 @@ void AKnowledgeScanner::StartActive()
 void AKnowledgeScanner::StopActive()
 {
 	bIsScanning = false;
-	LinkComponent->SetVisibility(false);
 	GetWorld()->GetTimerManager().ClearTimer(ScanTimer);
-	ScanTimer.Invalidate();
 	OnScanProgress.Broadcast(-1.f);
-	LinkComponent->bAttachEnd = true;
+	ScanTimer.Invalidate();
+	ScanLinkFinished();
 }
 
 void AKnowledgeScanner::Scan()
@@ -109,19 +108,24 @@ void AKnowledgeScanner::FireScanLink(const FVector& TargetLocation)
 		}
 		else
 		{
-			ScanLinkFailed();
+			ScanLinkFinished();
 		}
 	}
 	else
 	{
-		ScanLinkFailed();
+		ScanLinkFinished();
 	}
 }
 
 void AKnowledgeScanner::ScanComplete()
 {
 	OnScanComplete.Broadcast(KnowledgeComponent.Get());
+	if (Projectile.IsValid()) Projectile->SetNewState();
+	StopActive();
+}
 
+void AKnowledgeScanner::ScanLinkFinished()
+{
 	if (DeferredDetachmentTime > 0.0f)
 	{
 		OnDeferredUnlink();
@@ -130,34 +134,24 @@ void AKnowledgeScanner::ScanComplete()
 	}
 	else
 	{
-		StopActive();
+		OnDeferredDetachment();
 	}
-}
-
-void AKnowledgeScanner::ScanLinkFailed()
-{
-	// LinkComponent->SetAttachEndToComponent(EquipmentMesh, MuzzleSocketName);
-	// LinkComponent->EndLocation = FVector(5000.f, 0.f, 0.f);
-	// GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, LinkComponent->EndLocation.ToString());
-	if (DeferredDetachmentTime > 0.0f)
-	{
-		GetWorld()->GetTimerManager().SetTimer(DeferredUnlinkTimer, this, &AKnowledgeScanner::OnDeferredUnlink, DeferredUnlinkTime, false);
-		GetWorld()->GetTimerManager().SetTimer(DeferredDetachmentTimer, this, &AKnowledgeScanner::OnDeferredDetachment, DeferredDetachmentTime, false);
-	}
-	else
-	{
-		StopActive();
-	}
-}
-
-void AKnowledgeScanner::OnDeferredDetachment()
-{
-	// StopActive();
 }
 
 void AKnowledgeScanner::OnDeferredUnlink()
 {
 	// LinkComponent->bAttachEnd = false;
+}
+
+void AKnowledgeScanner::OnDeferredDetachment()
+{
+	LinkComponent->SetVisibility(false);
+	LinkComponent->bAttachEnd = true;
+	if (Projectile.IsValid())
+	{
+		Projectile->Destroy();
+		Projectile.Reset();
+	}
 }
 
 FTransform AKnowledgeScanner::CalculateTargetTransform(const FVector& TargetLocation) const

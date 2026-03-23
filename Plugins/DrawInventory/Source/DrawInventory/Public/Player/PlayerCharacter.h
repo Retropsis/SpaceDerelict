@@ -28,6 +28,7 @@ public:
 	virtual void HolsterActiveEquipment(AActiveEquipActor* ActiveEquipment) override;
 	virtual void OnActiveEquipmentActivated(AActiveEquipActor* ActiveEquipment) override;
 	virtual void OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEquipment) override;
+	virtual FGameplayTag GetActiveEquipmentTag() override;
 	//~ WeaponInterface
 	
 	void StartActive() const;

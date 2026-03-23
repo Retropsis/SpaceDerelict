@@ -26,7 +26,7 @@ public:
 	void OnEquipVisualEffects();
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnAimDownSightVisualEffects();
+	void OnAimDownSightVisualEffects(bool bAimDownSight);
 
 private:
 	UPROPERTY(EditAnywhere, Category ="DrawInventory", meta=(Categories="Item"))

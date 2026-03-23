@@ -228,6 +228,7 @@ void APlayerCharacterController::PrimaryInteract()
 void APlayerCharacterController::SecondaryInteract(bool bADS)
 {
 	bAimDownSight = bADS;
+	HUDWidget->UpdateActiveEquipmentADS(PlayerCharacter->GetActiveEquipmentTag(),  bAimDownSight);
 }
 
 void APlayerCharacterController::CreateHUDWidget()

@@ -14,6 +14,7 @@ namespace Item
 	{
 		UE_DEFINE_GAMEPLAY_TAG(BoxKey, "Item.Puzzle.BoxKey");
 		UE_DEFINE_GAMEPLAY_TAG(Code, "Item.Puzzle.Code");
+		UE_DEFINE_GAMEPLAY_TAG(Combination, "Item.Puzzle.Combination");
 	}
 	namespace Equipment
 	{

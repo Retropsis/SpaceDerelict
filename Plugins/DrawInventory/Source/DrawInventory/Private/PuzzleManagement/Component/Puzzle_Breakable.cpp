@@ -20,7 +20,6 @@ void UPuzzle_Breakable::ConstructPuzzle(const FIntPoint& Coordinates)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
 	GetOwner()->GetComponents(USpawnerComponent::StaticClass(), Spawners);
-	Algo::RandomShuffle(Spawners);
 	
 	const ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
 	check(DerelictGameMode);
@@ -31,12 +30,23 @@ void UPuzzle_Breakable::ConstructPuzzle(const FIntPoint& Coordinates)
 	const int32 RewardSelection = FMath::RandRange(0, Rewards.Num() - 1);
 	const TSubclassOf<AActor> ChosenRewardClass = Rewards[RewardSelection].GetLootItemClass();
 	
-	USpawnerComponent* SpawnerComponent = *Spawners.FindByPredicate([] (const USpawnerComponent* Spawner) { return Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Pattern::Breakable); });
+	USpawnerComponent* SpawnerComponent = nullptr;
+	for (USpawnerComponent* Spawner : Spawners)
+	{
+		if (IsValid(Spawner) && Spawner->GetSpawnerTag().MatchesTagExact(Puzzle::Pattern::Breakable))
+		{
+			SpawnerComponent = Spawner;
+			break;
+		}
+	}
+	
 	if (IsValid(SpawnerComponent))
 	{
 		GetOwner()->GetWorld()->SpawnActor<AActor>(Pattern->GetPatternClass(), SpawnerComponent->GetComponentTransform(), SpawnParams);
 		Spawners.Remove(SpawnerComponent);
 	}
+	
+	Algo::RandomShuffle(Spawners);
 	
 	int32 SpawnerIndex = 0;
 	for (const TTuple<TSubclassOf<ABreakable>, FGameplayTag>& TaggedBreakable : Breakables)

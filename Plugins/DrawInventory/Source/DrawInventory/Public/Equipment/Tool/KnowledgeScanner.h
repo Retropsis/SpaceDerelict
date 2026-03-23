@@ -48,7 +48,7 @@ protected:
 
 private:
 	virtual void Scan();
-	void ScanLinkFailed();
+	void ScanLinkFinished();
 	virtual void FireScanLink(const FVector& TargetLocation);
 	FTransform CalculateTargetTransform(const FVector& TargetLocation) const;
 	void OnDeferredDetachment();

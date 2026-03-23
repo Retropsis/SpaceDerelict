@@ -46,6 +46,9 @@ public:
 	void UpdateActiveEquipmentWidget(const FGameplayTag& EquipmentType, bool bNewlyEquipped);
 	
 	UFUNCTION()
+	void UpdateActiveEquipmentADS(const FGameplayTag& EquipmentType, bool bAimDownSight);
+	
+	UFUNCTION()
 	void OnActiveEquipped(const FGameplayTag& EquipmentType);
 	
 	UFUNCTION()

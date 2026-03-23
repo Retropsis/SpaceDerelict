@@ -20,7 +20,7 @@ AProjectile::AProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->InitialSpeed = 3000.0f;
 	ProjectileMovement->MaxSpeed = 3000.0f;
-	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->bShouldBounce = false;
 
 	// set the default damage type
 	// HitDamageType = UDamageType::StaticClass();
@@ -64,6 +64,12 @@ void AProjectile::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, cl
 
 	OnProjectileHit(Hit);
 	ConstructFieldSystem(GetActorLocation());
+}
+
+void AProjectile::SetNewState()
+{
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	ProjectileMovement->ProjectileGravityScale = 1.25f;
 }
 
 void AProjectile::ProcessHit(AActor* HitActor, UPrimitiveComponent* HitComp, const FVector& HitLocation, const FVector& HitDirection)

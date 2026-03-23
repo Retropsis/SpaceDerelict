@@ -29,10 +29,7 @@ public:
 protected:
 	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
 
-private:
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FHieroglyphicCombinationPattern> HieroglyphicCombinationPatterns;
-	
+private:	
 	TArray<APressurePlate> PressurePlates;
 	TArray<FGameplayTag> DesiredCombination;
 	TArray<FGameplayTag> InputCombination;

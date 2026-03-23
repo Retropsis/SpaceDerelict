@@ -27,14 +27,13 @@ public:
 	void ConstructRoom(const FDestinationAvailabilityResult& Result, float RoomSize);
 	void ConstructDoors(const FDestinationAvailabilityResult& Result);
 	void ConstructPuzzle(const FIntPoint& Coordinates) const;
-	void ConstructDisplay(const FIntPoint& Coordinates);
+	void ConstructDisplay(const FIntPoint& Coordinates) const;
 	TSet<FGameplayTag>  GetLayer() const { return Layers; }
 	void AddLayer(const FGameplayTag& NewLayer) { Layers.Add(NewLayer); }
 	TMap<FName, FIntPoint> GetDestinationOffsets() const { return DestinationOffsets; }
 	UDoorComponent* GetDoorComponentBySocket(const FName& Socket);
 	TArray<FTransform> GetAvailableSpawnerTransforms() const;
 	TArray<TWeakObjectPtr<ADoor>> GetDoors() const { return Doors; }
-	void ConstructKnowledgeComponent(int32 Integer, UKnowledgeComponent* KnowledgeComponent, const ADerelictGameMode* DerelictGameMode);
 	
 	FOnPlayerEnter OnPlayerEnter;
 

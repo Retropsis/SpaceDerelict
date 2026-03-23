@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
 #include "WeaponInterface.generated.h"
 
@@ -32,4 +33,5 @@ public:
 	virtual void HolsterActiveEquipment(AActiveEquipActor* ActiveEquipment) = 0;
 	virtual void OnActiveEquipmentActivated(AActiveEquipActor* ActiveEquipment) = 0;
 	virtual void OnActiveEquipmentDeactivated(AActiveEquipActor* ActiveEquipment) = 0;
+	virtual FGameplayTag GetActiveEquipmentTag() = 0;
 };

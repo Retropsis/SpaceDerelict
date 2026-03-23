@@ -6,7 +6,6 @@
 #include "PuzzleManagement/PuzzleComponent.h"
 #include "Puzzle_Delivery.generated.h"
 
-
 struct FDeliveryPattern;
 class USpawnerComponent;
 
@@ -18,8 +17,4 @@ class DRAWINVENTORY_API UPuzzle_Delivery : public UPuzzleComponent
 public:
 	UPuzzle_Delivery();
 	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;
-
-private:
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TArray<FDeliveryPattern> DeliveryPatterns;
 };
