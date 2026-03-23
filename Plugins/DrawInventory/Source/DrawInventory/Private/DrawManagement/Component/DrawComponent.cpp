@@ -302,17 +302,6 @@ void UDrawComponent::SpawnValuables(const UInventoryItem* RoomToSpawn, const ARo
 
 void UDrawComponent::Server_OpenConnectedDoor_Implementation(ARoomActor* RoomActor, const FName& Socket)
 {
-	// if (!IsValid(Room))
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: Room is invalid"));
-	// 	return;
-	// }
-	// const FRoomFragment* RoomFragment = Room->GetItemManifest().GetFragmentOfType<FRoomFragment>();
-	// if (!RoomFragment || RoomFragment->GetRoomActor())
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("Server_OpenConnectedDoor_Implementation: RoomFragment is invalid"));
-	// 	return;
-	// }
 	if (IsValid(RoomActor))
 	{
 		UDoorComponent* DoorComponent = RoomActor->GetDoorComponentBySocket(Socket);

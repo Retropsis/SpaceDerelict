@@ -3,7 +3,6 @@
 #include "DrawManagement/Room/RoomActor.h"
 #include "Components/BoxComponent.h"
 #include "Data/DestinationData.h"
-#include "DrawManagement/Room/SpawnerComponent.h"
 #include "DrawManagement/Utility/DrawingUtility.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -12,6 +11,7 @@
 #include "World/Actor/Display.h"
 #include "World/Level/Door/Door.h"
 #include "World/Level/Door/DoorComponent.h"
+#include "World/Spawner/Spawner.h"
 
 ARoomActor::ARoomActor()
 {
@@ -142,12 +142,13 @@ UDoorComponent* ARoomActor::GetDoorComponentBySocket(const FName& Socket)
 TArray<FTransform> ARoomActor::GetAvailableSpawnerTransforms() const
 {
 	TArray<FTransform> SpawnerTransforms;
-	TArray<UActorComponent*> Components;
-	GetComponents(USpawnerComponent::StaticClass(), Components);
-	for (UActorComponent* Component : Components)
+	TArray<ASpawner*> Spawners;
+	for (AActor* Actor : GetLevel()->Actors)
 	{
-		USceneComponent* SceneComponent = Cast<USceneComponent>(Component);
-		if (IsValid(SceneComponent)) SpawnerTransforms.Add(SceneComponent->GetComponentTransform());
+		if (const ASpawner* Spawner = Cast<ASpawner>(Actor))
+		{
+			SpawnerTransforms.Add(Spawner->GetSpawnTransform());
+		}
 	}
 	return SpawnerTransforms;
 }

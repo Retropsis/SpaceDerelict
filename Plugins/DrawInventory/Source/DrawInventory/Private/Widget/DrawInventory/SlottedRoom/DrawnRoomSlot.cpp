@@ -68,6 +68,7 @@ void UDrawnRoomSlot::SetPuzzleIcon(UTexture2D* Icon) const
 		
 	UHorizontalBoxSlot* ImageSlot = UWidgetLayoutLibrary::SlotAsHorizontalBoxSlot(Image);
 	FSlateChildSize Size;
+	Size.Value = 256.f;
 	Size.SizeRule = ESlateSizeRule::Automatic;
 	ImageSlot->SetHorizontalAlignment(HAlign_Center);
 	ImageSlot->SetSize(Size);

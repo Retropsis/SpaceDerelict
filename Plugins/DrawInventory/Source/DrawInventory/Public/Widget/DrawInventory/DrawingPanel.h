@@ -67,7 +67,7 @@ private:
 	TArray<TObjectPtr<UDrawnRoomSlot>> DrawnRoomSlots;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	float TileSize{240};
+	float TileSize{300};
 	
 	TWeakObjectPtr<UDrawComponent> DrawComponent;
 };
