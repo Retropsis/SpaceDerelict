@@ -61,9 +61,12 @@ void UDrawnRoomSlot::SetPuzzleIcon(UTexture2D* Icon) const
 	HorizontalBox_Valuable->SetVisibility(ESlateVisibility::Visible);
 	
 	UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-	Image->SetBrushResourceObject(Icon);
+	// Image->SetBrushResourceObject(Icon);
 	FSlateBrush Brush;
+	Brush.SetResourceObject(Icon);
 	Brush.DrawAs = ESlateBrushDrawType::Image;
+	Brush.ImageSize = FVector2D(64.f, 64.f);
+	Image->SetBrush(Brush);
 	HorizontalBox_Valuable->AddChildToHorizontalBox(Image);
 		
 	UHorizontalBoxSlot* ImageSlot = UWidgetLayoutLibrary::SlotAsHorizontalBoxSlot(Image);
