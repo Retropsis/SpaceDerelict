@@ -56,7 +56,7 @@ void ARoomActor::ConstructRoom(const FDestinationAvailabilityResult& Result, flo
 	ConstructDoors(Result);
 	ConstructPuzzle(Result.RoomCoordinates);
 	ConstructDisplay(Result.RoomCoordinates);
-	RoomBoundary->SetBoxExtent(FVector( RoomSize/ 2.f, RoomSize/ 2.f, 20000.f ));
+	RoomBoundary->SetBoxExtent(FVector( RoomSize/ 2.f - 35.f, RoomSize/ 2.f - 35.f, 20000.f )); // Removing Player Capsule Radius 
 	RoomBoundary->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnRoomBoundaryBeginOverlap);
 }
 

@@ -7,6 +7,7 @@
 #include "EquipmentManagement/EquipActor/EquipActor.h"
 #include "Widget/Composite/CompositeBase.h"
 #include "Widget/Composite/Leaf_Image.h"
+#include "Widget/Composite/Leaf_ImageCollection.h"
 #include "Widget/Composite/Leaf_LabeledValue.h"
 #include "Widget/Composite/Leaf_Text.h"
 
@@ -69,6 +70,27 @@ void FLabeledNumberFragment::Manifest()
 		Value = FMath::FRandRange(Min, Max);
 	}
 	bRandomizeOnManifest = false;
+}
+
+void FImageCollectionFragment::Assimilate(UCompositeBase* Composite) const
+{
+	FInventoryItemFragment::Assimilate(Composite);
+	if (!MatchesWidgetTag(Composite)) return;
+	
+	ULeaf_ImageCollection* ImageCollection = Cast<ULeaf_ImageCollection>(Composite);
+	if (!IsValid(ImageCollection)) return;
+
+	ImageCollection->ClearImageCollection();
+	for (const TObjectPtr<UTexture2D>& Icon : GetImageCollection())
+	{
+		ImageCollection->AddImageToCollection(Icon);
+	}
+	ImageCollection->SetCollectionVisibility(false);
+}
+
+void FImageCollectionFragment::Manifest()
+{
+	FInventoryItemFragment::Manifest();
 }
 
 void FConsumableFragment::Assimilate(UCompositeBase* Composite) const

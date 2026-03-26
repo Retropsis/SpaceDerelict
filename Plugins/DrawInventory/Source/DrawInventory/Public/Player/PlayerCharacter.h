@@ -19,6 +19,7 @@ class DRAWINVENTORY_API APlayerCharacter : public ACharacter, public IWeaponInte
 public:
 	APlayerCharacter();
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	
 	//~ WeaponInterface
 	virtual void AttachEquipmentMeshes(AActiveEquipActor* ActiveEquipment) override;
@@ -42,7 +43,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	APlayerCharacterController* GetPlayerCharacterController() const { return PlayerCharacterController.Get(); }
-
 
 private:
 	UPROPERTY(EditAnywhere, Category ="PlayerCharacter")

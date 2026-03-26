@@ -166,6 +166,21 @@ private:
 };
 
 USTRUCT(BlueprintType)
+struct FImageCollectionFragment : public FInventoryItemFragment
+{
+	GENERATED_BODY()
+
+	virtual void Assimilate(UCompositeBase* Composite) const override;
+	virtual void Manifest() override;
+	TArray<TObjectPtr<UTexture2D>> GetImageCollection() const { return Collection; }
+	void SetImageCollection(const TArray<UTexture2D*>& NewCollection) { Collection = NewCollection; }
+
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TArray<TObjectPtr<UTexture2D>> Collection;
+};
+
+USTRUCT(BlueprintType)
 struct FStackableFragment : public FItemFragment
 {
 	GENERATED_BODY()

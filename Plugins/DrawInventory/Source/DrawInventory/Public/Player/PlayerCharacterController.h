@@ -40,10 +40,9 @@ public:
 	UFUNCTION()
 	void ToggleHUD(bool bShow);
 
-	void SetSavedPlayerLocation(const FVector& Location) { SavedPlayerLocation = Location; }
-	
-	UFUNCTION(BlueprintCallable)
+	void SetSavedPlayerLocation(const FVector& Location);
 	FVector GetSavedPlayerLocation() const { return SavedPlayerLocation; }
+	FRotator GetSavedPlayerRotation() const { return SavedPlayerRotation; }
 
 	FPlayerPositionUpdated OnPlayerPositionUpdated;
 
@@ -68,6 +67,7 @@ private:
 	void StartFiring();
 	void StopFiring();
 	void ToggleKnowledgeLog();
+	void ToggleMainMenu();
 	void ToggleWeapon(int32 Index);
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
@@ -111,6 +111,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
 	TObjectPtr<UInputAction> KnowledgeAction;
+	
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> MenuAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;
@@ -134,6 +137,7 @@ private:
 	float AO_Pitch;
 	bool bGloveRaised;
 	FVector SavedPlayerLocation = FVector::ZeroVector;
+	FRotator SavedPlayerRotation = FRotator::ZeroRotator;
 	FGameplayTag PreviousLayer = FGameplayTag::EmptyTag;
 	bool bAimDownSight{false};
 };

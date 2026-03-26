@@ -10,6 +10,7 @@
 struct FHieroglyphicCombinationPattern;
 class APressurePlate;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSymbolLocked, const FGameplayTag&, Symbol);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCombinationComplete);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), BlueprintType)
@@ -25,6 +26,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCombinationComplete OnCombinationComplete;
+
+	FOnSymbolLocked OnSymbolLocked;
 
 protected:
 	virtual void ConstructPuzzle(const FIntPoint& Coordinates) override;

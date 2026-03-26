@@ -46,9 +46,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<AActor> DoorClass;
-	
-	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
-	TArray<UMaterialInterface*> Numerics;
 
 	TMap<FName, FIntPoint> DestinationOffsets;
 

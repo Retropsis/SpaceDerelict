@@ -4,7 +4,7 @@
 #include "Data/PuzzleData.h"
 #include "Game/DerelictGameMode.h"
 #include "PuzzleManagement/PuzzleTags.h"
-#include "PuzzleManagement/Piece/RewardBox.h"
+#include "PuzzleManagement/Piece/DeliveryBox.h"
 
 UPuzzle_Delivery::UPuzzle_Delivery()
 {
@@ -18,7 +18,7 @@ void UPuzzle_Delivery::ConstructPuzzle(const FIntPoint& Coordinates)
 
 	const ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
 	check(DerelictGameMode);
-	
+
 	const FDeliveryPattern* Pattern = DerelictGameMode->GetPuzzleDataOfTypeWithTag<FDeliveryPattern>(Puzzle::Pattern::Delivery);
 	
 	TSubclassOf<AActor> ItemToSpawn = nullptr;
@@ -30,10 +30,11 @@ void UPuzzle_Delivery::ConstructPuzzle(const FIntPoint& Coordinates)
 	
 	for (const TObjectPtr<AActor>& Actor : GetOwner()->GetLevel()->Actors)
 	{
-		if (ARewardBox* RewardBox = Cast<ARewardBox>(Actor))
+		if (ADeliveryBox* DeliveryBox = Cast<ADeliveryBox>(Actor))
 		{
-			RewardBox->SetLootItemClass(ItemToSpawn);
-			RewardBox->SetResourceObject(Pattern->GetDeliveryPanel());
+			DeliveryBox->SetLootItemClass(ItemToSpawn);
+			DeliveryBox->SetResourceObject(Pattern->GetDeliveryPanel());
+			DeliveryBox->SetupDeliveryPanel(DerelictGameMode->ConstructDeliveryPanel(*Pattern));
 			return;
 		}
 	}

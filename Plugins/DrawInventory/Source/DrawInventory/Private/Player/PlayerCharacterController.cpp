@@ -101,6 +101,7 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
 	EnhancedInputComponent->BindAction(KnowledgeAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleKnowledgeLog);
+	EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleMainMenu);
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
@@ -166,6 +167,11 @@ void APlayerCharacterController::ToggleWeapon(int32 Index)
 void APlayerCharacterController::ToggleKnowledgeLog()
 {
 	HUDWidget->ToggleKnowledgeLog();
+}
+
+void APlayerCharacterController::ToggleMainMenu()
+{
+	HUDWidget->ToggleMainMenu();
 }
 
 void APlayerCharacterController::PrimaryInteract()
@@ -261,6 +267,16 @@ void APlayerCharacterController::ToggleInventory()
 void APlayerCharacterController::ToggleHUD(bool bShow)
 {
 	HUDWidget->ToggleHUD(bShow);
+}
+
+void APlayerCharacterController::SetSavedPlayerLocation(const FVector& Location)
+{
+	SavedPlayerLocation = Location;
+	float Yaw = 180.f;
+	if (GetPlayerCharacter()->GetActorRotation().Yaw > 45.f && GetPlayerCharacter()->GetActorRotation().Yaw <= 135.f) Yaw = 90.f;
+	if (GetPlayerCharacter()->GetActorRotation().Yaw > -45.f && GetPlayerCharacter()->GetActorRotation().Yaw <= 45.f) Yaw = 0.f;
+	if (GetPlayerCharacter()->GetActorRotation().Yaw < -45.f && GetPlayerCharacter()->GetActorRotation().Yaw >= -135.f) Yaw = -90.f;
+	SavedPlayerRotation = FRotator(0.f, Yaw, 0.f);
 }
 
 void APlayerCharacterController::CalculateAOPitch()

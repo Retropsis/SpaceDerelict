@@ -3,6 +3,7 @@
 
 #include "Widget/HUD/HUDWidget.h"
 #include "Blueprint/WidgetTree.h"
+#include "Components/Button.h"
 #include "EquipmentManagement/Component/EquipmentComponent.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "InventoryManagement/Utilities/InventoryUtility.h"
@@ -12,6 +13,7 @@
 #include "Widget/HUD/InfoMessage.h"
 #include "Widget/HUD/RadialProgressBar.h"
 #include "Widget/Knowledge/KnowledgeLog.h"
+#include "Widget/MainMenu/MainMenu.h"
 
 
 void UHUDWidget::NativeOnInitialized()
@@ -32,9 +34,10 @@ void UHUDWidget::NativeOnInitialized()
 	}
 	InitializeHUDCounters();
 	InitializeActiveEquipmentWidget();
+	InitializeMenus();
 }
 
-void UHUDWidget::InitializeKnowledgeLog()
+void UHUDWidget::InitializeMenus()
 {
 	WidgetTree->ForEachWidget([this] (UWidget* Widget)
 	{
@@ -42,6 +45,12 @@ void UHUDWidget::InitializeKnowledgeLog()
 		{
 			KnowledgeLog = KnowledgeLogWidget;
 			KnowledgeLog->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		if (UMainMenu* MainMenuWidget = Cast<UMainMenu>(Widget); IsValid(MainMenuWidget))
+		{
+			MainMenu = MainMenuWidget;
+			MainMenu->SetVisibility(ESlateVisibility::Collapsed);
+			MainMenu->ResumeButton->OnClicked.AddDynamic(this, &ThisClass::CloseMainMenu);
 		}
 	});
 }
@@ -58,6 +67,38 @@ void UHUDWidget::ToggleKnowledgeLog()
 	}
 }
 
+void UHUDWidget::CloseMainMenu()
+{
+	if (!IsValid(MainMenu)) return;
+
+	MainMenu->SetVisibility(ESlateVisibility::Collapsed);
+	bMainMenuOpen = false;
+
+	SetInputModeGameOnly();
+}
+
+void UHUDWidget::OpenMainMenu()
+{
+	if (!IsValid(MainMenu)) return;
+
+	MainMenu->SetVisibility(ESlateVisibility::Visible);
+	bMainMenuOpen = true;
+
+	SetInputModeGameAndUI();
+}
+
+void UHUDWidget::ToggleMainMenu()
+{
+	if (bMainMenuOpen)
+	{
+		CloseMainMenu();
+	}
+	else
+	{
+		OpenMainMenu();
+	}
+}
+
 void UHUDWidget::CloseKnowledgeLog()
 {
 	if (!IsValid(KnowledgeLog)) return;
@@ -65,11 +106,7 @@ void UHUDWidget::CloseKnowledgeLog()
 	KnowledgeLog->SetVisibility(ESlateVisibility::Collapsed);
 	bKnowledgeLogOpen = false;
 
-	if (!IsValid(GetOwningPlayer())) return;
-
-	FInputModeGameOnly InputMode;
-	GetOwningPlayer()->SetInputMode(InputMode);
-	GetOwningPlayer()->SetShowMouseCursor(false);
+	SetInputModeGameOnly();
 }
 
 void UHUDWidget::OpenKnowledgeLog()
@@ -79,11 +116,7 @@ void UHUDWidget::OpenKnowledgeLog()
 	KnowledgeLog->SetVisibility(ESlateVisibility::Visible);
 	bKnowledgeLogOpen = true;
 
-	if (!IsValid(GetOwningPlayer())) return;
-
-	FInputModeGameAndUI InputMode;
-	GetOwningPlayer()->SetInputMode(InputMode);
-	GetOwningPlayer()->SetShowMouseCursor(true);
+	SetInputModeGameAndUI();
 }
 
 void UHUDWidget::InitializeHUDCounters()
@@ -209,4 +242,20 @@ void UHUDWidget::OnNoItemOfTypeAndAmount(const FName& ItemName)
 	if (!IsValid(InfoMessage)) return;
 	const FString Message = FString::Printf(TEXT("No %s In Inventory."), *ItemName.ToString());
 	InfoMessage->SetMessage(FText::FromString(Message));
+}
+
+void UHUDWidget::SetInputModeGameOnly() const
+{
+	if (!IsValid(GetOwningPlayer())) return;
+	const FInputModeGameOnly InputMode;
+	GetOwningPlayer()->SetInputMode(InputMode);
+	GetOwningPlayer()->SetShowMouseCursor(false);
+}
+
+void UHUDWidget::SetInputModeGameAndUI() const
+{
+	if (!IsValid(GetOwningPlayer())) return;
+	const FInputModeGameAndUI InputMode;
+	GetOwningPlayer()->SetInputMode(InputMode);
+	GetOwningPlayer()->SetShowMouseCursor(true);
 }

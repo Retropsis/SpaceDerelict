@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Equipment/Weapon/Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameModeBase.h"
 #include "Player/PlayerAnimInstance.h"
 #include "Player/PlayerCharacterController.h"
 
@@ -44,6 +45,15 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	PlayerCharacterController = Cast<APlayerCharacterController>(NewController);
+}
+
+void APlayerCharacter::FellOutOfWorld(const UDamageType& dmgType)
+{
+	if (PlayerCharacterController.IsValid())
+	{
+		SetActorLocation(PlayerCharacterController->GetSavedPlayerLocation());
+		PlayerCharacterController->SetControlRotation(PlayerCharacterController->GetSavedPlayerRotation());
+	}
 }
 
 void APlayerCharacter::AttachEquipmentMeshes(AActiveEquipActor* ActiveEquipment)

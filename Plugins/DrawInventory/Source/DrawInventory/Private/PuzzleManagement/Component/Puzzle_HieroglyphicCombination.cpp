@@ -28,6 +28,7 @@ void UPuzzle_HieroglyphicCombination::ConstructPuzzle(const FIntPoint& Coordinat
 		if (APressurePlate* PressurePlate = Cast<APressurePlate>(Actor))
 		{
 			PressurePlate->OnPressurePlateActivated.AddDynamic(this, &ThisClass::OnSymbolReceived);
+			OnSymbolLocked.AddDynamic(PressurePlate, &APressurePlate::APressurePlate::OnSymbolLocked);
 		}
 	}
 
@@ -66,6 +67,11 @@ void UPuzzle_HieroglyphicCombination::ConstructPuzzle(const FIntPoint& Coordinat
 void UPuzzle_HieroglyphicCombination::OnSymbolReceived(const FGameplayTag& Symbol)
 {
 	InputCombination.Add(Symbol);
+
+	if (DesiredCombination.Contains(Symbol))
+	{
+		OnSymbolLocked.Broadcast(Symbol);
+	}
 
 	bool bDesiredCombination = true;
 	for (int32 i = 0; i < DesiredCombination.Num(); ++i)

@@ -26,6 +26,12 @@ public:
 
 	UFUNCTION()
 	void OnPressurePlateActivation();
+	
+	UFUNCTION()
+	void OnSymbolLocked(const FGameplayTag& InSymbol);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSymbolLockedVisualEffects();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PressurePlateActivationEffects();
@@ -37,9 +43,9 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	float PressurePlateTime{2.f};
+	float PressurePlateTime{1.25f};
 
-	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Puzzle"))
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta=(Categories="Knowledge.Symbol"))
 	FGameplayTag Symbol = FGameplayTag::EmptyTag;
 
 	UPROPERTY(VisibleAnywhere)

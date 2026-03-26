@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UMainMenu;
 class UKnowledgeComponent;
 class UKnowledgeLog;
 class URadialProgressBar;
@@ -24,10 +25,14 @@ class DRAWINVENTORY_API UHUDWidget : public UUserWidget
 
 public:
 	virtual void NativeOnInitialized() override;
-	void InitializeKnowledgeLog();
+	void InitializeMenus();
 	void CloseKnowledgeLog();
 	void OpenKnowledgeLog();
 	void ToggleKnowledgeLog();
+	void SetInputModeGameOnly() const;
+	void SetInputModeGameAndUI() const;
+	void OpenMainMenu();
+	void ToggleMainMenu();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "DrawInventory")
 	void ShowPickupMessage(const FString& Message);
@@ -38,6 +43,9 @@ public:
 	void InitializeActiveEquipmentWidget();
 	void InitializeHUDCounters();
 	void ToggleHUD(bool bShow);
+	
+	UFUNCTION()
+	void CloseMainMenu();
 
 	UFUNCTION()
 	void UpdateHUDCounter(const FGameplayTag& ItemType, int32 NewCount);
@@ -78,8 +86,12 @@ private:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UKnowledgeLog> KnowledgeLog;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UMainMenu> MainMenu;
 
 	bool bKnowledgeLogOpen{false};
+	bool bMainMenuOpen{false};
 
 	UFUNCTION()
 	void OnNoRoom();

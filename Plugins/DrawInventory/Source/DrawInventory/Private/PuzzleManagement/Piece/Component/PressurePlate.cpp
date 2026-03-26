@@ -39,3 +39,11 @@ void APressurePlate::OnPressurePlateActivation()
 	BoxOverlap->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void APressurePlate::OnSymbolLocked(const FGameplayTag& InSymbol)
+{
+	if (Symbol.MatchesTagExact(InSymbol))
+	{
+		OnSymbolLockedVisualEffects();
+	}
+}
+

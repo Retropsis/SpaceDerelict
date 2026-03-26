@@ -22,14 +22,21 @@ void ARewardBox::SpawnReward()
 		if (UItemComponent* ItemComponent = Item->FindComponentByClass<UItemComponent>())
 		{
 			const FPuzzleTagFragment* PuzzleFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeWithTag<FPuzzleTagFragment>(Fragment::PuzzleTag);
-			FTextFragment* TextFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeWithTagMutable<FTextFragment>(Fragment::FlavorText);
-			if (!PuzzleFragment || !TextFragment)
-			{
-				return;
-			}
+			if (!PuzzleFragment) return;
 
-			const FString Message = DerelictGameMode->GetHintMessageWithTag(PuzzleFragment->GetPuzzleTag());
-			TextFragment->SetText(FText::FromString(Message));
+			FTextFragment* TextFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeWithTagMutable<FTextFragment>(Fragment::FlavorText);
+			if (TextFragment)
+			{
+				const FString Message = DerelictGameMode->GetHintMessageWithTag(PuzzleFragment->GetPuzzleTag());
+				TextFragment->SetText(FText::FromString(Message));
+			}
+			
+			FImageCollectionFragment* ImageCollectionFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeWithTagMutable<FImageCollectionFragment>(Fragment::ImageCollection);
+			if (ImageCollectionFragment)
+			{
+				const TArray<UTexture2D*> ImageCollection = DerelictGameMode->GetImageCollectionWithTag(PuzzleFragment->GetPuzzleTag());
+				ImageCollectionFragment->SetImageCollection(ImageCollection);
+			}
 		}
 	}
 	bHasSpawned = true;

@@ -27,4 +27,29 @@ namespace Knowledge
 			UE_DEFINE_GAMEPLAY_TAG(Nine, "Knowledge.Symbol.Numeric.9");
 		}
 	}
+	namespace Hieroglyphic
+	{
+		UE_DEFINE_GAMEPLAY_TAG(Apostrophe_1, "Knowledge.Symbol.Hieroglyphic.Apostrophe1");
+		UE_DEFINE_GAMEPLAY_TAG(Apostrophe_2, "Knowledge.Symbol.Hieroglyphic.Apostrophe2");
+		UE_DEFINE_GAMEPLAY_TAG(B, "Knowledge.Symbol.Hieroglyphic.B");
+		UE_DEFINE_GAMEPLAY_TAG(D, "Knowledge.Symbol.Hieroglyphic.D");
+		UE_DEFINE_GAMEPLAY_TAG(G, "Knowledge.Symbol.Hieroglyphic.G");
+		UE_DEFINE_GAMEPLAY_TAG(H, "Knowledge.Symbol.Hieroglyphic.H");
+		UE_DEFINE_GAMEPLAY_TAG(HLong, "Knowledge.Symbol.Hieroglyphic.HLong");
+		UE_DEFINE_GAMEPLAY_TAG(K, "Knowledge.Symbol.Hieroglyphic.K");
+		UE_DEFINE_GAMEPLAY_TAG(L, "Knowledge.Symbol.Hieroglyphic.L");
+		UE_DEFINE_GAMEPLAY_TAG(M, "Knowledge.Symbol.Hieroglyphic.M");
+		UE_DEFINE_GAMEPLAY_TAG(N, "Knowledge.Symbol.Hieroglyphic.N");
+		UE_DEFINE_GAMEPLAY_TAG(P, "Knowledge.Symbol.Hieroglyphic.P");
+		UE_DEFINE_GAMEPLAY_TAG(Q, "Knowledge.Symbol.Hieroglyphic.Q");
+		UE_DEFINE_GAMEPLAY_TAG(R, "Knowledge.Symbol.Hieroglyphic.R");
+		UE_DEFINE_GAMEPLAY_TAG(S, "Knowledge.Symbol.Hieroglyphic.S");
+		UE_DEFINE_GAMEPLAY_TAG(SShort, "Knowledge.Symbol.Hieroglyphic.SShort");
+		UE_DEFINE_GAMEPLAY_TAG(SLong, "Knowledge.Symbol.Hieroglyphic.SLong");
+		UE_DEFINE_GAMEPLAY_TAG(T, "Knowledge.Symbol.Hieroglyphic.T");
+		UE_DEFINE_GAMEPLAY_TAG(TLong, "Knowledge.Symbol.Hieroglyphic.TLong");
+		UE_DEFINE_GAMEPLAY_TAG(W, "Knowledge.Symbol.Hieroglyphic.W");
+		UE_DEFINE_GAMEPLAY_TAG(Y, "Knowledge.Symbol.Hieroglyphic.Y");
+		UE_DEFINE_GAMEPLAY_TAG(Z, "Knowledge.Symbol.Hieroglyphic.Z");
+	}
 }

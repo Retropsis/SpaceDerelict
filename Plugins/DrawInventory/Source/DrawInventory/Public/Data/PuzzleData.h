@@ -17,9 +17,13 @@ struct FPuzzleReward
 	GENERATED_BODY()
 
 public:
-	TSubclassOf<AActor> GetLootItemClass() const { return LootItemClass; };
+	TSubclassOf<AActor> GetLootItemClass() const { return LootItemClass; }
+	TObjectPtr<UTexture2D> GetItemIcon() const { return Icon; }
 
 private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TObjectPtr<UTexture2D> Icon = nullptr;
+	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
 	TSubclassOf<AActor> LootItemClass = nullptr;
 };

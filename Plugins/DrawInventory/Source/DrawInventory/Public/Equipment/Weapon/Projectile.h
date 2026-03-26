@@ -25,6 +25,9 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void ProcessHit(AActor* HitActor, UPrimitiveComponent* HitComp, const FVector& HitLocation, const FVector& HitDirection);
+	void ExplosionCheck(const FVector& ExplosionCenter);
+	void OnDeferredDestruction();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category="DrawInventory", meta = (DisplayName = "On Projectile Hit"))
 	void OnProjectileHit(const FHitResult& Hit);
@@ -32,32 +35,28 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category="DrawInventory")
 	void ConstructFieldSystem(const FVector& FieldLocation);
 	
-private:
-	void ExplosionCheck(const FVector& ExplosionCenter);
-	void ProcessHit(AActor* HitActor, UPrimitiveComponent* HitComp, const FVector& HitLocation, const FVector& HitDirection);
-	void OnDeferredDestruction();
-	
 	UPROPERTY(VisibleAnywhere, Category="DrawInventory")
 	USphereComponent* CollisionComponent;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	bool bDamageOwner = false;
+	bool bExplodeOnHit = false;
 	
 	UPROPERTY(EditAnywhere, Category="DrawInventory", meta = (ClampMin = 0, ClampMax = 50000))
 	float PhysicsForce = 100.0f;
-	
-	UPROPERTY(EditAnywhere, Category="DrawInventory", meta = (ClampMin = 0, ClampMax = 100))
-	float HitDamage = 25.0f;
-
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	TSubclassOf<UDamageType> HitDamageType;
-	
-	UPROPERTY(EditAnywhere, Category="DrawInventory")
-	bool bExplodeOnHit = false;
 
 	UPROPERTY(EditAnywhere, Category="DrawInventory", meta = (ClampMin = 0, ClampMax = 10, Units = "s"))
 	float DeferredDestructionTime = 1.0f;
 
 	FTimerHandle DestructionTimer;
 	bool bHit = false;
+	
+private:
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	bool bDamageOwner = false;
+	
+	UPROPERTY(EditAnywhere, Category="DrawInventory", meta = (ClampMin = 0, ClampMax = 100))
+	float HitDamage = 25.0f;
+
+	UPROPERTY(EditAnywhere, Category="DrawInventory")
+	TSubclassOf<UDamageType> HitDamageType;
 };

@@ -38,12 +38,13 @@ FString FDeliveryPattern::GetHintMessage() const
 
 FString FHieroglyphicCombinationPattern::GetHintMessage() const
 {
-	FString Message = FString();
-	for (const FGameplayTag& Hieroglyphic : HieroglyphicCombination)
-	{
-		Message.Append(FString::Printf(TEXT("%s, "), *Hieroglyphic.GetTagLeafName().ToString()));
-	}
-	return Message;
+	// FString Message = FString();
+	// for (const FGameplayTag& Hieroglyphic : HieroglyphicCombination)
+	// {
+	// 	Message.Append(FString::Printf(TEXT("%s, "), *Hieroglyphic.GetTagLeafName().ToString()));
+	// }
+	// return Message;
+	return FString::Printf(TEXT("Symbols are carved on this object, it seems to be phoenician."));
 }
 
 FString FBreakablePattern::GetHintMessage() const
