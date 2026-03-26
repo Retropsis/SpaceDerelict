@@ -33,7 +33,6 @@ void UPuzzle_Delivery::ConstructPuzzle(const FIntPoint& Coordinates)
 		if (ADeliveryBox* DeliveryBox = Cast<ADeliveryBox>(Actor))
 		{
 			DeliveryBox->SetLootItemClass(ItemToSpawn);
-			DeliveryBox->SetResourceObject(Pattern->GetDeliveryPanel());
 			DeliveryBox->SetupDeliveryPanel(DerelictGameMode->ConstructDeliveryPanel(*Pattern));
 			return;
 		}
