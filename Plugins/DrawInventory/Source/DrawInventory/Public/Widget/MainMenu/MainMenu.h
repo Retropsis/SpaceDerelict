@@ -27,8 +27,20 @@ private:
 	UFUNCTION()
 	void QuitGame();
 	
+	UFUNCTION()
+	void SetDefaultMappingToAzerty();
+	
+	UFUNCTION()
+	void SetDefaultMappingToQwerty();
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> RestartButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> AzertyButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> QwertyButton;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> QuitButton;

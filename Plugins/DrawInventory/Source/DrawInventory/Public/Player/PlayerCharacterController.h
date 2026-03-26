@@ -33,6 +33,9 @@ public:
 	bool IsAimDownSight() const { return bAimDownSight; }
 	virtual void RestartLevel() override;
 	UHUDWidget* GetHUDWidget() const { return HUDWidget; }
+	
+	void SetDefaultMappingToAzerty() const;
+	void SetDefaultMappingToQwerty() const;
 
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
@@ -78,6 +81,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TArray<TObjectPtr<UInputMappingContext>> DefaultIMCs;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TObjectPtr<UInputMappingContext> QwertyIMC;
+	
+	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
+	TObjectPtr<UInputMappingContext> AzertyIMC;
 	
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TObjectPtr<UInputAction> PrimaryInteractAction;

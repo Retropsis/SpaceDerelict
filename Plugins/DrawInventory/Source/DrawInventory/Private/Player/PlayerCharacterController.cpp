@@ -36,6 +36,20 @@ void APlayerCharacterController::RestartLevel()
 	Super::RestartLevel();
 }
 
+void APlayerCharacterController::SetDefaultMappingToAzerty() const
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	Subsystem->RemoveMappingContext(QwertyIMC);
+	Subsystem->AddMappingContext(AzertyIMC, 0);
+}
+
+void APlayerCharacterController::SetDefaultMappingToQwerty() const
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	Subsystem->RemoveMappingContext(AzertyIMC);
+	Subsystem->AddMappingContext(QwertyIMC, 0);
+}
+
 void APlayerCharacterController::BeginPlay()
 {
 	Super::BeginPlay();
