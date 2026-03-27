@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UHelpPage;
 class UMainMenu;
 class UKnowledgeComponent;
 class UKnowledgeLog;
@@ -33,6 +34,7 @@ public:
 	void SetInputModeGameAndUI() const;
 	void OpenMainMenu();
 	void ToggleMainMenu();
+	void ToggleHelpPage();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "DrawInventory")
 	void ShowPickupMessage(const FString& Message);
@@ -90,8 +92,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UMainMenu> MainMenu;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UHelpPage> HelpPage;
+
 	bool bKnowledgeLogOpen{false};
 	bool bMainMenuOpen{false};
+	bool bHelpPageOpen{false};
 
 	UFUNCTION()
 	void OnNoRoom();

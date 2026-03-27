@@ -10,6 +10,7 @@
 #include "Item/ItemTags.h"
 #include "Widget/DrawInventory/HUD/HUDCounter.h"
 #include "Widget/HUD/ActiveEquipmentWidget.h"
+#include "Widget/HUD/HelpPage.h"
 #include "Widget/HUD/InfoMessage.h"
 #include "Widget/HUD/RadialProgressBar.h"
 #include "Widget/Knowledge/KnowledgeLog.h"
@@ -97,6 +98,19 @@ void UHUDWidget::ToggleMainMenu()
 	{
 		OpenMainMenu();
 	}
+}
+
+void UHUDWidget::ToggleHelpPage()
+{
+	if (bHelpPageOpen)
+	{
+		HelpPage->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		HelpPage->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	bHelpPageOpen = !bHelpPageOpen;
 }
 
 void UHUDWidget::CloseKnowledgeLog()

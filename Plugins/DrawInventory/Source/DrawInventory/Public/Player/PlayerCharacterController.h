@@ -71,6 +71,7 @@ private:
 	void StopFiring();
 	void ToggleKnowledgeLog();
 	void ToggleMainMenu();
+	void ToggleHelpPage();
 	void ToggleWeapon(int32 Index);
 
 	UFUNCTION(BlueprintCallable, Category="DrawInventory")
@@ -123,6 +124,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category ="DrawInventory")
 	TObjectPtr<UInputAction> MenuAction;
+	
+	UPROPERTY(EditAnywhere, Category ="DrawInventory")
+	TObjectPtr<UInputAction> HelpAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="DrawInventory")
 	TSubclassOf<UHUDWidget> HUDWidgetClass;

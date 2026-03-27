@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "Data/DestinationData.h"
 #include "DrawManagement/FastArray/RoomFastArray.h"
-#include "DrawManagement/Room/RoomActor.h"
 #include "InventoryManagement/Component/InventoryComponent.h"
 #include "DrawComponent.generated.h"
 

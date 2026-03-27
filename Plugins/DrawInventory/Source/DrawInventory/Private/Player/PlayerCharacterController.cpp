@@ -116,6 +116,7 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
 	EnhancedInputComponent->BindAction(KnowledgeAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleKnowledgeLog);
 	EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleMainMenu);
+	EnhancedInputComponent->BindAction(HelpAction, ETriggerEvent::Started, this, &APlayerCharacterController::ToggleHelpPage);
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
@@ -186,6 +187,11 @@ void APlayerCharacterController::ToggleKnowledgeLog()
 void APlayerCharacterController::ToggleMainMenu()
 {
 	HUDWidget->ToggleMainMenu();
+}
+
+void APlayerCharacterController::ToggleHelpPage()
+{
+	HUDWidget->ToggleHelpPage();
 }
 
 void APlayerCharacterController::PrimaryInteract()

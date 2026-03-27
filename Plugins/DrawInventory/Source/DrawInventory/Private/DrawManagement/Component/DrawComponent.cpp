@@ -260,7 +260,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 	if (!bSuccess) return;;
 	
 	LevelStreaming->OnLevelShown.AddDynamic(this, &ThisClass::OnLevelShown);
-	RoomShown.AddWeakLambda(this, [this, LevelStreaming, Result, RoomToSpawn] ()
+	RoomShown.AddWeakLambda(this, [this, LevelStreaming, Result, RoomToSpawn, RoomFragment] ()
 	{
 		ARoomActor* RoomActor = Cast<ARoomActor>(ULevelUtility::GetFirstActorOfClassFromStreamLevel(LevelStreaming, ARoomActor::StaticClass()));
 		if (!IsValid(RoomActor))
@@ -272,6 +272,7 @@ void UDrawComponent::Server_DrawnRoomSlotClicked_Implementation(UInventoryItem* 
 		RoomActor->ConstructDestinationOffsets();
 		RoomActor->ConstructRoom(Result, RoomSize);
 		RoomActor->OnPlayerEnter.AddDynamic(this, &ThisClass::OnPlayerEnterRoom);
+		RoomFragment->SetSpawnedRoomActor(RoomActor);
 		SpawnValuables(RoomToSpawn, RoomActor);
 	});
 
