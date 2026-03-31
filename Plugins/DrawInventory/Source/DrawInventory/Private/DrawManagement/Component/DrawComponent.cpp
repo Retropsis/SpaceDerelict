@@ -537,6 +537,7 @@ void UDrawComponent::OpenUnlockWidget()
 {
 	if (!IsValid(UnlockWidget)) return;
 
+	OnToggleHUD.Broadcast(false);
 	UnlockWidget->SetVisibility(ESlateVisibility::Visible);
 	bUnlockWidgetOpen = true;
 
@@ -552,6 +553,7 @@ void UDrawComponent::CloseUnlockWidget()
 {
 	if (!IsValid(UnlockWidget)) return;
 
+	OnToggleHUD.Broadcast(true);
 	UnlockWidget->SetVisibility(ESlateVisibility::Collapsed);
 	bUnlockWidgetOpen = false;
 

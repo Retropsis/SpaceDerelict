@@ -32,6 +32,7 @@ public:
 	bool IsGloveRaised() const { return bGloveRaised; }
 	bool IsAimDownSight() const { return bAimDownSight; }
 	virtual void RestartLevel() override;
+	void RestartGame();
 	UHUDWidget* GetHUDWidget() const { return HUDWidget; }
 	
 	void SetDefaultMappingToAzerty() const;
@@ -153,4 +154,5 @@ private:
 	FRotator SavedPlayerRotation = FRotator::ZeroRotator;
 	FGameplayTag PreviousLayer = FGameplayTag::EmptyTag;
 	bool bAimDownSight{false};
+	FTimerHandle PositionUpdateTimer;
 };

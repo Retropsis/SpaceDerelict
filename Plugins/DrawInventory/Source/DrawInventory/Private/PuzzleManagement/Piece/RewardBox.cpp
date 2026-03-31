@@ -4,16 +4,17 @@
 #include "Game/DerelictGameMode.h"
 #include "Item/Component/ItemComponent.h"
 #include "Item/Fragment/ItemFragment.h"
+#include "PuzzleManagement/PuzzleTags.h"
 #include "PuzzleManagement/Component/LockComponent.h"
 
 void ARewardBox::SpawnReward()
 {
 	if (bHasSpawned) return;
 	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (IsValid(LootItemClass))
+	if (LootItemClass)
 	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		const AActor* Item = GetWorld()->SpawnActor<AActor>(LootItemClass, GetSpawnTransform(), SpawnParams);
 		
 		const ADerelictGameMode* DerelictGameMode = Cast<ADerelictGameMode>(GetWorld()->GetAuthGameMode());
@@ -21,7 +22,7 @@ void ARewardBox::SpawnReward()
 		
 		if (UItemComponent* ItemComponent = Item->FindComponentByClass<UItemComponent>())
 		{
-			const FPuzzleTagFragment* PuzzleFragment = ItemComponent->GetItemManifest().GetFragmentOfTypeWithTag<FPuzzleTagFragment>(Fragment::PuzzleTag);
+			FPuzzleTagFragment* PuzzleFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeWithTagMutable<FPuzzleTagFragment>(Fragment::PuzzleTag);
 			if (!PuzzleFragment) return;
 
 			FTextFragment* TextFragment = ItemComponent->GetItemManifestMutable().GetFragmentOfTypeWithTagMutable<FTextFragment>(Fragment::FlavorText);

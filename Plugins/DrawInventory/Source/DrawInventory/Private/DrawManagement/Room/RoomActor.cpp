@@ -75,7 +75,7 @@ void ARoomActor::ConstructDoors(const FDestinationAvailabilityResult& Result)
 #endif
 		float Yaw{ 0 };
 
-		UStaticMeshComponent* StaticMeshComponent = FindComponentByClass<UStaticMeshComponent>();
+		UStaticMeshComponent* StaticMeshComponent = FindComponentByTag<UStaticMeshComponent>(FName("Room"));
 		if (IsValid(StaticMeshComponent))
 		{
 			Door->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Availability.Socket);

@@ -19,8 +19,6 @@ void ADerelictGameMode::ConstructPuzzleMeta()
 	for (const TInstancedStruct<FPuzzlePattern>& PuzzlePattern : PuzzleInfo->GetPuzzlePatterns())
 	{
 		PuzzleData.Add(PuzzlePattern);
-
-		UE_LOG(LogTemp, Display, TEXT("Puzzle Data:"));
 	}
 }
 

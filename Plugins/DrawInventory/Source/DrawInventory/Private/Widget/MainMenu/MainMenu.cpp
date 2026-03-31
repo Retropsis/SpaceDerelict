@@ -19,7 +19,10 @@ void UMainMenu::NativeConstruct()
 
 void UMainMenu::RestartGame()
 {
-	UGameplayStatics::OpenLevel(GetOwningPlayer(), GetWorld()->GetCurrentLevel()->GetFName());
+	if (APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(GetOwningPlayer()))
+	{
+		PlayerCharacterController->RestartGame();
+	}
 }
 
 void UMainMenu::QuitGame()

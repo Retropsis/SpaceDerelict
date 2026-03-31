@@ -22,10 +22,13 @@ void UPuzzle_Delivery::ConstructPuzzle(const FIntPoint& Coordinates)
 	const FDeliveryPattern* Pattern = DerelictGameMode->GetPuzzleDataOfTypeWithTag<FDeliveryPattern>(Puzzle::Pattern::Delivery);
 	
 	TSubclassOf<AActor> ItemToSpawn = nullptr;
-	if (Pattern->GetRewardToCoordinates().Contains(Coordinates))
+	for (const TTuple<FIntPoint, FPuzzleReward>& Pair : Pattern->GetRewardToCoordinates())
 	{
-		const FPuzzleReward* Reward = Pattern->GetRewardToCoordinates().Find(Coordinates);
-		ItemToSpawn = Reward->GetLootItemClass();
+		if (Pair.Key == Coordinates)
+		{
+			ItemToSpawn = Pair.Value.GetLootItemClass();
+			break;
+		}
 	}
 	
 	for (const TObjectPtr<AActor>& Actor : GetOwner()->GetLevel()->Actors)

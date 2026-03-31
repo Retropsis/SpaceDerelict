@@ -26,6 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	TSubclassOf<AActor> LootItemClass;
+	UPROPERTY()
+	TSubclassOf<AActor> LootItemClass = nullptr;
 	bool bHasSpawned = false;
 };

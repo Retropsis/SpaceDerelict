@@ -103,7 +103,7 @@ struct FPuzzleTagFragment : public FItemFragment
 	GENERATED_BODY()
 
 public:
-	FGameplayTag GetPuzzleTag() const { return PuzzleTag; }
+	const FGameplayTag& GetPuzzleTag() const { return PuzzleTag; }
 	void SetPuzzleTag(FGameplayTag Tag) { PuzzleTag = Tag; }
 
 private:

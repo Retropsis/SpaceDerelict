@@ -36,6 +36,13 @@ void APlayerCharacterController::RestartLevel()
 	Super::RestartLevel();
 }
 
+void APlayerCharacterController::RestartGame()
+{
+	GetWorld()->GetTimerManager().ClearTimer(PositionUpdateTimer);
+	PositionUpdateTimer.Invalidate();
+	UGameplayStatics::OpenLevel(this, GetWorld()->GetCurrentLevel()->GetFName());
+}
+
 void APlayerCharacterController::SetDefaultMappingToAzerty() const
 {
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
@@ -76,7 +83,6 @@ void APlayerCharacterController::OnPossess(APawn* aPawn)
 
 void APlayerCharacterController::SetTimerPlayerPositionUpdate()
 {
-	FTimerHandle PositionUpdateTimer;
 	GetWorld()->GetTimerManager().SetTimer(PositionUpdateTimer, [this] ()
 	{
 		const APawn* Pawn = GetPawn();
@@ -280,7 +286,7 @@ void APlayerCharacterController::ToggleInventory()
 	}
 	else
 	{
-		HUDWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+		HUDWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

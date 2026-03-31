@@ -90,6 +90,7 @@ void UHUDWidget::OpenMainMenu()
 
 void UHUDWidget::ToggleMainMenu()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ToggleMainMenu"));
 	if (bMainMenuOpen)
 	{
 		CloseMainMenu();
@@ -157,7 +158,7 @@ void UHUDWidget::InitializeActiveEquipmentWidget()
 
 void UHUDWidget::ToggleHUD(bool bShow)
 {
-	SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+	SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
 
 void UHUDWidget::UpdateHUDCounter(const FGameplayTag& ItemType, int32 NewCount)
